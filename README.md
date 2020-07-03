@@ -38,3 +38,24 @@ name: "hello",
 x: 3.6,
 locked: true
 }
+
+## Protocol
+
+### messages C -> S
+
+connect
+disconnect
+openDocument -> clientId
+closeDocument
+
+create
+remove
+update
+
+query
+
+## message S -> C
+
+create
+remove
+update
