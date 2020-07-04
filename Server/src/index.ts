@@ -3,7 +3,9 @@ import express from "express";
 import http from "http";
 import socketIO from "socket.io";
 import debug from "debug";
-import documentService from "./DocumentService";
+import projectService from "./ProjectService";
+import clientService from "./ClientService";
+import { ChangeDataType } from "./types";
 
 const serverDebug = debug("server");
 const ioDebug = debug("io");
@@ -51,19 +53,33 @@ io.on("connection", (socket) => {
     );
   });
 
-  socket.on("open-document", async (documentId) => {
-    socketDebug(`socket:${socket.id} open-document:${documentId}`);
-    const document = await documentService.open(documentId);
-    if (document) {
-      socket.join(documentId);
-      // if (io.sockets.adapter.rooms[documentId].length <= 1) {
+  socket.on("open-project", async (projectId) => {
+    const clientId = clientService.connectClient(socket.id, projectId);
+
+    socketDebug(`socket:${socket.id} open-project:${projectId}`);
+    const project = await projectService.open(projectId);
+    if (project) {
+      socket.join(projectId);
       const socketId = socket.id;
-      io.to(socket.id).emit("send-document", document);
-      // }
+      io.to(socket.id).emit("send-clientid", clientId);
+      io.to(socket.id).emit("send-project", project);
+    }
+  });
+
+  socket.on("change-data", async (changeData: ChangeDataType[]) => {
+    socketDebug(`socket:${socket.id} change-data`);
+    const projectId = clientService.getProjectIdBySocketId(socket.id);
+    if (projectId) {
+      const project = await projectService.get(projectId);
+      if (project) {
+        const result = await project.changeData(changeData);
+      }
     }
   });
 
   socket.on("disconnecting", () => {
+    clientService.disconnectClient(socket.id);
+
     socketDebug("disconnecting...", socket.id);
     const rooms = io.sockets.adapter.rooms;
     for (const roomID in socket.rooms) {

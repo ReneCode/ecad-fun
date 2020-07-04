@@ -17,6 +17,26 @@ async change data
 
 # Server
 
+## parent property
+
+{parentId:fIndex}
+
+```js
+E1 = { id: "4" }
+E2 = { parent: "4:5" }
+E3 = { parent: "4:6" }
+=> E1.children = [E2, E3]
+
+E4 = { parent: "4:55" }
+=> E1.children = [E2, E4, E3]
+
+E5 = { parent: "4:5"}
+=> E1.children = [E2, E5, E4, E3]
+=> fix E5 = { parent: "4:51"}
+```
+
+if fIndex property is already taken, that change it to a new fIndex straight after the current fIndex. For that query all the objects with the same parentId.
+
 ## Multiplayer
 
 - ClientId holen / ClientService

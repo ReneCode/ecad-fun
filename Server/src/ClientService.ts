@@ -1,6 +1,6 @@
 type ClientRecord = {
   socketId: string;
-  documentId: string;
+  projectId: string;
   clientId: number;
 };
 
@@ -8,15 +8,22 @@ type ClientRecord = {
 let clientRecordDb: ClientRecord[] = [];
 
 class ClientService {
+  getProjectIdBySocketId(socketId: string) {
+    const r = clientRecordDb.find((r) => r.socketId === socketId);
+    return r?.projectId;
+  }
   constructor() {}
 
-  // return clientId
-  public connectClient(socketId: string, documentId: string): number {
+  /**
+   * saves combination socketId + projectId and create a unique clientId
+   * @return clientId
+   */
+  public connectClient(socketId: string, projectId: string): number {
     if (this.clientAlreadyConnected(socketId)) {
       throw new Error(`client with socketId: ${socketId} already connected`);
     }
-    const clientId = this.getNextClientIdForDocument(documentId);
-    this.add(socketId, documentId, clientId);
+    const clientId = this.getNextClientIdForProject(projectId);
+    this.add(socketId, projectId, clientId);
     return clientId;
   }
 
@@ -30,9 +37,9 @@ class ClientService {
     return !!clientRecordDb.find((r) => r.socketId === socketId);
   }
 
-  private getNextClientIdForDocument(documentId: string) {
+  private getNextClientIdForProject(projectId: string) {
     const ids = clientRecordDb
-      .filter((r) => r.documentId === documentId)
+      .filter((r) => r.projectId === projectId)
       .map((r) => r.clientId)
       .sort((a, b) => a - b);
 
@@ -49,8 +56,8 @@ class ClientService {
     }
   }
 
-  private add(socketId: string, documentId: string, clientId: number) {
-    const record: ClientRecord = { socketId, documentId, clientId };
+  private add(socketId: string, projectId: string, clientId: number) {
+    const record: ClientRecord = { socketId, projectId: projectId, clientId };
     clientRecordDb.push(record);
   }
 

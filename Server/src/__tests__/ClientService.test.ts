@@ -4,21 +4,21 @@ describe("ClientService", () => {
   beforeEach(() => {});
 
   it("connect", () => {
-    const documentId = "FILE";
+    const projectId = "FILE";
     const socketIdA = "SOCKET-A";
     const socketIdB = "SOCKET-B";
     const socketIdC = "SOCKET-C";
 
-    const clientIdA = clientService.connectClient(socketIdA, documentId);
+    const clientIdA = clientService.connectClient(socketIdA, projectId);
     expect(clientIdA).toBe(1);
 
-    const clientIdB = clientService.connectClient(socketIdB, documentId);
+    const clientIdB = clientService.connectClient(socketIdB, projectId);
     expect(clientIdB).toBe(2);
 
     clientService.disconnectClient(socketIdA);
 
     // recycle disconnected id
-    const clientIdC = clientService.connectClient(socketIdC, documentId);
+    const clientIdC = clientService.connectClient(socketIdC, projectId);
     expect(clientIdC).toBe(1);
   });
 
