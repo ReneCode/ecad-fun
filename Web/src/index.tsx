@@ -1,16 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
+
+import { Provider as OvermindProvider } from "overmind-react";
+
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
 import Routing from "./Routing";
+import { overmind } from "./overmind";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <Routing />
-    </Router>
+    <OvermindProvider value={overmind}>
+      <Router>
+        <Routing />
+      </Router>
+    </OvermindProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
