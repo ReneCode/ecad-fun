@@ -1,7 +1,12 @@
+import { ECadBaseElement } from "../element";
+
 export type AppState = {
-  eventType: "pointermove";
   clientX: number;
   clientY: number;
   pointerX: number;
   pointerY: number;
+  width: number;
+  height: number;
+  editingElement: ECadBaseElement | null;
+  elements: ECadBaseElement[];
 };
