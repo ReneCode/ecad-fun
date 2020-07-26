@@ -1,10 +1,161 @@
 import React from "react";
-import Paper from "paper";
-import { actions, state } from "../overmind";
-import { canvasState, BaseElement } from "../canvas";
+// import { actions, state } from "../overmind";
+import { canvasState } from "../canvas";
 import { nanoid } from "nanoid";
+import { ECadLineElement, ECadBaseElement } from "../element";
+import { renderScene } from "../renderer";
 
-class Project extends React.Component {
+type AppState = {
+  editingElement: ECadLineElement | null;
+  elements: ECadBaseElement[];
+  width: number;
+  height: number;
+};
+
+type Props = {
+  width: number;
+  height: number;
+};
+
+class Project extends React.Component<Props> {
+  canvas: HTMLCanvasElement | null = null;
+
+  unsubscribe: (() => void)[] = [];
+
+  state: AppState = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    editingElement: null,
+    elements: [],
+  };
+
+  constructor(props: Props) {
+    super(props);
+    this.setState({ width: props.width, height: props.height });
+    this.setState = this.setState.bind(this);
+    this.onPointerDown = this.onPointerDown.bind(this);
+    this.onPointerMove = this.onPointerMove.bind(this);
+    this.onPointerUp = this.onPointerUp.bind(this);
+    console.log("AB");
+    this.unsubscribe.push(
+      canvasState.subscribe(() => {
+        // this.setState({});
+      })
+    );
+  }
+
+  componentDidMount() {
+    if (this.canvas) {
+      const elements = canvasState.getElements();
+      console.log("render");
+      renderScene(this.canvas, elements);
+    }
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe.forEach((fn) => fn());
+  }
+  /*
+  useEffect(() => {
+    if (canvasRef.current) {
+      const elements = canvasState.getElements();
+      renderScene(canvasRef.current, elements);
+    }
+    const unsubscribeFn = canvasState.subscribe(() => {
+      // if (canvasRef.current) {
+      //   const elements = canvasState.getElements();
+      //   renderScene(canvasRef.current, elements);
+      // }
+      console.log("change");
+      setState(state + 1);
+    });
+
+    return () => unsubscribeFn();
+  }, []);
+
+  useEffect(() => {
+    console.log("redraw");
+
+    if (canvasRef.current) {
+    }
+  }, [state]);
+*/
+
+  componentDidUpdate() {
+    if (this.canvas) {
+      let elements = [...canvasState.getElements()];
+      if (this.state.editingElement) {
+        elements.push(this.state.editingElement);
+      }
+      renderScene(this.canvas, elements);
+    }
+  }
+
+  private onPointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
+    console.log(event);
+    const x = Math.floor(event.clientX);
+    const y = Math.floor(event.clientY);
+
+    if (this.state.editingElement) {
+      const element = {
+        ...this.state.editingElement,
+        x2: x,
+        y2: y,
+      };
+      this.setState({ editingElement: element });
+    }
+  }
+  private onPointerUp(event: React.PointerEvent<HTMLCanvasElement>) {
+    if (this.state.editingElement) {
+      console.log(">> up");
+      canvasState.addElement(this.state.editingElement);
+      this.setState({ editingElement: null });
+    }
+  }
+
+  private onPointerDown(event: React.PointerEvent<HTMLCanvasElement>) {
+    const x = Math.floor(event.clientX);
+    const y = Math.floor(event.clientY);
+
+    const element: ECadLineElement = {
+      id: nanoid(),
+      type: "line",
+      x,
+      y,
+      x2: x,
+      y2: y,
+      color: "green",
+    };
+    this.setState({ editingElement: element });
+  }
+
+  public render() {
+    const canvasScale = window.devicePixelRatio;
+    const canvasDOMWidth = this.props.width;
+    const canvasDOMHeight = this.props.height;
+    const canvasWidth = canvasDOMWidth * canvasScale;
+    const canvasHeight = canvasDOMHeight * canvasScale;
+
+    return (
+      <canvas
+        ref={this.handleCanvasRef}
+        style={{ width: canvasDOMWidth, height: canvasDOMHeight }}
+        width={canvasWidth}
+        height={canvasHeight}
+        onPointerDown={this.onPointerDown}
+        onPointerUp={this.onPointerUp}
+        onPointerMove={this.onPointerMove}
+      ></canvas>
+    );
+  }
+
+  private handleCanvasRef = (canvas: HTMLCanvasElement) => {
+    if (canvas) {
+      this.canvas = canvas;
+    }
+  };
+
+  /*
   canvas: HTMLCanvasElement | undefined = undefined;
   cleanupFn: any[] = [];
 
@@ -16,99 +167,52 @@ class Project extends React.Component {
 
   componentDidMount() {
     this.cleanupFn.push(canvasState.subscribe(this.renderCanvas));
+
+    document.addEventListener("resize", this.handleResize, false);
   }
 
   componentWillUnmount() {
+    document.removeEventListener("resize", this.handleResize, false);
+
     this.cleanupFn.forEach((fn) => fn());
   }
 
+  handleResize() {}
+
   public render() {
-    const canvasDOMWidth = window.innerWidth;
-    const canvasDOMHeight = window.innerHeight;
+    if (!this.canvas) {
+      return null;
+    }
     const canvasScale = window.devicePixelRatio;
+    const canvasDOMWidth = this.canvas.width;
+    const canvasDOMHeight = this.canvas.height;
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
 
     return (
-      <div className="main">
-        <canvas
-          id="canvas"
-          style={{
-            width: canvasDOMWidth,
-            height: canvasDOMHeight,
-          }}
-          width={canvasWidth}
-          height={canvasHeight}
-          ref={this.handleCanvasRef}
-          onPointerDown={this.handlePointerDown}
-        ></canvas>
-      </div>
+      <canvas
+        ref={this.handleCanvasRef}
+        style={{ width: canvasDOMWidth, height: canvasDOMHeight }}
+        width={canvasWidth}
+        height={canvasHeight}
+        onPointerDown={this.handlePointerDown}
+      ></canvas>
     );
   }
 
   private renderCanvas() {
-    debugger;
     if (!this.canvas) {
       return;
     }
+
     const elements = canvasState.getElements();
-
-    const context = this.canvas.getContext("2d");
-    if (!context) {
-      return;
-    }
-
-    const canvasWidth = this.canvas.width;
-    const canvasHeight = this.canvas.height;
-    context.clearRect(0, 0, canvasWidth, canvasHeight);
-    context.fillStyle = "#eeb";
-    context.fillRect(0, 0, canvasWidth, canvasHeight);
-
-    /*
-    const rc = rough.canvas(this.canvas, { options: { roughness: 0 } });
-    const generator = rough.generator({ options: { roughness: 0 } });
-
-    const drawings: Drawable[] = [];
-    elements.forEach((e) => {
-      drawings.push(generator.circle(e.x, e.y, 140));
-    });
-
-    const json = JSON.stringify(drawings, null, 2);
-    console.log(">>", json);
-    drawings.forEach((d) => {
-      rc.draw(d);
-    });
-    */
-
-    const paperScope = new Paper.PaperScope();
-    paperScope.setup(this.canvas);
-
-    const path = new paperScope.Path.Circle(new Paper.Point(40, 60), 30);
-    path.strokeColor = new Paper.Color("red");
+    renderScene(this.canvas, elements);
   }
 
-  private handlePointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>
-  ) => {
-    const name = state.canvas.name;
-    actions.canvas.setName("A-" + name);
 
-    const element: BaseElement = {
-      id: nanoid(),
-      x: 200,
-      y: 300,
-      strokeColor: "red",
-      fillStyle: "yellow",
-    };
 
-    canvasState.addElement(element);
-  };
 
-  private handleCanvasRef = (canvas: HTMLCanvasElement) => {
-    if (canvas) {
-      this.canvas = canvas;
-    }
-  };
+  */
 }
 
 export default Project;

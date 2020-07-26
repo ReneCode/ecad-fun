@@ -14,10 +14,10 @@ declare module "overmind" {
   interface Config extends IConfig<typeof config> {}
 }
 
-export const overmind = createOvermind(config, {
-  devtools: true,
-});
+// export const overmind = createOvermind(config, {
+//   devtools: true,
+// });
 
-export const { state, actions } = overmind;
+// export const { state, actions } = overmind;
 
-export const useOvermind = createHook<typeof config>();
+// export const useOvermind = createHook<typeof config>();
