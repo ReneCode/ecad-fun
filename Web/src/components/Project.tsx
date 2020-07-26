@@ -1,18 +1,9 @@
 import React from "react";
-// import { actions, state } from "../overmind";
 import { canvasState } from "../canvas";
-import { nanoid } from "nanoid";
-import { ECadLineElement, ECadBaseElement } from "../element";
+import Toolbox from "./Toobox";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { AppState } from "../state/appState";
-
-// type AppState = {
-//   editingElement: ECadLineElement | null;
-//   elements: ECadBaseElement[];
-//   width: number;
-//   height: number;
-// };
 
 type Props = {
   width: number;
@@ -74,6 +65,29 @@ class Project extends React.Component<Props> {
     }
   }
 
+  public render() {
+    const canvasScale = window.devicePixelRatio;
+    const canvasDOMWidth = this.props.width;
+    const canvasDOMHeight = this.props.height;
+    const canvasWidth = canvasDOMWidth * canvasScale;
+    const canvasHeight = canvasDOMHeight * canvasScale;
+
+    return (
+      <div className="main">
+        <Toolbox onClick={this.onToolboxClick.bind(this)} />
+        <canvas
+          ref={this.handleCanvasRef}
+          style={{ width: canvasDOMWidth, height: canvasDOMHeight }}
+          width={canvasWidth}
+          height={canvasHeight}
+          onPointerDown={this.onPointerDown}
+          onPointerUp={this.onPointerUp}
+          onPointerMove={this.onPointerMove}
+        ></canvas>
+      </div>
+    );
+  }
+
   private onPointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
     this.executePointerEvent("pointerMove", event);
   }
@@ -84,24 +98,8 @@ class Project extends React.Component<Props> {
     this.executePointerEvent("pointerDown", event);
   }
 
-  public render() {
-    const canvasScale = window.devicePixelRatio;
-    const canvasDOMWidth = this.props.width;
-    const canvasDOMHeight = this.props.height;
-    const canvasWidth = canvasDOMWidth * canvasScale;
-    const canvasHeight = canvasDOMHeight * canvasScale;
-
-    return (
-      <canvas
-        ref={this.handleCanvasRef}
-        style={{ width: canvasDOMWidth, height: canvasDOMHeight }}
-        width={canvasWidth}
-        height={canvasHeight}
-        onPointerDown={this.onPointerDown}
-        onPointerUp={this.onPointerUp}
-        onPointerMove={this.onPointerMove}
-      ></canvas>
-    );
+  private onToolboxClick(action: string) {
+    this.actionMananger.startAction(action, this.state);
   }
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {

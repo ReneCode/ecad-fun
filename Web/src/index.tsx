@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 // import { Provider as OvermindProvider } from "overmind-react";
 
-import "./index.css";
+import "./index.scss";
 import * as serviceWorker from "./serviceWorker";
 
 import Routing from "./Routing";

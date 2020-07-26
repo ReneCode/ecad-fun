@@ -1,4 +1,8 @@
-import { ECadBaseElement, ECadLineElement } from "../element";
+import {
+  ECadBaseElement,
+  ECadLineElement,
+  ECadCircleElement,
+} from "../element";
 
 export const renderScene = (
   canvas: HTMLCanvasElement,
@@ -28,8 +32,21 @@ function renderElement(
       const lineElement = element as ECadLineElement;
       context.moveTo(lineElement.x, lineElement.y);
       context.lineTo(lineElement.x2, lineElement.y2);
+      context.strokeStyle = lineElement.color;
       context.stroke();
-      context.strokeStyle = lineElement.color || "black";
+      break;
+
+    case "circle":
+      const circleElement = element as ECadCircleElement;
+      context.arc(
+        circleElement.x,
+        circleElement.y,
+        circleElement.radius,
+        0,
+        Math.PI * 2
+      );
+      context.strokeStyle = circleElement.color;
+      context.stroke();
       break;
   }
   context.beginPath();

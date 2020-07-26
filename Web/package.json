@@ -12,6 +12,7 @@
     "@types/react-dom": "^16.9.0",
     "dotenv": "^8.2.0",
     "nanoid": "3.1.10",
+    "node-sass": "4.14.1",
     "overmind": "^24.1.1",
     "overmind-react": "^25.1.1",
     "paper": "0.12.11",

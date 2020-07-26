@@ -17,3 +17,24 @@ html,
   width: 100%;
   height: 100%;
 }
+
+.main {
+}
+
+.toolbox {
+  position: fixed;
+  background-color: #eeeeee88;
+  padding: 10px;
+  border: 1px solid #aaaaaa88;
+  border-radius: 5px;
+  top: 10px;
+  left: 10px;
+  button {
+    &:hover {
+      cursor: pointer;
+    }
+    font-size: 1rem;
+    margin: 5px;
+    border-radius: 5px;
+  }
+}

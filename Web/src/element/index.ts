@@ -10,3 +10,7 @@ export type ECadLineElement = ECadBaseElement & {
   x2: number;
   y2: number;
 };
+
+export type ECadCircleElement = ECadBaseElement & {
+  radius: number;
+};

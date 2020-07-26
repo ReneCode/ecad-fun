@@ -8,5 +8,5 @@ export type AppState = {
   width: number;
   height: number;
   editingElement: ECadBaseElement | null;
-  elements: ECadBaseElement[];
+  elements: readonly ECadBaseElement[];
 };
