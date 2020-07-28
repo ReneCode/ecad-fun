@@ -1,8 +1,13 @@
+# ecad.fun
+
+https://www.youtube.com/watch?v=6arkndScw7A&t=649s
+https://www.youtube.com/watch?v=IcfhcJrtJqI
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the project directory, you can run: elaborate
 
 ### `yarn start`
 

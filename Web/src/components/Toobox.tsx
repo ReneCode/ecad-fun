@@ -7,6 +7,7 @@ type Props = {
 const Toolbox: React.FC<Props> = ({ onClick }) => {
   return (
     <div className="toolbox">
+      <ToolButton onClick={() => onClick("select")}>select</ToolButton>
       <ToolButton onClick={() => onClick("line")}>line</ToolButton>
       <ToolButton onClick={() => onClick("circle")}>circle</ToolButton>
     </div>

@@ -1,10 +1,13 @@
 import { AppState } from "../state/appState";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
+import { actionHover } from "./actionHover";
+import { actionSelect } from "./actionSelect";
 
 export type EventType = "start" | "pointerMove" | "pointerUp" | "pointerDown";
 
-type PointerFn = (appState: AppState) => void;
+type PointerFn = (appState: AppState) => {} | void;
+type setStateFn = (data: any) => void;
 
 export type Action = {
   name: string;
@@ -18,11 +21,19 @@ export class ActionManager {
   allActions: Action[] = [];
   basicActions: Action[] = [];
   currentActionName: string = "";
+  setState: setStateFn;
+
+  constructor({ setState }: { setState: setStateFn }) {
+    this.setState = setState;
+  }
 
   register(action: Action) {
     this.allActions.push(action);
   }
   registerAll() {
+    this.basicActions.push(actionHover);
+
+    this.register(actionSelect);
     this.register(actionLine);
     this.register(actionCircle);
   }
@@ -32,13 +43,15 @@ export class ActionManager {
       this.executeActionMethode(action, type, state);
     }
 
-    const currentAction = this.allActions.find(
-      (action) => action.name === this.currentActionName
-    );
-    if (currentAction) {
-      this.executeActionMethode(currentAction, type, state);
-    } else {
-      console.error("can't find action:", this.currentActionName);
+    if (this.currentActionName) {
+      const currentAction = this.allActions.find(
+        (action) => action.name === this.currentActionName
+      );
+      if (currentAction) {
+        this.executeActionMethode(currentAction, type, state);
+      } else {
+        throw new Error(`can't find action: ${this.currentActionName}`);
+      }
     }
   }
 
@@ -54,7 +67,10 @@ export class ActionManager {
   ) {
     const fn = action[type];
     if (fn) {
-      fn(state);
+      const newState = fn(state);
+      if (newState) {
+        this.setState(newState);
+      }
     }
   }
 }

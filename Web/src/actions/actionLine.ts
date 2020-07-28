@@ -5,9 +5,8 @@ import { nanoid } from "nanoid";
 
 export const actionLine: Action = {
   name: "line",
-  pointerDown: (state: AppState) => {
-    console.log(">>down");
 
+  pointerDown: (state: AppState) => {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadLineElement = {
@@ -19,12 +18,12 @@ export const actionLine: Action = {
       y2: y,
       color: "green",
     };
-    state.editingElement = element;
+    return {
+      editingElement: element,
+    };
   },
 
   pointerMove: (state: AppState) => {
-    console.log(">>move");
-
     if (state.editingElement) {
       const x = state.pointerX;
       const y = state.pointerY;
@@ -34,16 +33,18 @@ export const actionLine: Action = {
         x2: x,
         y2: y,
       };
-      state.editingElement = element;
+      return {
+        editingElement: element,
+      };
     }
   },
 
   pointerUp: (state: AppState) => {
-    console.log(">>up");
-
     if (state.editingElement) {
-      state.elements = [...state.elements, state.editingElement];
-      state.editingElement = null;
+      return {
+        elements: [...state.elements, state.editingElement],
+        editingElement: null,
+      };
     }
   },
 };

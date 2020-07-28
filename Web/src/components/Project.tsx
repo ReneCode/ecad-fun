@@ -16,6 +16,7 @@ class Project extends React.Component<Props> {
   unsubscribe: (() => void)[] = [];
 
   state: AppState = {
+    cursor: "default",
     width: window.innerWidth,
     height: window.innerHeight,
     editingElement: null,
@@ -39,7 +40,9 @@ class Project extends React.Component<Props> {
       })
     );
 
-    this.actionMananger = new ActionManager();
+    this.actionMananger = new ActionManager({
+      setState: this.setState.bind(this),
+    });
 
     this.actionMananger.registerAll();
   }
@@ -57,6 +60,8 @@ class Project extends React.Component<Props> {
 
   componentDidUpdate() {
     if (this.canvas) {
+      console.log("didupdate");
+      this.canvas.style.cursor = this.state.cursor;
       let elements = [...this.state.elements];
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
@@ -119,7 +124,7 @@ class Project extends React.Component<Props> {
       pointerY: y,
     });
     this.actionMananger.execute(eventType, this.state);
-    this.setState({});
+    // this.setState({});
   }
 }
 

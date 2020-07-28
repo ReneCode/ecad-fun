@@ -6,6 +6,7 @@ import { distanceBetweenPoints } from "../utils/geometric";
 
 export const actionCircle: Action = {
   name: "circle",
+
   pointerDown: (state: AppState) => {
     const x = state.pointerX;
     const y = state.pointerY;
@@ -17,7 +18,9 @@ export const actionCircle: Action = {
       radius: 0,
       color: "black",
     };
-    state.editingElement = element;
+    return {
+      editingElement: element,
+    };
   },
 
   pointerMove: (state: AppState) => {
@@ -34,14 +37,18 @@ export const actionCircle: Action = {
         ...state.editingElement,
         radius,
       };
-      state.editingElement = element;
+      return {
+        editingElement: element,
+      };
     }
   },
 
   pointerUp: (state: AppState) => {
     if (state.editingElement) {
-      state.elements = [...state.elements, state.editingElement];
-      state.editingElement = null;
+      return {
+        elements: [...state.elements, state.editingElement],
+        editingElement: null,
+      };
     }
   },
 };

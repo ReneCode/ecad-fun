@@ -1,6 +1,7 @@
 import { ECadBaseElement } from "../element";
 
 export type AppState = {
+  cursor: string;
   clientX: number;
   clientY: number;
   pointerX: number;
