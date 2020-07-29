@@ -38,3 +38,14 @@ html,
     border-radius: 5px;
   }
 }
+
+.status {
+  position: fixed;
+  background-color: #eeeeee88;
+  padding: 10px;
+  border: 1px solid #aaaaaa88;
+  border-radius: 5px;
+  bottom: 20px;
+  left: 10px;
+  font-family: "Courier New", Courier, monospace;
+}

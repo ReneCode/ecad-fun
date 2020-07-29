@@ -1,6 +1,7 @@
 import { AppState } from "../state/appState";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
+import { actionRectangle } from "./actionRectangle";
 import { actionHover } from "./actionHover";
 import { actionSelect } from "./actionSelect";
 
@@ -36,6 +37,7 @@ export class ActionManager {
     this.register(actionSelect);
     this.register(actionLine);
     this.register(actionCircle);
+    this.register(actionRectangle);
   }
 
   public execute(type: EventType, state: AppState) {

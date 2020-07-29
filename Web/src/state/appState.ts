@@ -1,4 +1,4 @@
-import { ECadBaseElement } from "../element";
+import { ECadBaseElement } from "../types";
 
 export type AppState = {
   cursor: string;

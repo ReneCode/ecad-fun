@@ -1,22 +1,22 @@
 import { Action } from "./manager";
 import { AppState } from "../state/appState";
-import { ECadCircleElement } from "../types";
+import { ECadRectangleElement } from "../types";
 import { nanoid } from "nanoid";
-import { distanceBetweenPoints } from "../utils/geometric";
 
-export const actionCircle: Action = {
-  name: "circle",
+export const actionRectangle: Action = {
+  name: "line",
 
   pointerDown: (state: AppState) => {
     const x = state.pointerX;
     const y = state.pointerY;
-    const element: ECadCircleElement = {
+    const element: ECadRectangleElement = {
       id: nanoid(),
-      type: "circle",
+      type: "rectangle",
       x,
       y,
-      radius: 0,
-      color: "black",
+      w: 0,
+      h: 0,
+      color: "green",
     };
     return {
       editingElement: element,
@@ -25,13 +25,13 @@ export const actionCircle: Action = {
 
   pointerMove: (state: AppState) => {
     if (state.editingElement) {
-      const { x, y } = state.editingElement;
-      const nx = state.pointerX;
-      const ny = state.pointerY;
-      const radius = distanceBetweenPoints(x, y, nx, ny);
-      const element: ECadCircleElement = {
+      const x = state.pointerX;
+      const y = state.pointerY;
+
+      const element: ECadRectangleElement = {
         ...state.editingElement,
-        radius,
+        w: x - state.editingElement.x,
+        h: y - state.editingElement.y,
       };
       return {
         editingElement: element,

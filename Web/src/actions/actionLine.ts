@@ -1,6 +1,6 @@
 import { Action } from "./manager";
 import { AppState } from "../state/appState";
-import { ECadLineElement } from "../element";
+import { ECadLineElement } from "../types";
 import { nanoid } from "nanoid";
 
 export const actionLine: Action = {
@@ -28,7 +28,7 @@ export const actionLine: Action = {
       const x = state.pointerX;
       const y = state.pointerY;
 
-      const element = {
+      const element: ECadLineElement = {
         ...state.editingElement,
         x2: x,
         y2: y,

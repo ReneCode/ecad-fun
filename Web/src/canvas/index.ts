@@ -1,13 +1,5 @@
 import * as Dispatcher from "./common/Dispatcher";
-import { ECadBaseElement } from "../element";
-
-// export type BaseElement = {
-//   id: string;
-//   x: number;
-//   y: number;
-//   strokeColor: string;
-//   fillStyle: string;
-// };
+import { ECadBaseElement } from "../types";
 
 class CanvasState {
   private elements: ECadBaseElement[] = [];

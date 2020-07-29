@@ -1,6 +1,7 @@
 import React from "react";
 import { canvasState } from "../canvas";
 import Toolbox from "./Toobox";
+import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { AppState } from "../state/appState";
@@ -60,7 +61,6 @@ class Project extends React.Component<Props> {
 
   componentDidUpdate() {
     if (this.canvas) {
-      console.log("didupdate");
       this.canvas.style.cursor = this.state.cursor;
       let elements = [...this.state.elements];
       if (this.state.editingElement) {
@@ -80,6 +80,7 @@ class Project extends React.Component<Props> {
     return (
       <div className="main">
         <Toolbox onClick={this.onToolboxClick.bind(this)} />
+        <Status x={this.state.pointerX} y={this.state.pointerY} />
         <canvas
           ref={this.handleCanvasRef}
           style={{ width: canvasDOMWidth, height: canvasDOMHeight }}
