@@ -28,8 +28,7 @@ class Project extends React.Component<Props> {
 
     viewX: 0,
     viewY: 0,
-    viewWidth: 100, // has to fix ratio of viewX/Y
-    viewHeight: 100,
+    zoom: 1.0,
 
     pointerX: 0,
     pointerY: 0,
@@ -42,7 +41,6 @@ class Project extends React.Component<Props> {
       height: props.height,
     });
 
-    this.updateViewSize(props.width, props.height);
     // this.updateScreenProjectMatrix()
     this.setState = this.setState.bind(this);
     this.onPointerDown = this.onPointerDown.bind(this);
@@ -76,9 +74,7 @@ class Project extends React.Component<Props> {
     this.unsubscribe.forEach((fn) => fn());
   }
 
-  onResize() {
-    this.updateViewSize(this.props.width, this.props.height);
-  }
+  onResize() {}
 
   componentDidUpdate() {
     if (this.canvas) {
@@ -150,21 +146,6 @@ class Project extends React.Component<Props> {
     });
     this.actionMananger.execute(eventType, this.state);
     // this.setState({});
-  }
-
-  updateViewSize(canvasWidth: number, canvasHeight: number) {
-    const ratioWidth = this.state.viewWidth / canvasWidth;
-    const ratioHeight = this.state.viewHeight / canvasHeight;
-    const ratio = Math.max(ratioHeight, ratioWidth);
-
-    const viewWidth = ratio * canvasWidth;
-    const viewHeight = ratio * canvasHeight;
-
-    console.log(ratioWidth, ratioHeight, viewWidth, viewHeight);
-    this.setState({
-      viewWidth,
-      viewHeight,
-    });
   }
 }
 

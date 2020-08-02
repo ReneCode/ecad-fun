@@ -14,8 +14,7 @@ export type AppState = {
   // project-coords view
   viewX: number;
   viewY: number;
-  viewWidth: number;
-  viewHeight: number;
+  zoom: number;
 
   // screen-coords view
   screenWidth: number;

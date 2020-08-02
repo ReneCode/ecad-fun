@@ -13,24 +13,20 @@ export const screenCoordToWorldCoord = (
   x: number,
   y: number,
   {
-    screenWidth,
     screenHeight,
     viewX,
     viewY,
-    viewWidth,
-    viewHeight,
+    zoom,
   }: {
-    screenWidth: number;
     screenHeight: number;
     viewX: number;
     viewY: number;
-    viewWidth: number;
-    viewHeight: number;
+    zoom: number;
   }
 ) => {
   return {
-    x: (x * viewWidth) / screenWidth + viewX,
-    y: ((screenHeight - y) * viewHeight) / screenHeight + viewY,
+    x: x / zoom + viewX,
+    y: (screenHeight - y) / zoom + viewY,
   };
 };
 
@@ -38,36 +34,30 @@ export const worldCoordToScreenCoord = (
   x: number,
   y: number,
   {
-    screenWidth,
     screenHeight,
     viewX,
     viewY,
-    viewWidth,
-    viewHeight,
+    zoom,
   }: {
-    screenWidth: number;
     screenHeight: number;
     viewX: number;
     viewY: number;
-    viewWidth: number;
-    viewHeight: number;
+    zoom: number;
   }
 ) => {
   return {
-    x: ((x - viewX) * screenWidth) / viewWidth,
-    y: screenHeight - ((y - viewY) * screenHeight) / viewHeight,
+    x: (x - viewX) * zoom,
+    y: screenHeight - (y - viewY) * zoom,
   };
 };
 
 export const worldLengthToScreenLength = (
   len: number,
   {
-    screenWidth,
-    viewWidth,
+    zoom,
   }: {
-    screenWidth: number;
-    viewWidth: number;
+    zoom: number;
   }
 ) => {
-  return (len * screenWidth) / viewWidth;
+  return len * zoom;
 };
