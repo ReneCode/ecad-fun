@@ -1,8 +1,19 @@
-import { ECadBaseElement, ECadLineElement, ECadCircleElement } from "../types";
+import {
+  ECadBaseElement,
+  ECadLineElement,
+  ECadCircleElement,
+  ECadRectangleElement,
+} from "../types";
+import {
+  worldCoordToScreenCoord,
+  worldLengthToScreenLength,
+} from "../utils/geometric";
+import { AppState } from "../state/appState";
 
 export const renderScene = (
   canvas: HTMLCanvasElement,
-  elements: ECadBaseElement[]
+  elements: ECadBaseElement[],
+  state: AppState
 ) => {
   const context = canvas.getContext("2d");
   if (!context) {
@@ -17,54 +28,86 @@ export const renderScene = (
   renderBackground(context, canvasWidth, canvasHeight);
 
   for (let element of elements) {
-    renderElement(context, element);
+    renderElement(context, element, state);
   }
 
-  context.beginPath();
-  context.strokeStyle = "RED";
-  context.fillStyle = "#22601355";
-  context.fillRect(200, 200, 400, 300);
+  // context.beginPath();
+  // context.strokeStyle = "RED";
+  // context.fillStyle = "#22601355";
+  // context.fillRect(200, 200, 400, 300);
 };
 
-function renderElement(
+const renderElement = (
   context: CanvasRenderingContext2D,
-  element: ECadBaseElement
-) {
+  element: ECadBaseElement,
+  state: AppState
+) => {
   context.save();
-  context.beginPath();
+  // context.beginPath();
   context.strokeStyle = element.color;
   switch (element.type) {
     case "line":
-      const lineElement = element as ECadLineElement;
-      context.moveTo(lineElement.x, lineElement.y);
-      context.lineTo(lineElement.x2, lineElement.y2);
-      context.stroke();
+      renderLineElement(context, element as ECadLineElement, state);
       break;
-
     case "circle":
-      const circleElement = element as ECadCircleElement;
-      context.arc(
-        circleElement.x,
-        circleElement.y,
-        circleElement.radius,
-        0,
-        Math.PI * 2
-      );
-      context.stroke();
+      renderCircleElement(context, element as ECadCircleElement, state);
+      break;
+    case "rectangle":
+      renderRectangleElement(context, element as ECadRectangleElement, state);
       break;
   }
   context.restore();
-}
+};
 
-function renderBackground(
+const renderBackground = (
   context: CanvasRenderingContext2D,
   canvasWidth: number,
   canvasHeight: number
-) {
+) => {
+  context.beginPath();
   context.clearRect(0, 0, canvasWidth, canvasHeight);
   context.fillStyle = "#eee";
   context.fillRect(0, 0, canvasWidth, canvasHeight);
-  // I dont't know why, but without begin/endPath the old rended canvas is not cleared
-  // context.beginPath();
-  // context.closePath();
-}
+  context.closePath();
+};
+
+const renderLineElement = (
+  context: CanvasRenderingContext2D,
+  element: ECadLineElement,
+  state: AppState
+) => {
+  const line = element as ECadLineElement;
+  const { x, y } = worldCoordToScreenCoord(line.x, line.y, state);
+  const { x: x2, y: y2 } = worldCoordToScreenCoord(line.x2, line.y2, state);
+  context.moveTo(x, y);
+  context.lineTo(x2, y2);
+  context.stroke();
+};
+
+const renderCircleElement = (
+  context: CanvasRenderingContext2D,
+  element: ECadCircleElement,
+  state: AppState
+) => {
+  const circle = element as ECadCircleElement;
+  const { x, y } = worldCoordToScreenCoord(circle.x, circle.y, state);
+  const radius = worldLengthToScreenLength(circle.radius, state);
+  //   state.offsetX,
+  //   state.offsetY
+  // );
+  context.arc(x, y, radius, 0, Math.PI * 2);
+  context.stroke();
+};
+
+const renderRectangleElement = (
+  context: CanvasRenderingContext2D,
+  element: ECadRectangleElement,
+  state: AppState
+) => {
+  const rectangle = element as ECadRectangleElement;
+  const { x, y } = worldCoordToScreenCoord(rectangle.x, rectangle.y, state);
+  const w = worldLengthToScreenLength(rectangle.w, state);
+  const h = worldLengthToScreenLength(rectangle.h, state);
+  context.rect(x, y, w, -h);
+  context.stroke();
+};

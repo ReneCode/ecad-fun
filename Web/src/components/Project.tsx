@@ -5,6 +5,7 @@ import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { AppState } from "../state/appState";
+import { screenCoordToWorldCoord as screenCoordToProjectCoord } from "../utils/geometric";
 
 type Props = {
   width: number;
@@ -18,23 +19,36 @@ class Project extends React.Component<Props> {
 
   state: AppState = {
     cursor: "default",
-    width: window.innerWidth,
-    height: window.innerHeight,
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
     editingElement: null,
     elements: [],
     clientX: 0,
     clientY: 0,
+
+    viewX: 0,
+    viewY: 0,
+    viewWidth: 100, // has to fix ratio of viewX/Y
+    viewHeight: 100,
+
     pointerX: 0,
     pointerY: 0,
   };
 
   constructor(props: Props) {
     super(props);
-    this.setState({ width: props.width, height: props.height });
+    this.setState({
+      width: props.width,
+      height: props.height,
+    });
+
+    this.updateViewSize(props.width, props.height);
+    // this.updateScreenProjectMatrix()
     this.setState = this.setState.bind(this);
     this.onPointerDown = this.onPointerDown.bind(this);
     this.onPointerMove = this.onPointerMove.bind(this);
     this.onPointerUp = this.onPointerUp.bind(this);
+    this.onResize = this.onResize.bind(this);
     this.unsubscribe.push(
       canvasState.subscribe(() => {
         // this.setState({});
@@ -51,12 +65,19 @@ class Project extends React.Component<Props> {
   componentDidMount() {
     if (this.canvas) {
       const elements = canvasState.getElements();
-      renderScene(this.canvas, elements);
+      renderScene(this.canvas, elements, this.state);
     }
+    window.addEventListener("resize", this.onResize);
   }
 
   componentWillUnmount() {
+    window.removeEventListener("resize", this.onResize);
+
     this.unsubscribe.forEach((fn) => fn());
+  }
+
+  onResize() {
+    this.updateViewSize(this.props.width, this.props.height);
   }
 
   componentDidUpdate() {
@@ -66,7 +87,7 @@ class Project extends React.Component<Props> {
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
       }
-      renderScene(this.canvas, elements);
+      renderScene(this.canvas, elements, this.state);
     }
   }
 
@@ -118,14 +139,32 @@ class Project extends React.Component<Props> {
     eventType: EventType,
     event: React.PointerEvent<HTMLCanvasElement>
   ) {
-    const x = Math.floor(event.clientX);
-    const y = Math.floor(event.clientY);
+    const { x, y } = screenCoordToProjectCoord(
+      event.clientX,
+      event.clientY,
+      this.state
+    );
     this.setState({
       pointerX: x,
       pointerY: y,
     });
     this.actionMananger.execute(eventType, this.state);
     // this.setState({});
+  }
+
+  updateViewSize(canvasWidth: number, canvasHeight: number) {
+    const ratioWidth = this.state.viewWidth / canvasWidth;
+    const ratioHeight = this.state.viewHeight / canvasHeight;
+    const ratio = Math.max(ratioHeight, ratioWidth);
+
+    const viewWidth = ratio * canvasWidth;
+    const viewHeight = ratio * canvasHeight;
+
+    console.log(ratioWidth, ratioHeight, viewWidth, viewHeight);
+    this.setState({
+      viewWidth,
+      viewHeight,
+    });
   }
 }
 

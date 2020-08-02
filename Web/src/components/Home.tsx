@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 // import { useOvermind } from "../overmind";
 
-function App() {
+const App = () => {
   // const { state, actions } = useOvermind();
 
   const handleClick = () => {
@@ -18,6 +18,6 @@ function App() {
       </header>
     </div>
   );
-}
+};
 
 export default App;

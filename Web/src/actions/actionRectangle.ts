@@ -4,7 +4,7 @@ import { ECadRectangleElement } from "../types";
 import { nanoid } from "nanoid";
 
 export const actionRectangle: Action = {
-  name: "line",
+  name: "rectangle",
 
   pointerDown: (state: AppState) => {
     const x = state.pointerX;
