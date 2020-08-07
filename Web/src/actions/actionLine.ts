@@ -1,5 +1,5 @@
 import { ECadLineElement, Action, AppState } from "../types";
-import { nanoid } from "nanoid";
+import { getRandomId } from "../utils/getRandomId";
 
 export const actionLine: Action = {
   name: "line",
@@ -8,7 +8,7 @@ export const actionLine: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadLineElement = {
-      id: nanoid(),
+      id: getRandomId(),
       type: "line",
       x,
       y,

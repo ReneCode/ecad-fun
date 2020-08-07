@@ -28,6 +28,8 @@ class Project extends React.Component<Props> {
     screenOriginY: window.innerHeight / 2,
 
     editingElement: null,
+    selectedElementIds: [],
+
     elements: [],
     clientX: 0,
     clientY: 0,
@@ -71,7 +73,7 @@ class Project extends React.Component<Props> {
     //   renderScene(this.canvas, elements, this.state, window.devicePixelRatio);
     // }
 
-    this.actionMananger.startAction("loadElements", this.state);
+    this.actionMananger.execute("loadElements", this.state);
 
     window.addEventListener("resize", this.onResize);
   }
@@ -127,27 +129,27 @@ class Project extends React.Component<Props> {
   }
 
   private onPointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
-    this.executePointerEvent("pointerMove", event);
+    this.dispatchPointerEvent("pointerMove", event);
   }
   private onPointerUp(event: React.PointerEvent<HTMLCanvasElement>) {
-    this.executePointerEvent("pointerUp", event);
+    this.dispatchPointerEvent("pointerUp", event);
   }
   private onPointerDown(event: React.PointerEvent<HTMLCanvasElement>) {
-    this.executePointerEvent("pointerDown", event);
+    this.dispatchPointerEvent("pointerDown", event);
   }
   private onWheel(event: WheelEvent) {
     event.preventDefault();
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
-      this.actionMananger.startAction("zoomPinch", this.state, event);
+      this.actionMananger.execute("zoomPinch", this.state, event);
     } else {
-      this.actionMananger.startAction("panning", this.state, event);
+      this.actionMananger.execute("panning", this.state, event);
     }
   }
 
   private onToolboxClick(action: string) {
-    this.actionMananger.startAction(action, this.state);
+    this.actionMananger.execute(action, this.state);
   }
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
@@ -163,7 +165,7 @@ class Project extends React.Component<Props> {
     }
   };
 
-  private executePointerEvent(
+  private dispatchPointerEvent(
     eventType: EventType,
     event: React.PointerEvent<HTMLCanvasElement>
   ) {
@@ -190,8 +192,7 @@ class Project extends React.Component<Props> {
       pointerX: x,
       pointerY: y,
     });
-    this.actionMananger.execute(eventType, this.state);
-    // this.setState({});
+    this.actionMananger.dispatch(eventType, this.state);
   }
 }
 

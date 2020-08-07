@@ -1,8 +1,10 @@
 export type ActionName = string;
 
+type ECadElementType = "line" | "rectangle" | "circle";
+
 export type ECadBaseElement = {
   id: string;
-  type: string;
+  type: ECadElementType;
   color: string;
   x: number;
   y: number;
@@ -43,6 +45,7 @@ export type AppState = {
   screenOriginX: number;
   screenOriginY: number;
 
+  selectedElementIds: string[];
   editingElement: ECadBaseElement | null;
   elements: readonly ECadBaseElement[];
 };

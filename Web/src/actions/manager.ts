@@ -27,8 +27,8 @@ export class ActionManager {
   }
   registerAll() {
     this.basicActions.push(actionHover);
+    this.basicActions.push(actionSelect);
 
-    this.register(actionSelect);
     this.register(actionLine);
     this.register(actionCircle);
     this.register(actionRectangle);
@@ -40,7 +40,7 @@ export class ActionManager {
     this.register(actionPanning);
   }
 
-  public execute(type: EventType, state: AppState, params: any = null) {
+  public dispatch(type: EventType, state: AppState, params: any = null) {
     for (let action of this.basicActions) {
       this.executeActionMethode(action, type, state, params);
     }
@@ -57,9 +57,9 @@ export class ActionManager {
     }
   }
 
-  public startAction(actionName: string, state: AppState, params: any = null) {
+  public execute(actionName: string, state: AppState, params: any = null) {
     this.currentActionName = actionName;
-    this.execute("start", state, params);
+    this.dispatch("start", state, params);
   }
 
   private executeActionMethode(

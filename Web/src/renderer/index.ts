@@ -9,6 +9,7 @@ import {
   worldCoordToScreenCoord,
   worldLengthToScreenLength,
 } from "../utils/geometric";
+import { getBoundingBox } from "../elements";
 
 export const renderScene = (
   canvas: HTMLCanvasElement,
@@ -29,10 +30,31 @@ export const renderScene = (
     renderElement(context, element, state);
   }
 
+  for (let id of state.selectedElementIds) {
+    const element = elements.find((el) => el.id === id);
+    if (element) {
+      const bbox = getBoundingBox(element);
+      renderBoundingBox(context, bbox, state);
+    }
+  }
+
   // context.beginPath();
   // context.strokeStyle = "RED";
   // context.fillStyle = "#22601355";
   // context.fillRect(200, 200, 400, 300);
+};
+
+const renderBoundingBox = (
+  context: CanvasRenderingContext2D,
+  { x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number },
+  state: AppState
+) => {
+  context.beginPath();
+  const { x: sx1, y: sy1 } = worldCoordToScreenCoord(x1, y1, state);
+  const { x: sx2, y: sy2 } = worldCoordToScreenCoord(x2, y2, state);
+  context.rect(sx1, sy2, sx2 - sx1, -(sy2 - sy1));
+  context.strokeStyle = "#9e9";
+  context.stroke();
 };
 
 const renderElement = (
@@ -54,6 +76,8 @@ const renderElement = (
     case "rectangle":
       renderRectangleElement(context, element as ECadRectangleElement, state);
       break;
+    default:
+      throw new Error(`bad element Type: ${element.type}`);
   }
   context.restore();
 };
