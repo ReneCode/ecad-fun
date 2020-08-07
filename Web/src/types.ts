@@ -47,7 +47,7 @@ export type AppState = {
   elements: readonly ECadBaseElement[];
 };
 
-type ActionFn = (appState: AppState) => {} | void;
+type ActionFn = (appState: AppState, params: any) => {} | void;
 
 export type Action = {
   name: string;

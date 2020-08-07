@@ -6,6 +6,7 @@ import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
 import { AppState } from "../types";
+import { Gesture } from "../utils/Gesture";
 
 type Props = {
   width: number;
@@ -15,6 +16,7 @@ type Props = {
 class Project extends React.Component<Props> {
   canvas: HTMLCanvasElement | null = null;
   actionMananger: ActionManager;
+  gesture = new Gesture();
   unsubscribe: (() => void)[] = [];
 
   state: AppState = {
@@ -49,6 +51,7 @@ class Project extends React.Component<Props> {
     this.onPointerMove = this.onPointerMove.bind(this);
     this.onPointerUp = this.onPointerUp.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.onWheel = this.onWheel.bind(this);
     this.unsubscribe.push(
       canvasState.subscribe(() => {
         // this.setState({});
@@ -117,6 +120,7 @@ class Project extends React.Component<Props> {
           onPointerDown={this.onPointerDown}
           onPointerUp={this.onPointerUp}
           onPointerMove={this.onPointerMove}
+          // onWheel={this.onWheel}
         ></canvas>
       </div>
     );
@@ -131,6 +135,14 @@ class Project extends React.Component<Props> {
   private onPointerDown(event: React.PointerEvent<HTMLCanvasElement>) {
     this.executePointerEvent("pointerDown", event);
   }
+  private onWheel(event: WheelEvent) {
+    event.preventDefault();
+
+    // note that event.ctrlKey is necessary to handle pinch zooming
+    if (event.metaKey || event.ctrlKey) {
+      this.actionMananger.startAction("zoomPinch", this.state, event);
+    }
+  }
 
   private onToolboxClick(action: string) {
     this.actionMananger.startAction(action, this.state);
@@ -139,6 +151,13 @@ class Project extends React.Component<Props> {
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
     if (canvas) {
       this.canvas = canvas;
+
+      this.canvas.addEventListener("wheel", this.onWheel, {
+        passive: false,
+      });
+    } else {
+      // unmount
+      this.canvas?.removeEventListener("wheel", this.onWheel);
     }
   };
 

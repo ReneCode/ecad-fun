@@ -4,7 +4,7 @@ import { actionRectangle } from "./actionRectangle";
 import { actionHover } from "./actionHover";
 import { actionSelect } from "./actionSelect";
 import { actionLoadElements } from "./actionLoadElements";
-import { actionZoomIn, actionZoomOut } from "./actionZoom";
+import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
 import { Action, AppState } from "../types";
 
 export type EventType = "start" | "pointerMove" | "pointerUp" | "pointerDown";
@@ -35,11 +35,12 @@ export class ActionManager {
     this.register(actionLoadElements);
     this.register(actionZoomIn);
     this.register(actionZoomOut);
+    this.register(actionZoomPinch);
   }
 
-  public execute(type: EventType, state: AppState) {
+  public execute(type: EventType, state: AppState, params: any = null) {
     for (let action of this.basicActions) {
-      this.executeActionMethode(action, type, state);
+      this.executeActionMethode(action, type, state, params);
     }
 
     if (this.currentActionName) {
@@ -47,26 +48,27 @@ export class ActionManager {
         (action) => action.name === this.currentActionName
       );
       if (currentAction) {
-        this.executeActionMethode(currentAction, type, state);
+        this.executeActionMethode(currentAction, type, state, params);
       } else {
         throw new Error(`can't find action: ${this.currentActionName}`);
       }
     }
   }
 
-  public startAction(actionName: string, state: AppState) {
+  public startAction(actionName: string, state: AppState, params: any = null) {
     this.currentActionName = actionName;
-    this.execute("start", state);
+    this.execute("start", state, params);
   }
 
   private executeActionMethode(
     action: Action,
     type: EventType,
-    state: AppState
+    state: AppState,
+    params: any
   ) {
     const fn = action[type];
     if (fn) {
-      const newState = fn(state);
+      const newState = fn(state, params);
       if (newState) {
         this.setState(newState);
       }

@@ -84,7 +84,6 @@ const renderLineElement = (
   const line = element as ECadLineElement;
   const { x, y } = worldCoordToScreenCoord(line.x, line.y, state);
   const { x: x2, y: y2 } = worldCoordToScreenCoord(line.x2, line.y2, state);
-  console.log(x, y, x2, y2);
   context.moveTo(x, y);
   context.lineTo(x2, y2);
   context.stroke();
