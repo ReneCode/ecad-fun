@@ -10,23 +10,21 @@ export const distanceBetweenPoints = (
 };
 
 export const screenCoordToWorldCoord = (
-  x: number,
-  y: number,
+  { clientX, clientY }: { clientX: number; clientY: number },
   {
-    screenHeight,
-    viewX,
-    viewY,
+    screenOriginX,
+    screenOriginY,
     zoom,
   }: {
-    screenHeight: number;
-    viewX: number;
-    viewY: number;
+    screenOriginX: number;
+    screenOriginY: number;
     zoom: number;
-  }
+  },
+  scale: number
 ) => {
   return {
-    x: x / zoom + viewX,
-    y: (screenHeight - y) / zoom + viewY,
+    x: ((clientX - screenOriginX) * scale) / zoom,
+    y: (-(clientY - screenOriginY) * scale) / zoom,
   };
 };
 
@@ -34,20 +32,19 @@ export const worldCoordToScreenCoord = (
   x: number,
   y: number,
   {
-    screenHeight,
-    viewX,
-    viewY,
+    screenOriginX,
+    screenOriginY,
     zoom,
   }: {
-    screenHeight: number;
-    viewX: number;
-    viewY: number;
+    screenOriginX: number;
+    screenOriginY: number;
     zoom: number;
-  }
+  },
+  scale: number
 ) => {
   return {
-    x: (x - viewX) * zoom,
-    y: screenHeight - (y - viewY) * zoom,
+    x: (x * zoom) / scale + screenOriginX,
+    y: screenOriginY - (y * zoom) / scale,
   };
 };
 

@@ -7,18 +7,19 @@ export type AppState = {
   clientX: number;
   clientY: number;
 
-  // project-coords of mouse/touch event
+  // world-coords of mouse/touch event
   pointerX: number;
   pointerY: number;
 
   // project-coords view
-  viewX: number;
-  viewY: number;
   zoom: number;
 
   // screen-coords view
   screenWidth: number;
   screenHeight: number;
+  // there is the word 0,0 point
+  screenOriginX: number;
+  screenOriginY: number;
 
   editingElement: ECadBaseElement | null;
   elements: readonly ECadBaseElement[];

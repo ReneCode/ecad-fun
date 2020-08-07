@@ -5,7 +5,8 @@ import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { AppState } from "../state/appState";
-import { screenCoordToWorldCoord as screenCoordToProjectCoord } from "../utils/geometric";
+import { screenCoordToWorldCoord } from "../utils/geometric";
+import { ECadLineElement } from "../types";
 
 type Props = {
   width: number;
@@ -19,15 +20,17 @@ class Project extends React.Component<Props> {
 
   state: AppState = {
     cursor: "default",
+
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
+    screenOriginX: window.innerWidth / 2,
+    screenOriginY: window.innerHeight / 2,
+
     editingElement: null,
     elements: [],
     clientX: 0,
     clientY: 0,
 
-    viewX: 0,
-    viewY: 0,
     zoom: 1.0,
 
     pointerX: 0,
@@ -61,10 +64,13 @@ class Project extends React.Component<Props> {
   }
 
   componentDidMount() {
-    if (this.canvas) {
-      const elements = canvasState.getElements();
-      renderScene(this.canvas, elements, this.state);
-    }
+    // if (this.canvas) {
+    //   const elements = canvasState.getElements();
+    //   renderScene(this.canvas, elements, this.state, window.devicePixelRatio);
+    // }
+
+    this.loadElements();
+
     window.addEventListener("resize", this.onResize);
   }
 
@@ -74,7 +80,12 @@ class Project extends React.Component<Props> {
     this.unsubscribe.forEach((fn) => fn());
   }
 
-  onResize() {}
+  onResize() {
+    this.setState({
+      screenWidth: this.canvas?.width,
+      screenHeight: this.canvas?.height,
+    });
+  }
 
   componentDidUpdate() {
     if (this.canvas) {
@@ -83,7 +94,7 @@ class Project extends React.Component<Props> {
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
       }
-      renderScene(this.canvas, elements, this.state);
+      renderScene(this.canvas, elements, this.state, 1); // window.devicePixelRatio);
     }
   }
 
@@ -135,17 +146,50 @@ class Project extends React.Component<Props> {
     eventType: EventType,
     event: React.PointerEvent<HTMLCanvasElement>
   ) {
-    const { x, y } = screenCoordToProjectCoord(
-      event.clientX,
-      event.clientY,
-      this.state
+    const { x, y } = screenCoordToWorldCoord(
+      event,
+      this.state,
+      window.devicePixelRatio
     );
+
+    if (false)
+      console.log(
+        event.clientX,
+        event.clientY,
+        "/",
+        x,
+        y,
+        "/",
+        window.devicePixelRatio,
+        this.state.zoom,
+        "/",
+        this.state.screenWidth,
+        this.state.screenHeight,
+        "/",
+        this.canvas?.width,
+        this.canvas?.height
+      );
     this.setState({
       pointerX: x,
       pointerY: y,
     });
     this.actionMananger.execute(eventType, this.state);
     // this.setState({});
+  }
+
+  private loadElements() {
+    const element: ECadLineElement = {
+      id: "1234",
+      type: "line",
+      x: 20,
+      y: 50,
+      x2: 200,
+      y2: 60,
+      color: "#222",
+    };
+    this.setState({
+      elements: [element],
+    });
   }
 }
 

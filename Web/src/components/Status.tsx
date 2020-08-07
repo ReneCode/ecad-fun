@@ -7,7 +7,7 @@ type Props = {
 const Status: React.FC<Props> = ({ x, y }) => {
   return (
     <div className="status">
-      x:{x} y:{y}
+      x:{Math.floor(x)} y:{Math.floor(y)}
     </div>
   );
 };

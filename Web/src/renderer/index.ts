@@ -13,22 +13,24 @@ import { AppState } from "../state/appState";
 export const renderScene = (
   canvas: HTMLCanvasElement,
   elements: ECadBaseElement[],
-  state: AppState
+  state: AppState,
+  scale: number
 ) => {
   const context = canvas.getContext("2d");
   if (!context) {
     return;
   }
 
-  context.resetTransform();
+  // context.resetTransform();
+  // context.scale(scale, scale);
 
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
 
-  renderBackground(context, canvasWidth, canvasHeight);
+  renderBackground(context, canvasWidth / scale, canvasHeight / scale);
 
   for (let element of elements) {
-    renderElement(context, element, state);
+    renderElement(context, element, state, scale);
   }
 
   // context.beginPath();
@@ -40,23 +42,31 @@ export const renderScene = (
 const renderElement = (
   context: CanvasRenderingContext2D,
   element: ECadBaseElement,
-  state: AppState
+  state: AppState,
+  scale: number
 ) => {
-  context.save();
+  // context.save();
+  // context.scale(scale, scale);
+
   // context.beginPath();
   context.strokeStyle = element.color;
   switch (element.type) {
     case "line":
-      renderLineElement(context, element as ECadLineElement, state);
+      renderLineElement(context, element as ECadLineElement, state, scale);
       break;
     case "circle":
-      renderCircleElement(context, element as ECadCircleElement, state);
+      renderCircleElement(context, element as ECadCircleElement, state, scale);
       break;
     case "rectangle":
-      renderRectangleElement(context, element as ECadRectangleElement, state);
+      renderRectangleElement(
+        context,
+        element as ECadRectangleElement,
+        state,
+        scale
+      );
       break;
   }
-  context.restore();
+  // context.restore();
 };
 
 const renderBackground = (
@@ -65,20 +75,33 @@ const renderBackground = (
   canvasHeight: number
 ) => {
   context.beginPath();
+  const padding = 10;
   context.clearRect(0, 0, canvasWidth, canvasHeight);
-  context.fillStyle = "#eee";
-  context.fillRect(0, 0, canvasWidth, canvasHeight);
-  context.closePath();
+  context.fillStyle = "#888";
+  context.fillRect(
+    0 + padding,
+    0 + padding,
+    canvasWidth - 2 * padding,
+    canvasHeight - 2 * padding
+  );
 };
 
 const renderLineElement = (
   context: CanvasRenderingContext2D,
   element: ECadLineElement,
-  state: AppState
+  state: AppState,
+  scale: number
 ) => {
+  context.beginPath();
   const line = element as ECadLineElement;
-  const { x, y } = worldCoordToScreenCoord(line.x, line.y, state);
-  const { x: x2, y: y2 } = worldCoordToScreenCoord(line.x2, line.y2, state);
+  const { x, y } = worldCoordToScreenCoord(line.x, line.y, state, scale);
+  const { x: x2, y: y2 } = worldCoordToScreenCoord(
+    line.x2,
+    line.y2,
+    state,
+    scale
+  );
+  console.log(x, y, x2, y2);
   context.moveTo(x, y);
   context.lineTo(x2, y2);
   context.stroke();
@@ -87,14 +110,13 @@ const renderLineElement = (
 const renderCircleElement = (
   context: CanvasRenderingContext2D,
   element: ECadCircleElement,
-  state: AppState
+  state: AppState,
+  scale: number
 ) => {
+  context.beginPath();
   const circle = element as ECadCircleElement;
-  const { x, y } = worldCoordToScreenCoord(circle.x, circle.y, state);
+  const { x, y } = worldCoordToScreenCoord(circle.x, circle.y, state, scale);
   const radius = worldLengthToScreenLength(circle.radius, state);
-  //   state.offsetX,
-  //   state.offsetY
-  // );
   context.arc(x, y, radius, 0, Math.PI * 2);
   context.stroke();
 };
@@ -102,10 +124,17 @@ const renderCircleElement = (
 const renderRectangleElement = (
   context: CanvasRenderingContext2D,
   element: ECadRectangleElement,
-  state: AppState
+  state: AppState,
+  scale: number
 ) => {
+  context.beginPath();
   const rectangle = element as ECadRectangleElement;
-  const { x, y } = worldCoordToScreenCoord(rectangle.x, rectangle.y, state);
+  const { x, y } = worldCoordToScreenCoord(
+    rectangle.x,
+    rectangle.y,
+    state,
+    scale
+  );
   const w = worldLengthToScreenLength(rectangle.w, state);
   const h = worldLengthToScreenLength(rectangle.h, state);
   context.rect(x, y, w, -h);

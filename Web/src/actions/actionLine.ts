@@ -16,7 +16,7 @@ export const actionLine: Action = {
       y,
       x2: x,
       y2: y,
-      color: "green",
+      color: "#222",
     };
     return {
       editingElement: element,
