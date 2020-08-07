@@ -14,8 +14,7 @@ describe("geometric", () => {
 
     const { x: wx, y: wy } = screenCoordToWorldCoord(
       { clientX: 100, clientY: 120 },
-      state,
-      1
+      state
     );
     expect(wx).toEqual(70);
     expect(wy).toEqual(80);
@@ -34,8 +33,7 @@ describe("geometric", () => {
 
     const { x: wx, y: wy } = screenCoordToWorldCoord(
       { clientX: 100, clientY: 120 },
-      state,
-      2
+      state
     );
     expect(wx).toEqual(70);
     expect(wy).toEqual(80);

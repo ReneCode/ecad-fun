@@ -1,22 +1,15 @@
-import { AppState } from "../state/appState";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";
 import { actionHover } from "./actionHover";
 import { actionSelect } from "./actionSelect";
+import { actionLoadElements } from "./actionLoadElements";
+import { actionZoomIn, actionZoomOut } from "./actionZoom";
+import { Action, AppState } from "../types";
 
 export type EventType = "start" | "pointerMove" | "pointerUp" | "pointerDown";
 
-type PointerFn = (appState: AppState) => {} | void;
 type setStateFn = (data: any) => void;
-
-export type Action = {
-  name: string;
-  start?: () => void;
-  pointerDown?: PointerFn;
-  pointerUp?: PointerFn;
-  pointerMove?: PointerFn;
-};
 
 export class ActionManager {
   allActions: Action[] = [];
@@ -38,6 +31,10 @@ export class ActionManager {
     this.register(actionLine);
     this.register(actionCircle);
     this.register(actionRectangle);
+
+    this.register(actionLoadElements);
+    this.register(actionZoomIn);
+    this.register(actionZoomOut);
   }
 
   public execute(type: EventType, state: AppState) {

@@ -4,9 +4,8 @@ import Toolbox from "./Toobox";
 import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
-import { AppState } from "../state/appState";
 import { screenCoordToWorldCoord } from "../utils/geometric";
-import { ECadLineElement } from "../types";
+import { AppState } from "../types";
 
 type Props = {
   width: number;
@@ -69,7 +68,7 @@ class Project extends React.Component<Props> {
     //   renderScene(this.canvas, elements, this.state, window.devicePixelRatio);
     // }
 
-    this.loadElements();
+    this.actionMananger.startAction("loadElements", this.state);
 
     window.addEventListener("resize", this.onResize);
   }
@@ -94,12 +93,13 @@ class Project extends React.Component<Props> {
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
       }
-      renderScene(this.canvas, elements, this.state, 1); // window.devicePixelRatio);
+      renderScene(this.canvas, elements, this.state);
     }
   }
 
   public render() {
-    const canvasScale = window.devicePixelRatio;
+    // window.devicePixelRatio will be used much more later
+    const canvasScale = 1.0;
     const canvasDOMWidth = this.props.width;
     const canvasDOMHeight = this.props.height;
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -146,11 +146,7 @@ class Project extends React.Component<Props> {
     eventType: EventType,
     event: React.PointerEvent<HTMLCanvasElement>
   ) {
-    const { x, y } = screenCoordToWorldCoord(
-      event,
-      this.state,
-      window.devicePixelRatio
-    );
+    const { x, y } = screenCoordToWorldCoord(event, this.state);
 
     if (false)
       console.log(
@@ -175,21 +171,6 @@ class Project extends React.Component<Props> {
     });
     this.actionMananger.execute(eventType, this.state);
     // this.setState({});
-  }
-
-  private loadElements() {
-    const element: ECadLineElement = {
-      id: "1234",
-      type: "line",
-      x: 20,
-      y: 50,
-      x2: 200,
-      y2: 60,
-      color: "#222",
-    };
-    this.setState({
-      elements: [element],
-    });
   }
 }
 

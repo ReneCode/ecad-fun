@@ -1,6 +1,4 @@
-import { Action } from "./manager";
-import { AppState } from "../state/appState";
-import { ECadLineElement } from "../types";
+import { ECadLineElement, Action, AppState } from "../types";
 import { nanoid } from "nanoid";
 
 export const actionLine: Action = {

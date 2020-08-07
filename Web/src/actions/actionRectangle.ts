@@ -1,7 +1,5 @@
-import { Action } from "./manager";
-import { AppState } from "../state/appState";
-import { ECadRectangleElement } from "../types";
-import { nanoid } from "nanoid";
+import { ECadRectangleElement, Action, AppState } from "../types";
+import { getRandomId } from "../utils/getRandomId";
 
 export const actionRectangle: Action = {
   name: "rectangle",
@@ -10,7 +8,7 @@ export const actionRectangle: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadRectangleElement = {
-      id: nanoid(),
+      id: getRandomId(),
       type: "rectangle",
       x,
       y,

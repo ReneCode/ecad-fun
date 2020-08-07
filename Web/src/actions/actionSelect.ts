@@ -1,5 +1,4 @@
-import { Action } from "./manager";
-import { AppState } from "../state/appState";
+import { Action, AppState } from "../types";
 
 export const actionSelect: Action = {
   name: "select",

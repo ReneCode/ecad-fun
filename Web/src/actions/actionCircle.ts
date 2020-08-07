@@ -1,8 +1,6 @@
-import { Action } from "./manager";
-import { AppState } from "../state/appState";
-import { ECadCircleElement } from "../types";
-import { nanoid } from "nanoid";
+import { ECadCircleElement, Action, AppState } from "../types";
 import { distanceBetweenPoints } from "../utils/geometric";
+import { getRandomId } from "../utils/getRandomId";
 
 export const actionCircle: Action = {
   name: "circle",
@@ -11,7 +9,7 @@ export const actionCircle: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadCircleElement = {
-      id: nanoid(),
+      id: getRandomId(),
       type: "circle",
       x,
       y,

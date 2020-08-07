@@ -19,12 +19,11 @@ export const screenCoordToWorldCoord = (
     screenOriginX: number;
     screenOriginY: number;
     zoom: number;
-  },
-  scale: number
+  }
 ) => {
   return {
-    x: ((clientX - screenOriginX) * scale) / zoom,
-    y: (-(clientY - screenOriginY) * scale) / zoom,
+    x: (clientX - screenOriginX) / zoom,
+    y: -(clientY - screenOriginY) / zoom,
   };
 };
 
@@ -39,12 +38,11 @@ export const worldCoordToScreenCoord = (
     screenOriginX: number;
     screenOriginY: number;
     zoom: number;
-  },
-  scale: number
+  }
 ) => {
   return {
-    x: (x * zoom) / scale + screenOriginX,
-    y: screenOriginY - (y * zoom) / scale,
+    x: x * zoom + screenOriginX,
+    y: screenOriginY - y * zoom,
   };
 };
 
