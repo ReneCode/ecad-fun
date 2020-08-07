@@ -141,6 +141,8 @@ class Project extends React.Component<Props> {
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       this.actionMananger.startAction("zoomPinch", this.state, event);
+    } else {
+      this.actionMananger.startAction("panning", this.state, event);
     }
   }
 

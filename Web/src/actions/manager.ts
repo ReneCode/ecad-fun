@@ -1,3 +1,4 @@
+import { Action, AppState } from "../types";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";
@@ -5,7 +6,7 @@ import { actionHover } from "./actionHover";
 import { actionSelect } from "./actionSelect";
 import { actionLoadElements } from "./actionLoadElements";
 import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
-import { Action, AppState } from "../types";
+import { actionPanning } from "./actionPanning";
 
 export type EventType = "start" | "pointerMove" | "pointerUp" | "pointerDown";
 
@@ -36,6 +37,7 @@ export class ActionManager {
     this.register(actionZoomIn);
     this.register(actionZoomOut);
     this.register(actionZoomPinch);
+    this.register(actionPanning);
   }
 
   public execute(type: EventType, state: AppState, params: any = null) {
