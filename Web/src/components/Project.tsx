@@ -5,7 +5,7 @@ import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
-import { AppState } from "../types";
+import { AppState, getDefaultAppState } from "../types";
 import { Gesture } from "../utils/Gesture";
 
 type Props = {
@@ -19,26 +19,7 @@ class Project extends React.Component<Props> {
   gesture = new Gesture();
   unsubscribe: (() => void)[] = [];
 
-  state: AppState = {
-    cursor: "default",
-
-    screenWidth: window.innerWidth,
-    screenHeight: window.innerHeight,
-    screenOriginX: window.innerWidth / 2,
-    screenOriginY: window.innerHeight / 2,
-
-    editingElement: null,
-    selectedElementIds: [],
-
-    elements: [],
-    clientX: 0,
-    clientY: 0,
-
-    zoom: 1.0,
-
-    pointerX: 0,
-    pointerY: 0,
-  };
+  state: AppState = getDefaultAppState();
 
   constructor(props: Props) {
     super(props);
@@ -170,7 +151,7 @@ class Project extends React.Component<Props> {
     event: React.PointerEvent<HTMLCanvasElement>
   ) {
     const { x, y } = screenCoordToWorldCoord(event, this.state);
-
+    // console.log(">", event.button, event.buttons);
     if (false)
       console.log(
         event.clientX,
@@ -188,9 +169,18 @@ class Project extends React.Component<Props> {
         this.canvas?.width,
         this.canvas?.height
       );
+    let addState = {};
+    if (eventType === "pointerDown") {
+      addState = {
+        pointerDownX: x,
+        pointerDownY: y,
+      };
+    }
     this.setState({
+      ...addState,
       pointerX: x,
       pointerY: y,
+      pointerButtons: event.buttons,
     });
     this.actionMananger.dispatch(eventType, this.state);
   }

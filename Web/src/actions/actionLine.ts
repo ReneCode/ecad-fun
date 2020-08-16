@@ -1,5 +1,5 @@
 import { ECadLineElement, Action, AppState } from "../types";
-import { getRandomId } from "../utils/getRandomId";
+import { randomId } from "../utils/randomId";
 
 export const actionLine: Action = {
   name: "line",
@@ -8,12 +8,12 @@ export const actionLine: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadLineElement = {
-      id: getRandomId(),
+      id: randomId(),
       type: "line",
       x,
       y,
-      x2: x,
-      y2: y,
+      w: 0,
+      h: 0,
       color: "#222",
     };
     return {
@@ -26,10 +26,11 @@ export const actionLine: Action = {
       const x = state.pointerX;
       const y = state.pointerY;
 
+      const oldLine = state.editingElement;
       const element: ECadLineElement = {
-        ...state.editingElement,
-        x2: x,
-        y2: y,
+        ...oldLine,
+        w: x - oldLine.x,
+        h: y - oldLine.y,
       };
       return {
         editingElement: element,

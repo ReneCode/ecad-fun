@@ -1,29 +1,29 @@
 import { ECadLineElement, ECadCircleElement, Action } from "../types";
-import { getRandomId } from "../utils/getRandomId";
+import { randomId } from "../utils/randomId";
 
 export const actionLoadElements: Action = {
   name: "loadElements",
   start: () => {
     const line: ECadLineElement = {
-      id: getRandomId(),
+      id: randomId(),
       type: "line",
       x: -50,
       y: 0,
-      x2: 200,
-      y2: 100,
+      w: 200,
+      h: 100,
       color: "#222",
     };
     const line2: ECadLineElement = {
-      id: getRandomId(),
+      id: randomId(),
       type: "line",
-      x: 10,
+      x: 210,
       y: 20,
-      x2: 200,
-      y2: 100,
+      w: -140,
+      h: 80,
       color: "#222",
     };
     const circle: ECadCircleElement = {
-      id: getRandomId(),
+      id: randomId(),
       type: "circle",
       x: 120,
       y: 50,
@@ -31,8 +31,22 @@ export const actionLoadElements: Action = {
       color: "#e23",
     };
 
+    const lines = [];
+    for (let i = 0; i < 5_000; i++) {
+      const l: ECadLineElement = {
+        id: randomId(),
+        type: "line",
+        x: -200 + 400 * Math.random(),
+        y: -200 + 400 * Math.random(),
+        w: -100 + 200 * Math.random(),
+        h: -100 + 200 * Math.random(),
+        color: "#ed2",
+      };
+      lines.push(l);
+    }
+
     return {
-      elements: [line, line2, circle],
+      elements: [...lines, line, line2, circle],
     };
   },
 };

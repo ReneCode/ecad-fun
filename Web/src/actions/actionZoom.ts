@@ -15,11 +15,12 @@ const zoom = (
   const newScreenOriginY = dy * zoomFactor + zoomCenterY;
 
   const newZoom = Math.max(0.01, appState.zoom * zoomFactor);
-
+  const SCREEN_GRIP_SIZE = 12;
   return {
     screenOriginX: newScreenOriginX,
     screenOriginY: newScreenOriginY,
     zoom: newZoom,
+    gripSize: SCREEN_GRIP_SIZE / newZoom,
   };
 };
 

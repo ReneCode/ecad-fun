@@ -11,6 +11,18 @@ import {
 } from "../utils/geometric";
 import { getBoundingBox } from "../elements";
 
+const COLOR = {
+  SELECTED: "#5522ee",
+  GRIPHANDLE_STROKE: "#5522ee",
+  GRIPHANDLE_FILL: "#eee",
+};
+
+const GRIP_SIZE = 14;
+
+type RenderOptions = {
+  selected?: boolean;
+};
+
 export const renderScene = (
   canvas: HTMLCanvasElement,
   elements: ECadBaseElement[],
@@ -27,14 +39,17 @@ export const renderScene = (
   renderBackground(context, canvasWidth, canvasHeight);
 
   for (let element of elements) {
-    renderElement(context, element, state);
+    if (!state.selectedElementIds.includes(element.id)) {
+      renderElement(context, element, state);
+    }
   }
 
   for (let id of state.selectedElementIds) {
     const element = elements.find((el) => el.id === id);
     if (element) {
-      const bbox = getBoundingBox(element);
-      renderBoundingBox(context, bbox, state);
+      // const bbox = getBoundingBox(element);
+      // renderBoundingBox(context, bbox, state);
+      renderElement(context, element, state, { selected: true });
     }
   }
 
@@ -60,7 +75,8 @@ const renderBoundingBox = (
 const renderElement = (
   context: CanvasRenderingContext2D,
   element: ECadBaseElement,
-  state: AppState
+  state: AppState,
+  options: RenderOptions = {}
 ) => {
   context.save();
 
@@ -68,7 +84,7 @@ const renderElement = (
   context.strokeStyle = element.color;
   switch (element.type) {
     case "line":
-      renderLineElement(context, element as ECadLineElement, state);
+      renderLineElement(context, element as ECadLineElement, state, options);
       break;
     case "circle":
       renderCircleElement(context, element as ECadCircleElement, state);
@@ -102,15 +118,30 @@ const renderBackground = (
 const renderLineElement = (
   context: CanvasRenderingContext2D,
   element: ECadLineElement,
-  state: AppState
+  state: AppState,
+  { selected }: RenderOptions
 ) => {
   context.beginPath();
   const line = element as ECadLineElement;
   const { x, y } = worldCoordToScreenCoord(line.x, line.y, state);
-  const { x: x2, y: y2 } = worldCoordToScreenCoord(line.x2, line.y2, state);
+  const { x: x2, y: y2 } = worldCoordToScreenCoord(
+    line.x + line.w,
+    line.y + line.h,
+    state
+  );
   context.moveTo(x, y);
   context.lineTo(x2, y2);
+  if (selected) {
+    context.strokeStyle = COLOR.SELECTED;
+  } else {
+    context.strokeStyle = element.color;
+  }
   context.stroke();
+
+  if (selected) {
+    renderGripHandle(context, x, y);
+    renderGripHandle(context, x2, y2);
+  }
 };
 
 const renderCircleElement = (
@@ -136,6 +167,34 @@ const renderRectangleElement = (
   const { x, y } = worldCoordToScreenCoord(rectangle.x, rectangle.y, state);
   const w = worldLengthToScreenLength(rectangle.w, state);
   const h = worldLengthToScreenLength(rectangle.h, state);
+  context.fillStyle = "red";
+  context.strokeStyle = element.color;
   context.rect(x, y, w, -h);
   context.stroke();
+};
+
+const renderGripHandle = (
+  context: CanvasRenderingContext2D,
+  screenX: number,
+  screenY: number
+) => {
+  context.beginPath();
+  context.strokeStyle = COLOR.GRIPHANDLE_STROKE;
+  context.fillStyle = COLOR.GRIPHANDLE_FILL;
+  context.fillRect(
+    screenX - GRIP_SIZE / 2,
+    screenY - GRIP_SIZE / 2,
+    GRIP_SIZE,
+    GRIP_SIZE
+  );
+  context.strokeRect(
+    screenX - GRIP_SIZE / 2,
+    screenY - GRIP_SIZE / 2,
+    GRIP_SIZE,
+    GRIP_SIZE
+  );
+
+  // context.strokeStyle = "RED";
+  // context.fillStyle = "#22601355";
+  // context.fillRect(200, 200, 400, 300);
 };
