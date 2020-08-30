@@ -17,7 +17,9 @@ export const actionCircle: Action = {
       color: "black",
     };
     return {
-      editingElement: element,
+      state: {
+        editingElement: element,
+      },
     };
   },
 
@@ -32,7 +34,9 @@ export const actionCircle: Action = {
         radius,
       };
       return {
-        editingElement: element,
+        state: {
+          editingElement: element,
+        },
       };
     }
   },
@@ -40,8 +44,10 @@ export const actionCircle: Action = {
   pointerUp: (state: AppState) => {
     if (state.editingElement) {
       return {
-        elements: [...state.elements, state.editingElement],
-        editingElement: null,
+        state: {
+          elements: [...state.elements, state.editingElement],
+          editingElement: null,
+        },
       };
     }
   },

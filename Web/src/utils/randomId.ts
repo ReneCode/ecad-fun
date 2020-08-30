@@ -1,5 +1,11 @@
-import { nanoid } from "nanoid";
+import nanoid from "nanoid";
+
+let testRandomId = 0;
 
 export const randomId = () => {
-  return nanoid();
+  if (process.env.NODE_ENV === "test") {
+    return `id${testRandomId++}`;
+  } else {
+    return nanoid();
+  }
 };

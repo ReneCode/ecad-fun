@@ -55,6 +55,7 @@ export type AppState = {
   screenOriginY: number;
 
   selectedElementIds: string[];
+  selectedHandleIdx: number;
   editingElement: ECadBaseElement | null;
   elements: readonly ECadBaseElement[];
 };
@@ -70,6 +71,7 @@ export const getDefaultAppState = (): AppState => {
 
     editingElement: null,
     selectedElementIds: [],
+    selectedHandleIdx: -1,
 
     elements: [],
     clientX: 0,
@@ -86,8 +88,7 @@ export const getDefaultAppState = (): AppState => {
   };
 };
 
-type ActionFn = (appState: AppState, params: any) => {} | void;
-
+// Action
 export type Action = {
   name: string;
 
@@ -95,4 +96,30 @@ export type Action = {
   pointerDown?: ActionFn;
   pointerUp?: ActionFn;
   pointerMove?: ActionFn;
+};
+
+export type ActionResult = {
+  state?: {
+    elements?: ECadBaseElement[];
+    editingElement?: ECadBaseElement | null;
+    selectedElementIds?: string[];
+    selectedHandleIdx?: number;
+
+    cursor?: string;
+
+    screenOriginX?: number;
+    screenOriginY?: number;
+
+    gripSize?: number;
+    zoom?: number;
+  };
+  actionFinished?: boolean;
+};
+
+type ActionFn = (appState: AppState, params: any) => ActionResult | void;
+
+export type HitTestResult = {
+  id: string;
+  type: "element" | "handle";
+  handleIdx?: number;
 };

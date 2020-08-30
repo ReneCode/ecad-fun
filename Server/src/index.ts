@@ -1,28 +1,59 @@
 require("dotenv").config();
 import express from "express";
+import SocketIO from "socket.io";
+const morgan = require("morgan");
 import http from "http";
-import socketIO from "socket.io";
+const bodyParser = require("body-parser");
+
 import debug from "debug";
-import projectService from "./ProjectService";
+import { setupExpressRouting } from "./routing";
+import { setupSocketServer } from "./setupSocketServer";
 import clientService from "./ClientService";
-import { ChangeDataType } from "./types";
+import DataStore from "./DataStore";
 
 const serverDebug = debug("server");
-const ioDebug = debug("io");
 const socketDebug = debug("socket");
 
 const app = express();
-const port = process.env.PORT || 80; // default port to listen
+
+const dataStore = new DataStore();
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json
+app.use(bodyParser.json());
+
+app.use(morgan("common"));
+
+setupExpressRouting(app);
+
+app.use("/", (req, res) => {
+  res.send("hi cad.fun Server");
+});
+
+app.use((req, res, next) => {
+  res.status(404).send("Not found");
+});
+
+// error handling - should be the last use
+app.use((error: any, req: any, res: any, next: any) => {
+  // catches all errors of the app
+  res.status(error.status || 500);
+  res.json({
+    error: {
+      message: "sorry - some error happens",
+    },
+  });
+});
+
+const port = process.env.PORT || 8080; // default port to listen
 
 serverDebug("starting ...");
 
 const server = http.createServer(app);
 
-server.listen(port, () => {
-  serverDebug(`listening on port: ${port}`);
-});
-
-const io = socketIO(server, {
+//setupSocketServer(server);
+const io = SocketIO(server, {
   handlePreflightRequest: function (req, res) {
     var headers = {
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -35,13 +66,15 @@ const io = socketIO(server, {
 });
 
 io.on("connection", (socket) => {
-  ioDebug("connection established!");
+  socketDebug("connection established!");
   io.to(`${socket.id}`).emit("init-room");
 
   socket.on("join-room", (roomID) => {
     socketDebug(`${socket.id} has joined ${roomID}`);
     socket.join(roomID);
-    socketDebug(`users in room: ${io.sockets.adapter.rooms[roomID].length}`);
+    socketDebug(
+      `${io.sockets.adapter.rooms[roomID].length} users in room: ${roomID}`
+    );
     if (io.sockets.adapter.rooms[roomID].length <= 1) {
       io.to(`${socket.id}`).emit("first-in-room");
     } else {
@@ -53,29 +86,38 @@ io.on("connection", (socket) => {
     );
   });
 
-  socket.on("open-project", async (projectId) => {
-    const clientId = clientService.connectClient(socket.id, projectId);
-
-    socketDebug(`socket:${socket.id} open-project:${projectId}`);
-    const project = await projectService.open(projectId);
-    if (project) {
-      socket.join(projectId);
-      const socketId = socket.id;
-      io.to(socket.id).emit("send-clientid", clientId);
-      io.to(socket.id).emit("send-project", project);
-    }
+  socket.on("pull", (data) => {
+    // pull
   });
 
-  socket.on("change-data", async (changeData: ChangeDataType[]) => {
-    socketDebug(`socket:${socket.id} change-data`);
-    const projectId = clientService.getProjectIdBySocketId(socket.id);
-    if (projectId) {
-      const project = await projectService.get(projectId);
-      if (project) {
-        const result = await project.changeData(changeData);
-      }
-    }
+  socket.on("push", (data) => {
+    // push
   });
+
+  // socket.on("open-project", async (projectId) => {
+  //   const clientId = clientService.connectClient(socket.id, projectId);
+
+  //   socketDebug(`socket:${socket.id} open-project:${projectId}`);
+  //   const project = await projectService.open(projectId);
+  //   if (project) {
+  //     socket.join(projectId);
+  //     const socketId = socket.id;
+  //     io.to(socket.id).emit("send-clientid", clientId);
+  //     io.to(socket.id).emit("send-project", project);
+  //   }
+  // });
+
+  // socket.on("change-data", async (changeData: ChangeDataType[]) => {
+  //   socketDebug(`socket:${socket.id} change-data`);
+  //   const projectId = clientService.getProjectIdBySocketId(socket.id);
+  //   if (projectId) {
+  //     const project = await projectService.get(projectId);
+  //     if (project) {
+  //       // TODO
+  //       // const result = await project.changeData(changeData);
+  //     }
+  //   }
+  // });
 
   socket.on("disconnecting", () => {
     clientService.disconnectClient(socket.id);
@@ -97,4 +139,8 @@ io.on("connection", (socket) => {
 
     socket.removeAllListeners();
   });
+});
+
+server.listen(port, () => {
+  serverDebug(`listening on port: ${port}`);
 });

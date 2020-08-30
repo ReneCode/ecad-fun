@@ -7,6 +7,7 @@ export const actionHover: Action = {
   pointerMove: (state: AppState) => {
     const x = state.pointerX;
     const y = state.pointerY;
+    let cursor = "default";
 
     const selectedElements = state.elements.filter((e) =>
       state.selectedElementIds.includes(e.id)
@@ -14,30 +15,14 @@ export const actionHover: Action = {
     for (let element of selectedElements) {
       const result = hitTestElement(element, x, y, state);
       if (result) {
-        if (result.type === "grip") {
-          return {
-            cursor: "move",
-          };
+        if (result.type === "handle") {
+          cursor = "ew-resize";
+        } else {
+          cursor = "move";
         }
-        return {
-          cursor: "pointer",
-        };
+        break;
       }
     }
-
-    for (let element of state.elements) {
-      if (element.type === "line") {
-        const result = hitTestElement(element, x, y, state);
-
-        if (result) {
-          return {
-            cursor: "pointer",
-          };
-        }
-      }
-    }
-    return {
-      cursor: "default",
-    };
+    return { state: { cursor } };
   },
 };

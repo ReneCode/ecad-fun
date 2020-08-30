@@ -1,4 +1,4 @@
-import { Action, AppState } from "../types";
+import { Action, AppState, ActionResult } from "../types";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";
@@ -70,9 +70,11 @@ export class ActionManager {
   ) {
     const fn = action[type];
     if (fn) {
-      const newState = fn(state, params);
-      if (newState) {
-        this.setState(newState);
+      const result = fn(state, params);
+      if (result) {
+        if (result.state) {
+          this.setState(result.state);
+        }
       }
     }
   }

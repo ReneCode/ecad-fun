@@ -7,11 +7,13 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "start:w": "nodemon src/index.ts",
-    "test:w": "jest --watchAll --runInBand --detectOpenHandles"
+    "test": "jest",
+    "test:w": "jest src/ --watchAll --runInBand --detectOpenHandles"
   },
   "dependencies": {
     "express": "4.17.1",
     "http-status-code": "^2.1.0",
+    "morgan": "^1.10.0",
     "nanoid": "^3.1.10",
     "socket.io": "2.3.0"
   },
@@ -23,6 +25,7 @@
     "@types/socket.io": "2.1.4",
     "@types/socket.io-client": "^1.4.33",
     "dotenv": "^8.2.0",
+    "http-status-codes": "^1.4.0",
     "jest": "^26.1.0",
     "nodemon": "^2.0.4",
     "socket.io-client": "^2.3.0",

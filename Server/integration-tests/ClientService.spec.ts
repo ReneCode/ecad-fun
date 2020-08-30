@@ -1,4 +1,4 @@
-import clientService from "../ClientService";
+import clientService from "../src/ClientService";
 
 describe("ClientService", () => {
   beforeEach(() => {});

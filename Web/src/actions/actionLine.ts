@@ -17,7 +17,9 @@ export const actionLine: Action = {
       color: "#222",
     };
     return {
-      editingElement: element,
+      state: {
+        editingElement: element,
+      },
     };
   },
 
@@ -33,7 +35,9 @@ export const actionLine: Action = {
         h: y - oldLine.y,
       };
       return {
-        editingElement: element,
+        state: {
+          editingElement: element,
+        },
       };
     }
   },
@@ -41,8 +45,10 @@ export const actionLine: Action = {
   pointerUp: (state: AppState) => {
     if (state.editingElement) {
       return {
-        elements: [...state.elements, state.editingElement],
-        editingElement: null,
+        state: {
+          elements: [...state.elements, state.editingElement],
+          editingElement: null,
+        },
       };
     }
   },

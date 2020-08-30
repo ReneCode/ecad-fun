@@ -1,27 +1,13 @@
-import { wait } from "./utils";
-import Project from "./Project";
-
-const projectDb: Record<string, Project> = {};
+import ProjectStore from "./multiplayer/ProjectStore";
 
 class ProjectService {
-  public async open(projectId: string) {
-    let project = await this.get(projectId);
-    if (!project) {
-      project = await this.create(projectId);
-    }
-    return project;
+  open(projectId: string) {
+    return {};
+    // throw new Error("Method not implemented.");
   }
 
-  async get(projectId: string) {
-    await wait(10);
-    return projectDb[projectId];
-  }
-
-  private async create(projectId: string) {
-    await wait(10);
-    const project = new Project(projectId);
-    projectDb[projectId] = project;
-    return project;
+  get(projectId: string) {
+    return {};
   }
 }
 

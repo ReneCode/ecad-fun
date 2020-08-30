@@ -2,6 +2,8 @@ import {
   screenCoordToWorldCoord,
   worldCoordToScreenCoord,
   worldLengthToScreenLength,
+  lineLength,
+  distancePointToLine,
 } from "./geometric";
 
 describe("geometric", () => {
@@ -60,5 +62,25 @@ describe("geometric", () => {
       zoom: 2.0,
     });
     expect(len).toEqual(200);
+  });
+
+  it("lineLength", () => {
+    const len = lineLength(20, 120, 50, 160);
+    expect(len).toBeCloseTo(50);
+  });
+
+  it("distancePointToLine point = start point", () => {
+    const dist0 = distancePointToLine(-50, -50, -50, -50, 50, 50);
+    expect(dist0).toBeCloseTo(0);
+  });
+
+  it("distancePointToLine point = point on line", () => {
+    const dist0 = distancePointToLine(10, 10, -50, -50, 50, 50);
+    expect(dist0).toBeCloseTo(0);
+  });
+
+  it("distancePointToLine point = outside point", () => {
+    const dist = distancePointToLine(10, 0, -50, -50, 50, 50);
+    expect(dist).toBeCloseTo(5 * Math.sqrt(2));
   });
 });

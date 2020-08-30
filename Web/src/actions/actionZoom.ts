@@ -1,11 +1,11 @@
-import { Action, AppState } from "../types";
+import { Action, AppState, ActionResult } from "../types";
 
 const zoom = (
   appState: AppState,
   zoomFactor: number,
   centerX?: number,
   centerY?: number
-) => {
+): ActionResult => {
   const zoomCenterX = centerX || appState.screenWidth / 2;
   const zoomCenterY = centerY || appState.screenHeight / 2;
 
@@ -17,10 +17,12 @@ const zoom = (
   const newZoom = Math.max(0.01, appState.zoom * zoomFactor);
   const SCREEN_GRIP_SIZE = 12;
   return {
-    screenOriginX: newScreenOriginX,
-    screenOriginY: newScreenOriginY,
-    zoom: newZoom,
-    gripSize: SCREEN_GRIP_SIZE / newZoom,
+    state: {
+      screenOriginX: newScreenOriginX,
+      screenOriginY: newScreenOriginY,
+      zoom: newZoom,
+      gripSize: SCREEN_GRIP_SIZE / newZoom,
+    },
   };
 };
 

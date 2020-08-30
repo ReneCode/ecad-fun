@@ -17,7 +17,9 @@ export const actionRectangle: Action = {
       color: "green",
     };
     return {
-      editingElement: element,
+      state: {
+        editingElement: element,
+      },
     };
   },
 
@@ -32,7 +34,9 @@ export const actionRectangle: Action = {
         h: y - state.editingElement.y,
       };
       return {
-        editingElement: element,
+        state: {
+          editingElement: element,
+        },
       };
     }
   },
@@ -40,8 +44,10 @@ export const actionRectangle: Action = {
   pointerUp: (state: AppState) => {
     if (state.editingElement) {
       return {
-        elements: [...state.elements, state.editingElement],
-        editingElement: null,
+        state: {
+          elements: [...state.elements, state.editingElement],
+          editingElement: null,
+        },
       };
     }
   },

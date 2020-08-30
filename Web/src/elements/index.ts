@@ -3,8 +3,14 @@ import {
   ECadLineElement,
   ECadRectangleElement,
   AppState,
+  HitTestResult,
 } from "../types";
-import { normalizeBox, enlargeBox, isPointInsideBox } from "../utils/geometric";
+import {
+  normalizeBox,
+  enlargeBox,
+  isPointInsideBox,
+  distancePointToLine,
+} from "../utils/geometric";
 
 export const getSelectedElements = (state: AppState) => {
   return state.elements.filter((e) => state.selectedElementIds.includes(e.id));
@@ -28,11 +34,36 @@ export const hitTestElement = (
   element: ECadBaseElement,
   x: number,
   y: number,
-  state: { gripSize: number }
-) => {
+  { gripSize }: { gripSize: number }
+): HitTestResult | undefined => {
+  const epsilon = gripSize / 2;
+
+  // check if outside bounding box
+  const bbox = enlargeBox(getBoundingBox(element), epsilon);
+  if (!isPointInsideBox(x, y, bbox)) {
+    return;
+  }
+
+  // check if handle it hit
+  const handles = getHandles(element);
+  for (let handle of handles) {
+    const bbox = enlargeBox(
+      {
+        x1: handle.x,
+        y1: handle.y,
+        x2: handle.x,
+        y2: handle.y,
+      },
+      epsilon
+    );
+    if (isPointInsideBox(x, y, bbox)) {
+      return { id: element.id, type: "handle", handleIdx: handle.idx };
+    }
+  }
+
   switch (element.type) {
     case "line":
-      return hitTestLine(element as ECadLineElement, x, y, state);
+      return hitTestLine(element as ECadLineElement, x, y, epsilon);
     case "rectangle":
     // return hitTestRectangle(element as ECadRectangleElement, x, y);
     case "circle":
@@ -45,32 +76,21 @@ export const hitTestElement = (
 
 const hitTestLine = (
   line: ECadLineElement,
-  x: number,
-  y: number,
-  { gripSize }: { gripSize: number }
-) => {
-  const bbox = enlargeBox(getBoundingBox(line), gripSize);
-  if (!isPointInsideBox(x, y, bbox)) {
-    return;
+  x0: number,
+  y0: number,
+  epsilon: number
+): HitTestResult | undefined => {
+  const dist = distancePointToLine(
+    x0,
+    y0,
+    line.x,
+    line.y,
+    line.x + line.w,
+    line.y + line.h
+  );
+  if (dist <= epsilon) {
+    return { id: line.id, type: "element" };
   }
-
-  const gripHandles = getGripHandlesLine(line);
-  for (let gripHandle of gripHandles) {
-    const bbox = enlargeBox(
-      {
-        x1: gripHandle.x,
-        y1: gripHandle.y,
-        x2: gripHandle.x,
-        y2: gripHandle.y,
-      },
-      gripSize / 2
-    );
-    if (isPointInsideBox(x, y, bbox)) {
-      return { id: line.id, type: "grip", idx: gripHandle.idx };
-    }
-  }
-
-  return { id: line, type: "element" };
 };
 
 const hitTestRectangle = (
@@ -89,7 +109,20 @@ export const getBoundingBox = (element: ECadBaseElement) => {
   }
 };
 
-const getGripHandlesLine = (line: ECadLineElement) => {
+/**
+ *
+ * @returns { x:number, y:number, idx: number }[]
+ */
+const getHandles = (element: ECadBaseElement) => {
+  switch (element.type) {
+    case "line":
+      return getHandlesLine(element as ECadLineElement);
+    default:
+      throw new Error("error");
+  }
+};
+
+const getHandlesLine = (line: ECadLineElement) => {
   return [
     { x: line.x, y: line.y, idx: 0 },
     { x: line.x + line.w, y: line.y + line.h, idx: 1 },

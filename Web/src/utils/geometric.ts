@@ -9,6 +9,31 @@ export const distanceBetweenPoints = (
   return Math.sqrt(dx * dx + dy * dy);
 };
 
+/**
+ * @description  calculates distance between point(x0,y0) and line (x1,y1,x2,y2)
+ */
+export const distancePointToLine = (
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
+): number => {
+  return (
+    Math.abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) /
+    lineLength(x1, y1, x2, y2)
+  );
+};
+
+export const lineLength = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
+): number => {
+  return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+};
 export const screenCoordToWorldCoord = (
   { clientX, clientY }: { clientX: number; clientY: number },
   {

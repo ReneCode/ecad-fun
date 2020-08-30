@@ -15,33 +15,38 @@ export const actionSelect: Action = {
     const y = state.pointerY;
 
     lastPoint = { x, y };
-    // const selectedElements = state.elements.filter((e) =>
-    //   state.selectedElementIds.includes(e.id)
-    // );
-    // for (let element of selectedElements) {
-    //   const result = hitTestElement(element, x, y, state);
-    //   if (result) {
-    //     if (result.type === "grip") {
-    //       return {
-    //         cursor: "move",
-    //       };
-    //     }
-    //     return {
-    //       cursor: "pointer",
-    //     };
-    //   }
-    // }
+
+    const selectedElements = state.elements.filter((e) =>
+      state.selectedElementIds.includes(e.id)
+    );
+    for (let element of selectedElements) {
+      const result = hitTestElement(element, x, y, state);
+      if (result) {
+        return {
+          state: {
+            selectedElementIds: [result.id],
+            selectedHandleIdx: result.type === "handle" ? result.handleIdx : -1,
+          },
+        };
+      }
+    }
 
     for (let element of state.elements) {
-      if (hitTestElement(element, x, y, state)) {
+      const result = hitTestElement(element, x, y, state);
+      if (result) {
         return {
-          selectedElementIds: [element.id],
+          state: {
+            selectedElementIds: [result.id],
+            selectedHandleIdx: -1,
+          },
         };
       }
     }
 
     return {
-      selectedElementIds: [],
+      state: {
+        selectedElementIds: [],
+      },
     };
   },
 
@@ -65,7 +70,9 @@ export const actionSelect: Action = {
         };
       });
       return {
-        elements: replaceElements(replace, state),
+        state: {
+          elements: replaceElements(replace, state),
+        },
       };
     }
   },

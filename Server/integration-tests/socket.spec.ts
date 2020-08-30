@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import { wait, SOCKET_URL, attempt } from "../utils";
+import { SOCKET_URL, wait } from "./utils";
 
 describe("socket-io", () => {
   it("init-room / first-in-room", async () => {
@@ -15,7 +15,6 @@ describe("socket-io", () => {
     });
     socket.emit("join-room", roomId);
     await wait();
-    // socket.emit("disconnecting");
     socket.close();
     expect(initRoom).toBeTruthy();
     expect(firstInRoom).toBeTruthy();

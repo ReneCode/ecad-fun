@@ -46,7 +46,9 @@ export const actionLoadElements: Action = {
     }
 
     return {
-      elements: [...lines, line, line2, circle],
+      state: {
+        elements: [...lines, line, line2, circle],
+      },
     };
   },
 };

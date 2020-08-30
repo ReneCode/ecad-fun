@@ -8,8 +8,10 @@ export const actionPanning: Action = {
     { deltaX, deltaY }: { deltaX: number; deltaY: number }
   ) => {
     return {
-      screenOriginX: appState.screenOriginX - deltaX,
-      screenOriginY: appState.screenOriginY - deltaY,
+      state: {
+        screenOriginX: appState.screenOriginX - deltaX,
+        screenOriginY: appState.screenOriginY - deltaY,
+      },
     };
   },
 };

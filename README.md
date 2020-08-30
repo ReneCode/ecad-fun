@@ -19,7 +19,7 @@ async change data
 
 ## parent property
 
-{parentId:fIndex}
+special property with syntax: `<parentId>:<fIndex>`
 
 ```js
 E1 = { id: "4" }
@@ -35,7 +35,7 @@ E5 = { parent: "4:5"}
 => fix E5 = { parent: "4:51"}
 ```
 
-if fIndex property is already taken, that change it to a new fIndex straight after the current fIndex. For that query all the objects with the same parentId.
+if fIndex property is already taken, that change it to a new fIndex straight after the current fIndex. For that, query all the objects with the same parentId.
 
 ## Multiplayer
 
@@ -45,19 +45,23 @@ if fIndex property is already taken, that change it to a new fIndex straight aft
   - Index
   - Scheme
 
-## Object
+## Element
 
-- id: {clientId:counter}
+- id: `<clientId>:<counter>`
 - type: string
 - props: Record<string, any>
 
-{
-id: "3:42",
-type: "page",
-name: "hello",
-x: 3.6,
-locked: true
+example:
+
+```
+element = {
+  id: "3:42",
+  type: "page",
+  name: "hello",
+  x: 3.6,
+  locked: true
 }
+```
 
 ## Protocol
 

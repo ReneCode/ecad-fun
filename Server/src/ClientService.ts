@@ -12,7 +12,6 @@ class ClientService {
     const r = clientRecordDb.find((r) => r.socketId === socketId);
     return r?.projectId;
   }
-  constructor() {}
 
   /**
    * saves combination socketId + projectId and create a unique clientId
@@ -46,6 +45,7 @@ class ClientService {
     if (ids.length === 0) {
       return 1;
     } else {
+      // try to find a gap in the clientIds to re-use
       for (let i = 0; i < ids.length; i++) {
         const checkId = i + 1;
         if (ids[i] > checkId) {
@@ -57,7 +57,7 @@ class ClientService {
   }
 
   private add(socketId: string, projectId: string, clientId: number) {
-    const record: ClientRecord = { socketId, projectId: projectId, clientId };
+    const record: ClientRecord = { socketId, projectId, clientId };
     clientRecordDb.push(record);
   }
 
