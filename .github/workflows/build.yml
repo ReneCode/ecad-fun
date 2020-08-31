@@ -33,9 +33,11 @@ jobs:
         run: ls -R
       
       - name: install package
+        working-directory: ./Web
         run: npm install
         
       - name: build app
+        working-directory: ./Web
         run: npm run build
         env:
           CI: true
