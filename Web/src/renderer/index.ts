@@ -9,7 +9,7 @@ import {
   worldCoordToScreenCoord,
   worldLengthToScreenLength,
 } from "../utils/geometric";
-import { getBoundingBox } from "../elements";
+import { getBoundingBox, getHandlesElement } from "../elements";
 
 const COLOR = {
   SELECTED: "#5522ee",
@@ -81,10 +81,15 @@ const renderElement = (
   context.save();
 
   // context.beginPath();
-  context.strokeStyle = element.color;
+  const { selected } = options;
+  if (selected) {
+    context.strokeStyle = COLOR.SELECTED;
+  } else {
+    context.strokeStyle = element.color;
+  }
   switch (element.type) {
     case "line":
-      renderLineElement(context, element as ECadLineElement, state, options);
+      renderLineElement(context, element as ECadLineElement, state);
       break;
     case "circle":
       renderCircleElement(context, element as ECadCircleElement, state);
@@ -94,6 +99,13 @@ const renderElement = (
       break;
     default:
       throw new Error(`bad element Type: ${element.type}`);
+  }
+
+  if (selected) {
+    const handles = getHandlesElement(element);
+    handles.forEach((handle) => {
+      renderHandle(context, handle.x, handle.y, state);
+    });
   }
   context.restore();
 };
@@ -118,8 +130,7 @@ const renderBackground = (
 const renderLineElement = (
   context: CanvasRenderingContext2D,
   element: ECadLineElement,
-  state: AppState,
-  { selected }: RenderOptions
+  state: AppState
 ) => {
   context.beginPath();
   const line = element as ECadLineElement;
@@ -131,17 +142,7 @@ const renderLineElement = (
   );
   context.moveTo(x, y);
   context.lineTo(x2, y2);
-  if (selected) {
-    context.strokeStyle = COLOR.SELECTED;
-  } else {
-    context.strokeStyle = element.color;
-  }
   context.stroke();
-
-  if (selected) {
-    renderGripHandle(context, x, y);
-    renderGripHandle(context, x2, y2);
-  }
 };
 
 const renderCircleElement = (
@@ -173,28 +174,27 @@ const renderRectangleElement = (
   context.stroke();
 };
 
-const renderGripHandle = (
+const renderHandle = (
   context: CanvasRenderingContext2D,
-  screenX: number,
-  screenY: number
+  x: number,
+  y: number,
+  state: AppState
 ) => {
+  const { x: sx, y: sy } = worldCoordToScreenCoord(x, y, state);
+
   context.beginPath();
   context.strokeStyle = COLOR.GRIPHANDLE_STROKE;
   context.fillStyle = COLOR.GRIPHANDLE_FILL;
   context.fillRect(
-    screenX - GRIP_SIZE / 2,
-    screenY - GRIP_SIZE / 2,
+    sx - GRIP_SIZE / 2,
+    sy - GRIP_SIZE / 2,
     GRIP_SIZE,
     GRIP_SIZE
   );
   context.strokeRect(
-    screenX - GRIP_SIZE / 2,
-    screenY - GRIP_SIZE / 2,
+    sx - GRIP_SIZE / 2,
+    sy - GRIP_SIZE / 2,
     GRIP_SIZE,
     GRIP_SIZE
   );
-
-  // context.strokeStyle = "RED";
-  // context.fillStyle = "#22601355";
-  // context.fillRect(200, 200, 400, 300);
 };

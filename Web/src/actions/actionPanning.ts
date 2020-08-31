@@ -1,16 +1,13 @@
-import { Action, AppState } from "../types";
+import { Action } from "../types";
 
 export const actionPanning: Action = {
   name: "panning",
 
-  start: (
-    appState: AppState,
-    { deltaX, deltaY }: { deltaX: number; deltaY: number }
-  ) => {
+  execute: ({ state, params }) => {
     return {
       state: {
-        screenOriginX: appState.screenOriginX - deltaX,
-        screenOriginY: appState.screenOriginY - deltaY,
+        screenOriginX: state.screenOriginX - params.deltaX,
+        screenOriginY: state.screenOriginY - params.deltaY,
       },
     };
   },

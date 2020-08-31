@@ -1,4 +1,4 @@
-export const distanceBetweenPoints = (
+export const distancePointToPoint = (
   x1: number,
   y1: number,
   x2: number,

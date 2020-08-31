@@ -5,7 +5,7 @@ import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
-import { AppState, getDefaultAppState } from "../types";
+import { AppState, getDefaultAppState, PointerState } from "../types";
 import { Gesture } from "../utils/Gesture";
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 class Project extends React.Component<Props> {
   canvas: HTMLCanvasElement | null = null;
   actionMananger: ActionManager;
+  pointerState: PointerState = {};
   gesture = new Gesture();
   unsubscribe: (() => void)[] = [];
 
@@ -43,6 +44,7 @@ class Project extends React.Component<Props> {
 
     this.actionMananger = new ActionManager({
       setState: this.setState.bind(this),
+      setPointerState: this.setPointerState.bind(this),
     });
 
     this.actionMananger.registerAll();
@@ -54,7 +56,7 @@ class Project extends React.Component<Props> {
     //   renderScene(this.canvas, elements, this.state, window.devicePixelRatio);
     // }
 
-    this.actionMananger.execute("loadElements", this.state);
+    // this.actionMananger.execute("loadElements", this.state);
 
     window.addEventListener("resize", this.onResize);
   }
@@ -109,6 +111,12 @@ class Project extends React.Component<Props> {
     );
   }
 
+  private setPointerState(data: PointerState) {
+    for (const key of Object.keys(data)) {
+      (this.pointerState as any)[key] = (data as any)[key];
+    }
+  }
+
   private onPointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
     this.dispatchPointerEvent("pointerMove", event);
   }
@@ -130,7 +138,7 @@ class Project extends React.Component<Props> {
   }
 
   private onToolboxClick(action: string) {
-    this.actionMananger.execute(action, this.state);
+    this.actionMananger.start(action, { state: this.state });
   }
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
@@ -171,18 +179,16 @@ class Project extends React.Component<Props> {
       );
     let addState = {};
     if (eventType === "pointerDown") {
-      addState = {
-        pointerDownX: x,
-        pointerDownY: y,
-      };
     }
     this.setState({
-      ...addState,
       pointerX: x,
       pointerY: y,
       pointerButtons: event.buttons,
     });
-    this.actionMananger.dispatch(eventType, this.state);
+    this.actionMananger.dispatch(eventType, {
+      state: this.state,
+      pointerState: this.pointerState,
+    });
   }
 }
 

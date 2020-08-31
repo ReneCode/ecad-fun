@@ -4,7 +4,7 @@ import { randomId } from "../utils/randomId";
 export const actionRectangle: Action = {
   name: "rectangle",
 
-  pointerDown: (state: AppState) => {
+  pointerDown: ({ state }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadRectangleElement = {
@@ -23,7 +23,7 @@ export const actionRectangle: Action = {
     };
   },
 
-  pointerMove: (state: AppState) => {
+  pointerMove: ({ state }) => {
     if (state.editingElement) {
       const x = state.pointerX;
       const y = state.pointerY;
@@ -41,7 +41,7 @@ export const actionRectangle: Action = {
     }
   },
 
-  pointerUp: (state: AppState) => {
+  pointerUp: ({ state }) => {
     if (state.editingElement) {
       return {
         state: {

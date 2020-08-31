@@ -4,7 +4,7 @@ import { hitTestElement } from "../elements";
 export const actionHover: Action = {
   name: "hover",
 
-  pointerMove: (state: AppState) => {
+  pointerMove: ({ state }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     let cursor = "default";

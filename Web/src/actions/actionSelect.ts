@@ -10,7 +10,7 @@ let lastPoint: { x: number; y: number } = { x: 0, y: 0 };
 export const actionSelect: Action = {
   name: "select",
 
-  pointerDown: (state: AppState) => {
+  pointerDown: ({ state }) => {
     const x = state.pointerX;
     const y = state.pointerY;
 
@@ -50,7 +50,7 @@ export const actionSelect: Action = {
     };
   },
 
-  pointerMove: (state: AppState) => {
+  pointerMove: ({ state }) => {
     if (
       state.selectedElementIds.length > 0 &&
       state.pointerButtons & POINTER_BUTTONS.MAIN

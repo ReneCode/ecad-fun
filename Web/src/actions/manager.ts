@@ -1,4 +1,4 @@
-import { Action, AppState, ActionResult } from "../types";
+import { Action, AppState, ActionResult, PointerState } from "../types";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";
@@ -8,18 +8,27 @@ import { actionLoadElements } from "./actionLoadElements";
 import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
 import { actionPanning } from "./actionPanning";
 
-export type EventType = "start" | "pointerMove" | "pointerUp" | "pointerDown";
+export type EventType = "execute" | "pointerMove" | "pointerUp" | "pointerDown";
 
 type setStateFn = (data: any) => void;
+type setPointerStateFn = (data: any) => void;
 
 export class ActionManager {
   allActions: Action[] = [];
   basicActions: Action[] = [];
-  currentActionName: string = "";
   setState: setStateFn;
+  setPointerState: setPointerStateFn;
+  runningActionNames: string[] = [];
 
-  constructor({ setState }: { setState: setStateFn }) {
+  constructor({
+    setState,
+    setPointerState,
+  }: {
+    setState: setStateFn;
+    setPointerState: setPointerStateFn;
+  }) {
     this.setState = setState;
+    this.setPointerState = setPointerState;
   }
 
   register(action: Action) {
@@ -40,40 +49,80 @@ export class ActionManager {
     this.register(actionPanning);
   }
 
-  public dispatch(type: EventType, state: AppState, params: any = null) {
+  public dispatch(
+    type: EventType,
+    {
+      state,
+      pointerState,
+      params,
+    }: { state: AppState; pointerState: PointerState; params?: any }
+  ) {
     for (let action of this.basicActions) {
-      this.executeActionMethode(action, type, state, params);
+      this.executeActionMethode(action, type, { state, pointerState, params });
     }
 
-    if (this.currentActionName) {
-      const currentAction = this.allActions.find(
-        (action) => action.name === this.currentActionName
-      );
-      if (currentAction) {
-        this.executeActionMethode(currentAction, type, state, params);
-      } else {
-        throw new Error(`can't find action: ${this.currentActionName}`);
+    this.runningActionNames.forEach((name) => {
+      const action = this.getAction(name);
+      if (action) {
+        this.executeActionMethode(action, type, {
+          state,
+          pointerState,
+          params,
+        });
       }
-    }
+    });
   }
 
   public execute(actionName: string, state: AppState, params: any = null) {
-    this.currentActionName = actionName;
-    this.dispatch("start", state, params);
+    const action = this.getAction(actionName);
+    if (action) {
+      this.executeActionMethode(action, "execute", {
+        state,
+        params,
+      });
+    }
+  }
+
+  public start(actionName: string, { state }: { state: AppState }) {
+    const action = this.getAction(actionName);
+    if (!action) {
+      throw new Error(`Action: ${actionName} not found`);
+    }
+    this.runningActionNames.push(actionName);
+
+    // may be later a "start" methode would be usefull
+    // this.executeActionMethode(action, "start", {
+    //   state,
+    // });
+  }
+
+  private getAction(actionName: string) {
+    return this.allActions.find((action) => action.name === actionName);
   }
 
   private executeActionMethode(
     action: Action,
     type: EventType,
-    state: AppState,
-    params: any
+    {
+      state,
+      pointerState,
+      params,
+    }: { state: AppState; pointerState?: PointerState; params?: any }
   ) {
     const fn = action[type];
     if (fn) {
-      const result = fn(state, params);
+      const result = fn({ state, pointerState, params });
       if (result) {
         if (result.state) {
           this.setState(result.state);
+        }
+        if (result.pointerState) {
+          this.setPointerState(result.pointerState);
+        }
+        if (result.stopAction) {
+          this.runningActionNames = this.runningActionNames.filter(
+            (name) => name !== action.name
+          );
         }
       }
     }

@@ -40,8 +40,6 @@ export type AppState = {
   // world-coords of mouse/touch event
   pointerX: number;
   pointerY: number;
-  pointerDownX: number;
-  pointerDownY: number;
 
   gripSize: number; // in worldCoord
   // project-coords view
@@ -83,8 +81,6 @@ export const getDefaultAppState = (): AppState => {
 
     pointerX: 0,
     pointerY: 0,
-    pointerDownX: 0,
-    pointerDownY: 0,
   };
 };
 
@@ -92,10 +88,15 @@ export const getDefaultAppState = (): AppState => {
 export type Action = {
   name: string;
 
-  start?: ActionFn;
+  execute?: ActionFn;
   pointerDown?: ActionFn;
   pointerUp?: ActionFn;
   pointerMove?: ActionFn;
+};
+
+export type PointerState = {
+  downX?: number;
+  downY?: number;
 };
 
 export type ActionResult = {
@@ -113,10 +114,15 @@ export type ActionResult = {
     gripSize?: number;
     zoom?: number;
   };
-  actionFinished?: boolean;
+  pointerState?: PointerState;
+  stopAction?: boolean;
 };
 
-type ActionFn = (appState: AppState, params: any) => ActionResult | void;
+type ActionFn = (args: {
+  state: AppState;
+  pointerState?: PointerState;
+  params: any;
+}) => ActionResult | void;
 
 export type HitTestResult = {
   id: string;

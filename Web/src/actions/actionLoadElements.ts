@@ -3,7 +3,8 @@ import { randomId } from "../utils/randomId";
 
 export const actionLoadElements: Action = {
   name: "loadElements",
-  start: () => {
+
+  execute: () => {
     const line: ECadLineElement = {
       id: randomId(),
       type: "line",

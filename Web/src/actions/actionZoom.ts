@@ -28,34 +28,29 @@ const zoom = (
 
 export const actionZoomIn: Action = {
   name: "zoomIn",
-  start: (appState: AppState) => {
-    return zoom(appState, 1.1);
+
+  execute: ({ state }) => {
+    return zoom(state, 1.1);
   },
 };
 
 export const actionZoomOut: Action = {
   name: "zoomOut",
-  start: (appState: AppState) => {
-    return zoom(appState, 1 / 1.1);
+
+  execute: ({ state }) => {
+    return zoom(state, 1 / 1.1);
   },
 };
 
 export const actionZoomPinch: Action = {
   name: "zoomPinch",
 
-  start: (
-    appState: AppState,
-    {
-      deltaY,
-      clientX,
-      clientY,
-    }: { deltaY: number; clientX: number; clientY: number }
-  ) => {
+  execute: ({ state, params }) => {
     const MAX_DELTA = 10;
-    let delta = Math.min(Math.abs(deltaY), MAX_DELTA);
-    const sign = Math.sign(deltaY);
+    let delta = Math.min(Math.abs(params.deltaY), MAX_DELTA);
+    const sign = Math.sign(params.deltaY);
     delta *= sign;
 
-    return zoom(appState, 1 - delta / 100, clientX, clientY);
+    return zoom(state, 1 - delta / 100, params.clientX, params.clientY);
   },
 };

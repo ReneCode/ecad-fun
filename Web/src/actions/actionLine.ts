@@ -4,7 +4,7 @@ import { randomId } from "../utils/randomId";
 export const actionLine: Action = {
   name: "line",
 
-  pointerDown: (state: AppState) => {
+  pointerDown: ({ state }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadLineElement = {
@@ -23,7 +23,7 @@ export const actionLine: Action = {
     };
   },
 
-  pointerMove: (state: AppState) => {
+  pointerMove: ({ state }) => {
     if (state.editingElement) {
       const x = state.pointerX;
       const y = state.pointerY;
@@ -42,13 +42,14 @@ export const actionLine: Action = {
     }
   },
 
-  pointerUp: (state: AppState) => {
+  pointerUp: ({ state }) => {
     if (state.editingElement) {
       return {
         state: {
           elements: [...state.elements, state.editingElement],
           editingElement: null,
         },
+        stopAction: true,
       };
     }
   },

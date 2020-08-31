@@ -1,11 +1,11 @@
 import { ECadCircleElement, Action, AppState } from "../types";
-import { distanceBetweenPoints } from "../utils/geometric";
+import { distancePointToPoint } from "../utils/geometric";
 import { randomId } from "../utils/randomId";
 
 export const actionCircle: Action = {
   name: "circle",
 
-  pointerDown: (state: AppState) => {
+  pointerDown: ({ state }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadCircleElement = {
@@ -20,15 +20,19 @@ export const actionCircle: Action = {
       state: {
         editingElement: element,
       },
+      pointerState: {
+        downX: x,
+        downY: y,
+      },
     };
   },
 
-  pointerMove: (state: AppState) => {
+  pointerMove: ({ state }) => {
     if (state.editingElement) {
       const { x, y } = state.editingElement;
       const nx = state.pointerX;
       const ny = state.pointerY;
-      const radius = distanceBetweenPoints(x, y, nx, ny);
+      const radius = distancePointToPoint(x, y, nx, ny);
       const element: ECadCircleElement = {
         ...state.editingElement,
         radius,
@@ -41,13 +45,14 @@ export const actionCircle: Action = {
     }
   },
 
-  pointerUp: (state: AppState) => {
+  pointerUp: ({ state }) => {
     if (state.editingElement) {
       return {
         state: {
           elements: [...state.elements, state.editingElement],
           editingElement: null,
         },
+        stopAction: true,
       };
     }
   },
