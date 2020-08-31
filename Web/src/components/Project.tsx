@@ -177,7 +177,6 @@ class Project extends React.Component<Props> {
         this.canvas?.width,
         this.canvas?.height
       );
-    let addState = {};
     if (eventType === "pointerDown") {
     }
     this.setState({

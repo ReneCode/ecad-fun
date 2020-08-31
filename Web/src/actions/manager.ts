@@ -1,4 +1,4 @@
-import { Action, AppState, ActionResult, PointerState } from "../types";
+import { Action, AppState, PointerState } from "../types";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";

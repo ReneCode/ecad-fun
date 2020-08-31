@@ -13,7 +13,6 @@ import {
   distancePointToLine,
   distancePointToPoint,
 } from "../utils/geometric";
-import { normalize } from "path";
 
 export const getSelectedElements = (state: AppState) => {
   return state.elements.filter((e) => state.selectedElementIds.includes(e.id));
@@ -73,8 +72,13 @@ export const hitTestElement = (
       hitElement = hitTestCircle(element as ECadCircleElement, x, y, epsilon);
       break;
     case "rectangle":
+      hitElement = hitTestRectangle(
+        element as ECadRectangleElement,
+        x,
+        y,
+        epsilon
+      );
       break;
-    // return hitTestRectangle(element as ECadRectangleElement, x, y);
     default:
       throw new Error(`bad element Type: ${element.type}`);
   }
@@ -113,8 +117,11 @@ const hitTestCircle = (
 const hitTestRectangle = (
   line: ECadRectangleElement,
   x: number,
-  y: number
-) => {};
+  y: number,
+  epsilon: number
+) => {
+  return false;
+};
 
 export const getBoundingBox = (element: ECadBaseElement) => {
   switch (element.type) {

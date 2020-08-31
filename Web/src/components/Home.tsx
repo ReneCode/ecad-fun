@@ -5,10 +5,6 @@ import "./App.css";
 const App = () => {
   // const { state, actions } = useOvermind();
 
-  const handleClick = () => {
-    // actions.canvas.setName("B" + state.canvas.name);
-  };
-
   return (
     <div className="App">
       <header className="App-header">

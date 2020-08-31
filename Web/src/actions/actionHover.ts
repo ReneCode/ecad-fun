@@ -1,4 +1,4 @@
-import { Action, AppState } from "../types";
+import { Action } from "../types";
 import { hitTestElement } from "../elements";
 
 export const actionHover: Action = {

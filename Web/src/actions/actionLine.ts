@@ -1,4 +1,4 @@
-import { ECadLineElement, Action, AppState } from "../types";
+import { ECadLineElement, Action } from "../types";
 import { randomId } from "../utils/randomId";
 
 export const actionLine: Action = {

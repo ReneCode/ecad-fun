@@ -1,4 +1,4 @@
-import { Action, AppState, POINTER_BUTTONS } from "../types";
+import { Action, POINTER_BUTTONS } from "../types";
 import {
   hitTestElement,
   getSelectedElements,

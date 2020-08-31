@@ -9,7 +9,7 @@ import {
   worldCoordToScreenCoord,
   worldLengthToScreenLength,
 } from "../utils/geometric";
-import { getBoundingBox, getHandlesElement } from "../elements";
+import { getHandlesElement } from "../elements";
 
 const COLOR = {
   SELECTED: "#5522ee",
@@ -59,18 +59,18 @@ export const renderScene = (
   // context.fillRect(200, 200, 400, 300);
 };
 
-const renderBoundingBox = (
-  context: CanvasRenderingContext2D,
-  { x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number },
-  state: AppState
-) => {
-  context.beginPath();
-  const { x: sx1, y: sy1 } = worldCoordToScreenCoord(x1, y1, state);
-  const { x: sx2, y: sy2 } = worldCoordToScreenCoord(x2, y2, state);
-  context.rect(sx1, sy2, sx2 - sx1, -(sy2 - sy1));
-  context.strokeStyle = "#9e9";
-  context.stroke();
-};
+// const renderBoundingBox = (
+//   context: CanvasRenderingContext2D,
+//   { x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number },
+//   state: AppState
+// ) => {
+//   context.beginPath();
+//   const { x: sx1, y: sy1 } = worldCoordToScreenCoord(x1, y1, state);
+//   const { x: sx2, y: sy2 } = worldCoordToScreenCoord(x2, y2, state);
+//   context.rect(sx1, sy2, sx2 - sx1, -(sy2 - sy1));
+//   context.strokeStyle = "#9e9";
+//   context.stroke();
+// };
 
 const renderElement = (
   context: CanvasRenderingContext2D,

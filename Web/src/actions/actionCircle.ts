@@ -1,4 +1,4 @@
-import { ECadCircleElement, Action, AppState } from "../types";
+import { ECadCircleElement, Action } from "../types";
 import { distancePointToPoint } from "../utils/geometric";
 import { randomId } from "../utils/randomId";
 
