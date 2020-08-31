@@ -20,7 +20,7 @@ jobs:
         node-version: [12.x]
 
     steps:
-      - name Checkout sources
+      - name: Checkout sources
         uses: actions/checkout@v2
 
       - name: User npm ${{matrix.node-version}}
