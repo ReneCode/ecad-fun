@@ -27,3 +27,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+          
+      - name: Change to frontend directory
+        working-directory: ./Web
+      
+      - name: Build frontend
+      - run: npm install
+      - run: npm build
+        
