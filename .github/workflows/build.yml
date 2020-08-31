@@ -31,7 +31,9 @@ jobs:
       - name: Change to frontend directory
         working-directory: ./Web
       
-      - name: Build frontend
-      - run: npm install
-      - run: npm build
+      - name: install package
+        run: npm install
+        
+      - name: build app
+        run: npm build
         
