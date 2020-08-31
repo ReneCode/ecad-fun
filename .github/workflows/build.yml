@@ -30,6 +30,7 @@ jobs:
           
       - name: Change to frontend directory
         working-directory: ./Web
+        run: ls -R
       
       - name: install package
         run: npm install
