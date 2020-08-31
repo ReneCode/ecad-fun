@@ -12,20 +12,23 @@ on:
     branches: [master]
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }} # runs a test on Ubuntu, Windows and macOS
+  build:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        deno: ["v1.x", "nightly"]
-        os: [macOS-latest, windows-latest, ubuntu-latest]
+        node-version: [12.x]
 
     steps:
-      - name: Setup repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Install packages
-        run: npm install
+      - name: User npm ${{matrix.node-version}}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-      - name: Build app
-        run: npm run build
+      - name: Build Frontend
+        working-directory: Web
+
+      - run: npm install
+      - run: npm run build
