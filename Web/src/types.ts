@@ -88,6 +88,9 @@ export const getDefaultAppState = (): AppState => {
 export type Action = {
   name: string;
 
+  stop?: ActionFn;
+  start?: ActionFn;
+
   execute?: ActionFn;
   pointerDown?: ActionFn;
   pointerUp?: ActionFn;

@@ -10,6 +10,15 @@ let lastPoint: { x: number; y: number } = { x: 0, y: 0 };
 export const actionSelect: Action = {
   name: "select",
 
+  stop: ({ state }) => {
+    console.log("actionSelect.stop");
+    return {
+      state: {
+        selectedElementIds: [],
+      },
+    };
+  },
+
   pointerDown: ({ state }) => {
     const x = state.pointerX;
     const y = state.pointerY;

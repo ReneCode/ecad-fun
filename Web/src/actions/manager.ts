@@ -8,7 +8,13 @@ import { actionLoadElements } from "./actionLoadElements";
 import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
 import { actionPanning } from "./actionPanning";
 
-export type EventType = "execute" | "pointerMove" | "pointerUp" | "pointerDown";
+export type EventType =
+  | "execute"
+  | "start"
+  | "stop"
+  | "pointerMove"
+  | "pointerUp"
+  | "pointerDown";
 
 type setStateFn = (data: any) => void;
 type setPointerStateFn = (data: any) => void;
@@ -35,8 +41,9 @@ export class ActionManager {
     this.allActions.push(action);
   }
   registerAll() {
-    this.basicActions.push(actionHover);
-    this.basicActions.push(actionSelect);
+    // this.basicActions.push(actionHover);
+
+    this.register(actionSelect);
 
     this.register(actionLine);
     this.register(actionCircle);
@@ -88,12 +95,14 @@ export class ActionManager {
     if (!action) {
       throw new Error(`Action: ${actionName} not found`);
     }
+
+    this.dispatch("stop", { state, pointerState: {} });
+    this.runningActionNames = [];
     this.runningActionNames.push(actionName);
 
-    // may be later a "start" methode would be usefull
-    // this.executeActionMethode(action, "start", {
-    //   state,
-    // });
+    this.executeActionMethode(action, "start", {
+      state,
+    });
   }
 
   private getAction(actionName: string) {
@@ -123,6 +132,9 @@ export class ActionManager {
           this.runningActionNames = this.runningActionNames.filter(
             (name) => name !== action.name
           );
+          if (this.runningActionNames.length === 0) {
+            this.start("select", { state });
+          }
         }
       }
     }
