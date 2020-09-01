@@ -1,8 +1,7 @@
-import { Action, AppState, PointerState } from "../types";
+import { Action, AppState, ActionState, defaultActionState } from "../types";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";
-import { actionHover } from "./actionHover";
 import { actionSelect } from "./actionSelect";
 import { actionLoadElements } from "./actionLoadElements";
 import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
@@ -17,24 +16,16 @@ export type EventType =
   | "pointerDown";
 
 type setStateFn = (data: any) => void;
-type setPointerStateFn = (data: any) => void;
 
 export class ActionManager {
   allActions: Action[] = [];
   basicActions: Action[] = [];
   setState: setStateFn;
-  setPointerState: setPointerStateFn;
   runningActionNames: string[] = [];
+  actionState: ActionState = defaultActionState;
 
-  constructor({
-    setState,
-    setPointerState,
-  }: {
-    setState: setStateFn;
-    setPointerState: setPointerStateFn;
-  }) {
+  constructor({ setState }: { setState: setStateFn }) {
     this.setState = setState;
-    this.setPointerState = setPointerState;
   }
 
   register(action: Action) {
@@ -58,33 +49,33 @@ export class ActionManager {
 
   public dispatch(
     type: EventType,
-    {
-      state,
-      pointerState,
-      params,
-    }: { state: AppState; pointerState: PointerState; params?: any }
+    { state, params }: { state: AppState; params?: any }
   ) {
-    for (let action of this.basicActions) {
-      this.executeActionMethode(action, type, { state, pointerState, params });
-    }
+    // for (let action of this.basicActions) {
+    //   this.executeActionMethode(action, type, { state, actionState: this.actionState, params });
+    // }
 
     this.runningActionNames.forEach((name) => {
       const action = this.getAction(name);
       if (action) {
         this.executeActionMethode(action, type, {
           state,
-          pointerState,
+          actionState: this.actionState,
           params,
         });
       }
     });
   }
 
-  public execute(actionName: string, state: AppState, params: any = null) {
+  public execute(
+    actionName: string,
+    { state, params }: { state: AppState; params: any }
+  ) {
     const action = this.getAction(actionName);
     if (action) {
       this.executeActionMethode(action, "execute", {
         state,
+        actionState: defaultActionState,
         params,
       });
     }
@@ -96,12 +87,13 @@ export class ActionManager {
       throw new Error(`Action: ${actionName} not found`);
     }
 
-    this.dispatch("stop", { state, pointerState: {} });
+    this.dispatch("stop", { state });
     this.runningActionNames = [];
     this.runningActionNames.push(actionName);
 
     this.executeActionMethode(action, "start", {
       state,
+      actionState: defaultActionState,
     });
   }
 
@@ -114,19 +106,19 @@ export class ActionManager {
     type: EventType,
     {
       state,
-      pointerState,
+      actionState,
       params,
-    }: { state: AppState; pointerState?: PointerState; params?: any }
+    }: { state: AppState; actionState: ActionState; params?: any }
   ) {
     const fn = action[type];
     if (fn) {
-      const result = fn({ state, pointerState, params });
+      const result = fn({ state, actionState, params });
       if (result) {
         if (result.state) {
           this.setState(result.state);
         }
-        if (result.pointerState) {
-          this.setPointerState(result.pointerState);
+        if (result.actionState) {
+          this.setActionState(result.actionState);
         }
         if (result.stopAction) {
           this.runningActionNames = this.runningActionNames.filter(
@@ -137,6 +129,12 @@ export class ActionManager {
           }
         }
       }
+    }
+  }
+
+  private setActionState(data: any) {
+    for (const key of Object.keys(data)) {
+      (this.actionState as any)[key] = (data as any)[key];
     }
   }
 }

@@ -5,7 +5,7 @@ import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
-import { AppState, getDefaultAppState, PointerState } from "../types";
+import { AppState, getDefaultAppState, ActionState } from "../types";
 import { Gesture } from "../utils/Gesture";
 
 type Props = {
@@ -16,7 +16,6 @@ type Props = {
 class Project extends React.Component<Props> {
   canvas: HTMLCanvasElement | null = null;
   actionMananger: ActionManager;
-  pointerState: PointerState = {};
   gesture = new Gesture();
   unsubscribe: (() => void)[] = [];
 
@@ -44,7 +43,6 @@ class Project extends React.Component<Props> {
 
     this.actionMananger = new ActionManager({
       setState: this.setState.bind(this),
-      setPointerState: this.setPointerState.bind(this),
     });
 
     this.actionMananger.registerAll();
@@ -111,12 +109,6 @@ class Project extends React.Component<Props> {
     );
   }
 
-  private setPointerState(data: PointerState) {
-    for (const key of Object.keys(data)) {
-      (this.pointerState as any)[key] = (data as any)[key];
-    }
-  }
-
   private onPointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
     this.dispatchPointerEvent("pointerMove", event);
   }
@@ -131,9 +123,15 @@ class Project extends React.Component<Props> {
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
-      this.actionMananger.execute("zoomPinch", this.state, event);
+      this.actionMananger.execute("zoomPinch", {
+        state: this.state,
+        params: event,
+      });
     } else {
-      this.actionMananger.execute("panning", this.state, event);
+      this.actionMananger.execute("panning", {
+        state: this.state,
+        params: event,
+      });
     }
   }
 
@@ -177,8 +175,6 @@ class Project extends React.Component<Props> {
         this.canvas?.width,
         this.canvas?.height
       );
-    if (eventType === "pointerDown") {
-    }
     this.setState({
       pointerX: x,
       pointerY: y,
@@ -186,7 +182,6 @@ class Project extends React.Component<Props> {
     });
     this.actionMananger.dispatch(eventType, {
       state: this.state,
-      pointerState: this.pointerState,
     });
   }
 }

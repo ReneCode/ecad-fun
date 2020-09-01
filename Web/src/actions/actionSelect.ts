@@ -1,17 +1,14 @@
-import { Action, POINTER_BUTTONS } from "../types";
+import { Action, POINTER_BUTTONS, ActionState } from "../types";
 import {
   hitTestElement,
   getSelectedElements,
   replaceElements,
 } from "../elements";
 
-let lastPoint: { x: number; y: number } = { x: 0, y: 0 };
-
 export const actionSelect: Action = {
   name: "select",
 
   stop: ({ state }) => {
-    console.log("actionSelect.stop");
     return {
       state: {
         selectedElementIds: [],
@@ -23,8 +20,6 @@ export const actionSelect: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
 
-    lastPoint = { x, y };
-
     const selectedElements = state.elements.filter((e) =>
       state.selectedElementIds.includes(e.id)
     );
@@ -34,6 +29,10 @@ export const actionSelect: Action = {
         return {
           state: {
             selectedElementIds: [result.id],
+          },
+          actionState: {
+            lastX: x,
+            lastY: y,
             selectedHandleIdx: result.type === "handle" ? result.handleIdx : -1,
           },
         };
@@ -46,6 +45,10 @@ export const actionSelect: Action = {
         return {
           state: {
             selectedElementIds: [result.id],
+          },
+          actionState: {
+            lastX: x,
+            lastY: y,
             selectedHandleIdx: -1,
           },
         };
@@ -59,17 +62,15 @@ export const actionSelect: Action = {
     };
   },
 
-  pointerMove: ({ state }) => {
+  pointerMove: ({ state, actionState }) => {
     if (
       state.selectedElementIds.length > 0 &&
       state.pointerButtons & POINTER_BUTTONS.MAIN
     ) {
       const x = state.pointerX;
       const y = state.pointerY;
-      const dx = x - lastPoint.x;
-      const dy = y - lastPoint.y;
-
-      lastPoint = { x, y };
+      const dx = x - actionState.lastX;
+      const dy = y - actionState.lastY;
 
       const replace = getSelectedElements(state).map((e) => {
         return {
@@ -81,6 +82,10 @@ export const actionSelect: Action = {
       return {
         state: {
           elements: replaceElements(replace, state),
+        },
+        actionState: {
+          lastX: x,
+          lastY: y,
         },
       };
     }

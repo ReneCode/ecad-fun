@@ -53,7 +53,6 @@ export type AppState = {
   screenOriginY: number;
 
   selectedElementIds: string[];
-  selectedHandleIdx: number;
   editingElement: ECadBaseElement | null;
   elements: readonly ECadBaseElement[];
 };
@@ -69,7 +68,6 @@ export const getDefaultAppState = (): AppState => {
 
     editingElement: null,
     selectedElementIds: [],
-    selectedHandleIdx: -1,
 
     elements: [],
     clientX: 0,
@@ -97,9 +95,16 @@ export type Action = {
   pointerMove?: ActionFn;
 };
 
-export type PointerState = {
-  downX?: number;
-  downY?: number;
+export type ActionState = {
+  lastX: number;
+  lastY: number;
+  selectedHandleIdx: number;
+};
+
+export const defaultActionState: ActionState = {
+  lastX: 0,
+  lastY: 0,
+  selectedHandleIdx: -1,
 };
 
 export type ActionResult = {
@@ -107,7 +112,6 @@ export type ActionResult = {
     elements?: ECadBaseElement[];
     editingElement?: ECadBaseElement | null;
     selectedElementIds?: string[];
-    selectedHandleIdx?: number;
 
     cursor?: string;
 
@@ -117,13 +121,17 @@ export type ActionResult = {
     gripSize?: number;
     zoom?: number;
   };
-  pointerState?: PointerState;
+  actionState?: {
+    lastX?: number;
+    lastY?: number;
+    selectedHandleIdx?: number;
+  };
   stopAction?: boolean;
 };
 
 type ActionFn = (args: {
   state: AppState;
-  pointerState?: PointerState;
+  actionState: ActionState;
   params: any;
 }) => ActionResult | void;
 

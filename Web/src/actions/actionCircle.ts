@@ -20,9 +20,9 @@ export const actionCircle: Action = {
       state: {
         editingElement: element,
       },
-      pointerState: {
-        downX: x,
-        downY: y,
+      actionState: {
+        lastX: x,
+        lastY: y,
       },
     };
   },
