@@ -5,7 +5,7 @@ import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/manager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
-import { AppState, getDefaultAppState, ActionState } from "../types";
+import { AppState, getDefaultAppState } from "../types";
 import { Gesture } from "../utils/Gesture";
 
 type Props = {
