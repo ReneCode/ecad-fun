@@ -45,6 +45,9 @@ export class ActionManager {
     this.register(actionZoomOut);
     this.register(actionZoomPinch);
     this.register(actionPanning);
+
+    // default action
+    this.runningActionNames.push("select");
   }
 
   public dispatch(

@@ -14,7 +14,6 @@ import {
   distancePointToLine,
   distancePointToPoint,
 } from "../utils/geometric";
-import { dirxml } from "console";
 
 export const getSelectedElements = (state: AppState) => {
   return state.elements.filter((e) => state.selectedElementIds.includes(e.id));

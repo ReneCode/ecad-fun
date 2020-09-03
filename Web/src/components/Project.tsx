@@ -7,6 +7,7 @@ import { ActionManager, EventType } from "../actions/manager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
 import { AppState, getDefaultAppState } from "../types";
 import { Gesture } from "../utils/Gesture";
+import { loadFromLocalStorage } from "../state";
 
 type Props = {
   width: number;
@@ -58,6 +59,7 @@ class Project extends React.Component<Props> {
     // this.actionMananger.execute("loadElements", this.state);
 
     window.addEventListener("resize", this.onResize);
+    this.setState(loadFromLocalStorage());
   }
 
   componentWillUnmount() {

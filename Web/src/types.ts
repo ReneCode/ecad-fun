@@ -35,8 +35,6 @@ export type AppState = {
   cursor: string;
 
   // screen-coords of mouse/touch event
-  clientX: number;
-  clientY: number;
   pointerButtons: number;
 
   // world-coords of mouse/touch event
@@ -72,8 +70,6 @@ export const getDefaultAppState = (): AppState => {
     selectedElementIds: [],
 
     elements: [],
-    clientX: 0,
-    clientY: 0,
     pointerButtons: -1,
 
     gripSize: 12,
