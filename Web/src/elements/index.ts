@@ -5,6 +5,7 @@ import {
   AppState,
   HitTestResult,
   ECadCircleElement,
+  Point,
 } from "../types";
 import {
   normalizeBox,
@@ -13,6 +14,7 @@ import {
   distancePointToLine,
   distancePointToPoint,
 } from "../utils/geometric";
+import { dirxml } from "console";
 
 export const getSelectedElements = (state: AppState) => {
   return state.elements.filter((e) => state.selectedElementIds.includes(e.id));
@@ -172,4 +174,54 @@ const getHandlesCircle = (circle: ECadCircleElement) => {
     { x: circle.x, y: circle.y - circle.radius, idx: 2 },
     { x: circle.x - circle.radius, y: circle.y, idx: 3 },
   ];
+};
+
+export const moveHandleOfElement = (
+  element: ECadBaseElement,
+  handleIdx: number,
+  pt: Point
+) => {
+  switch (element.type) {
+    case "line":
+      return moveHandleOfLine(element as ECadLineElement, handleIdx, pt);
+    default:
+      throw new Error("bad type for moveHandleOfElement");
+  }
+};
+
+export const moveHandleOfLine = (
+  line: ECadLineElement,
+  handleIdx: number,
+  pt: Point
+): ECadLineElement => {
+  const newLine = { ...line };
+  if (handleIdx === 0) {
+    const dx = pt.x - line.x;
+    const dy = pt.y - line.y;
+    newLine.x = pt.x;
+    newLine.y = pt.y;
+    newLine.w = line.w - dx;
+    newLine.h = line.h - dy;
+  }
+
+  return newLine;
+};
+
+export const moveElementByDelta = (element: ECadBaseElement, delta: Point) => {
+  switch (element.type) {
+    case "line":
+      return moveByDeltaLine(element as ECadLineElement, delta);
+    case "circle":
+    case "rectangle":
+      return { ...element, x: element.x + delta.x, y: element.y + delta.y };
+    default:
+      throw new Error("bad type for moveHandleOfElement");
+  }
+};
+
+export const moveByDeltaLine = (
+  line: ECadLineElement,
+  delta: Point
+): ECadLineElement => {
+  return { ...line, x: line.x + delta.x, y: line.y + delta.y };
 };

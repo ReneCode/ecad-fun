@@ -9,11 +9,9 @@ export const saveDebounced = debounce((appState: AppState) => {
 }, DELAY_SAVE);
 
 const saveToLocalStorage = (appState: AppState) => {
-  {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appState));
-    } catch (err) {
-      console.error(err);
-    }
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appState));
+  } catch (err) {
+    console.error(err);
   }
 };

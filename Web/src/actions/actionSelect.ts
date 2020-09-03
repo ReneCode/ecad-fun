@@ -3,6 +3,8 @@ import {
   hitTestElement,
   getSelectedElements,
   replaceElements,
+  moveHandleOfElement,
+  moveElementByDelta,
 } from "../elements";
 
 export const actionSelect: Action = {
@@ -73,22 +75,41 @@ export const actionSelect: Action = {
       const dy = y - actionState.lastY;
       const handleIdx = actionState.selectedHandleIdx;
 
-      const replace = getSelectedElements(state).map((e) => {
+      if (handleIdx < 0) {
+        // move element
+
+        const replace = getSelectedElements(state).map((e) => {
+          return moveElementByDelta(e, { x: dx, y: dy });
+          // return {
+          //   ...e,
+          //   x: e.x + dx,
+          //   y: e.y + dy,
+          // };
+        });
         return {
-          ...e,
-          x: e.x + dx,
-          y: e.y + dy,
+          state: {
+            elements: replaceElements(replace, state),
+          },
+          actionState: {
+            lastX: x,
+            lastY: y,
+          },
         };
-      });
-      return {
-        state: {
-          elements: replaceElements(replace, state),
-        },
-        actionState: {
-          lastX: x,
-          lastY: y,
-        },
-      };
+      } else {
+        // move handle
+        const replace = getSelectedElements(state).map((e) => {
+          return moveHandleOfElement(e, handleIdx, { x, y });
+        });
+        return {
+          state: {
+            elements: replaceElements(replace, state),
+          },
+          actionState: {
+            lastX: x,
+            lastY: y,
+          },
+        };
+      }
     }
   },
 };
