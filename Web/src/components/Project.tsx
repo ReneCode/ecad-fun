@@ -11,6 +11,7 @@ import { Gesture } from "../utils/Gesture";
 type Props = {
   width: number;
   height: number;
+  onChange: (appState: AppState) => void;
 };
 
 class Project extends React.Component<Props> {
@@ -81,6 +82,7 @@ class Project extends React.Component<Props> {
       }
       renderScene(this.canvas, elements, this.state);
     }
+    this.props.onChange(this.state);
   }
 
   public render() {

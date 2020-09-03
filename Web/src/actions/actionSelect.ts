@@ -71,6 +71,7 @@ export const actionSelect: Action = {
       const y = state.pointerY;
       const dx = x - actionState.lastX;
       const dy = y - actionState.lastY;
+      const handleIdx = actionState.selectedHandleIdx;
 
       const replace = getSelectedElements(state).map((e) => {
         return {

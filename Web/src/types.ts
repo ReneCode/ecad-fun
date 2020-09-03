@@ -121,11 +121,7 @@ export type ActionResult = {
     gripSize?: number;
     zoom?: number;
   };
-  actionState?: {
-    lastX?: number;
-    lastY?: number;
-    selectedHandleIdx?: number;
-  };
+  actionState?: Partial<ActionState>;
   stopAction?: boolean;
 };
 

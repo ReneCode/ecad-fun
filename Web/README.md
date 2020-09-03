@@ -1,5 +1,11 @@
 # ecad.fun
 
+easy is realative. (easy for whom)
+
+simple is an objective
+
+haskell, clojoure
+
 https://www.youtube.com/watch?v=6arkndScw7A&t=649s
 https://www.youtube.com/watch?v=IcfhcJrtJqI
 
