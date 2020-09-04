@@ -86,14 +86,17 @@ export const getDefaultAppState = (): AppState => {
   };
 };
 
-// Action
+/**
+ * @description Action interface. if execute methode is set, that that action is only called once,
+ * otherwise it is a long-running action and start,stop,pointer... are called until actionResult.stopAction:true is returned.
+ */
 export type Action = {
   name: string;
 
   stop?: ActionFn;
   start?: ActionFn;
 
-  execute?: ActionFn;
+  execute?: ActionFn; //
   pointerDown?: ActionFn;
   pointerUp?: ActionFn;
   pointerMove?: ActionFn;

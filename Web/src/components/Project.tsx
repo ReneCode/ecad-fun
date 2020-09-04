@@ -143,7 +143,7 @@ class Project extends React.Component<Props> {
   }
 
   private onToolboxClick(action: string) {
-    this.actionMananger.start(action, { state: this.state });
+    this.actionMananger.execute(action, { state: this.state, params: null });
   }
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {

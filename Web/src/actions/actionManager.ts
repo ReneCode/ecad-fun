@@ -6,6 +6,7 @@ import { actionSelect } from "./actionSelect";
 import { actionLoadElements } from "./actionLoadElements";
 import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
 import { actionPanning } from "./actionPanning";
+import { actionCreateSymbol } from "./actionCreateSymbol";
 
 export type EventType =
   | "execute"
@@ -39,6 +40,7 @@ export class ActionManager {
     this.register(actionLine);
     this.register(actionCircle);
     this.register(actionRectangle);
+    this.register(actionCreateSymbol);
 
     this.register(actionLoadElements);
     this.register(actionZoomIn);
@@ -61,7 +63,7 @@ export class ActionManager {
     this.runningActionNames.forEach((name) => {
       const action = this.getAction(name);
       if (action) {
-        this.executeActionMethode(action, type, {
+        this.applyActionMethode(action, type, {
           state,
           actionState: this.actionState,
           params,
@@ -76,35 +78,32 @@ export class ActionManager {
   ) {
     const action = this.getAction(actionName);
     if (action) {
-      this.executeActionMethode(action, "execute", {
-        state,
-        actionState: defaultActionState,
-        params,
-      });
+      if (action.execute) {
+        // if execute methode exists, than it is a execute-once-action
+        this.applyActionMethode(action, "execute", {
+          state,
+          actionState: defaultActionState,
+          params,
+        });
+      } else {
+        // otherwise this is a long running action
+        this.dispatch("stop", { state });
+        this.runningActionNames = [];
+        this.runningActionNames.push(actionName);
+
+        this.applyActionMethode(action, "start", {
+          state,
+          actionState: defaultActionState,
+        });
+      }
     }
-  }
-
-  public start(actionName: string, { state }: { state: AppState }) {
-    const action = this.getAction(actionName);
-    if (!action) {
-      throw new Error(`Action: ${actionName} not found`);
-    }
-
-    this.dispatch("stop", { state });
-    this.runningActionNames = [];
-    this.runningActionNames.push(actionName);
-
-    this.executeActionMethode(action, "start", {
-      state,
-      actionState: defaultActionState,
-    });
   }
 
   private getAction(actionName: string) {
     return this.allActions.find((action) => action.name === actionName);
   }
 
-  private executeActionMethode(
+  private applyActionMethode(
     action: Action,
     type: EventType,
     {
@@ -128,7 +127,7 @@ export class ActionManager {
             (name) => name !== action.name
           );
           if (this.runningActionNames.length === 0) {
-            this.start("select", { state });
+            this.execute("select", { state, params });
           }
         }
       }
