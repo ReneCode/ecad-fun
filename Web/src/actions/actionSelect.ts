@@ -22,6 +22,7 @@ export const actionSelect: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
 
+    //  check selection on the selected elements
     const selectedElements = state.elements.filter((e) =>
       state.selectedElementIds.includes(e.id)
     );
@@ -41,6 +42,7 @@ export const actionSelect: Action = {
       }
     }
 
+    // select new element be picking
     for (let element of state.elements) {
       const result = hitTestElement(element, { x, y }, state);
       if (result) {
@@ -57,20 +59,28 @@ export const actionSelect: Action = {
       }
     }
 
+    // start select with selection-box
+
     return {
       state: {
+        lastX: x,
+        lastY: y,
         selectedElementIds: [],
+        selectionBox: { x1: x, y1: y, x2: x, y2: y },
+      },
+      actionState: {
+        mode: "selectionbox",
       },
     };
   },
 
   pointerMove: ({ state, actionState }) => {
+    const x = state.pointerX;
+    const y = state.pointerY;
     if (
       state.selectedElementIds.length > 0 &&
       state.pointerButtons & POINTER_BUTTONS.MAIN
     ) {
-      const x = state.pointerX;
-      const y = state.pointerY;
       const dx = x - actionState.lastX;
       const dy = y - actionState.lastY;
       const handleIdx = actionState.selectedHandleIdx;
@@ -111,5 +121,26 @@ export const actionSelect: Action = {
         };
       }
     }
+
+    // draw selection-box
+    if (state.selectionBox && state.pointerButtons & POINTER_BUTTONS.MAIN) {
+      return {
+        state: {
+          selectionBox: {
+            ...state.selectionBox,
+            x2: x,
+            y2: y,
+          },
+        },
+      };
+    }
+  },
+
+  pointerUp: ({ state, actionState }) => {
+    return {
+      state: {
+        selectionBox: null,
+      },
+    };
   },
 };

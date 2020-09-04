@@ -10,10 +10,10 @@ export const actionRectangle: Action = {
     const element: ECadRectangleElement = {
       id: randomId(),
       type: "rectangle",
-      x,
-      y,
-      w: 0,
-      h: 0,
+      x1: x,
+      y1: y,
+      x2: x,
+      y2: y,
       color: "green",
     };
     return {
@@ -31,8 +31,8 @@ export const actionRectangle: Action = {
       const rectangle = state.editingElement as ECadRectangleElement;
       const element: ECadRectangleElement = {
         ...rectangle,
-        w: x - rectangle.x,
-        h: y - rectangle.y,
+        x2: x,
+        y2: y,
       };
       return {
         state: {

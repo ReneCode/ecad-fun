@@ -1,6 +1,6 @@
 import { ElementWorker, ECadBaseElement, ECadRectangleElement } from "../types";
 
-import { normalizeBox } from "../utils/geometric";
+import { normalizeBox, distancePointToLine } from "../utils/geometric";
 
 export const workerRectangle: ElementWorker = {
   type: "rectangle",
@@ -12,37 +12,58 @@ export const workerRectangle: ElementWorker = {
   ) => {
     context.beginPath();
     const rectangle = element as ECadRectangleElement;
-    const { x, y } = worldCoordToScreenCoord(rectangle.x, rectangle.y);
-    const w = worldLengthToScreenLength(rectangle.w);
-    const h = worldLengthToScreenLength(rectangle.h);
-    context.rect(x, y, w, -h);
+    const { x: x1, y: y1 } = worldCoordToScreenCoord(
+      rectangle.x1,
+      rectangle.y1
+    );
+    const { x: x2, y: y2 } = worldCoordToScreenCoord(
+      rectangle.x2,
+      rectangle.y2
+    );
+    context.rect(x1, y1, x2 - x1, y2 - y1);
     context.stroke();
   },
 
   hitTest: (element, pt, epsilon) => {
-    return false;
+    const rect = element as ECadRectangleElement;
+
+    const hitTestLine = (x1: number, y1: number, x2: number, y2: number) => {
+      const dist = distancePointToLine(pt.x, pt.y, x1, y1, x2, y2);
+      return dist <= epsilon;
+    };
+
+    return (
+      hitTestLine(rect.x1, rect.y1, rect.x1, rect.y2) ||
+      hitTestLine(rect.x1, rect.y2, rect.x2, rect.y2) ||
+      hitTestLine(rect.x2, rect.y2, rect.x2, rect.y1) ||
+      hitTestLine(rect.x2, rect.y1, rect.x1, rect.y1)
+    );
   },
 
   getBoundingBox: (element: ECadBaseElement) => {
     const rectangle = element as ECadRectangleElement;
 
-    return normalizeBox(
-      rectangle.x,
-      rectangle.y,
-      rectangle.x + rectangle.w,
-      rectangle.y + rectangle.h
-    );
+    return normalizeBox(rectangle.x1, rectangle.y1, rectangle.x2, rectangle.y2);
   },
   getHandles: (element: ECadBaseElement) => {
-    return [];
+    const rectangle = element as ECadRectangleElement;
+
+    return [
+      { x: rectangle.x1, y: rectangle.y1, idx: 0 },
+      { x: rectangle.x1, y: rectangle.y2, idx: 1 },
+      { x: rectangle.x2, y: rectangle.y2, idx: 2 },
+      { x: rectangle.x2, y: rectangle.y1, idx: 3 },
+    ];
   },
 
   moveByDelta: (element, { x: dx, y: dy }): ECadRectangleElement => {
     const rectangle = element as ECadRectangleElement;
     return {
       ...rectangle,
-      x: rectangle.x + dx,
-      y: rectangle.y + dy,
+      x1: rectangle.x1 + dx,
+      y1: rectangle.y1 + dy,
+      x2: rectangle.x2 + dx,
+      y2: rectangle.y2 + dy,
     };
   },
 

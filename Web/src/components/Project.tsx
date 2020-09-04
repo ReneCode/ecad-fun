@@ -3,7 +3,7 @@ import { canvasState } from "../canvas";
 import Toolbox from "./Toobox";
 import Status from "./Status";
 import { renderScene } from "../renderer";
-import { ActionManager, EventType } from "../actions/manager";
+import { ActionManager, EventType } from "../actions/actionManager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
 import { AppState, getDefaultAppState } from "../types";
 import { Gesture } from "../utils/Gesture";
@@ -81,6 +81,9 @@ class Project extends React.Component<Props> {
       let elements = [...this.state.elements];
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
+      }
+      if (this.state.selectionBox) {
+        // element.push(this.state.selectionBox)
       }
       renderScene(this.canvas, elements, this.state);
     }

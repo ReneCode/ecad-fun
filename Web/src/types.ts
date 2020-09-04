@@ -27,10 +27,10 @@ export type ECadCircleElement = ECadBaseElement & {
 };
 
 export type ECadRectangleElement = ECadBaseElement & {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
 };
 
 export type AppState = {
@@ -54,8 +54,10 @@ export type AppState = {
   screenOriginX: number;
   screenOriginY: number;
 
-  selectedElementIds: string[];
   editingElement: ECadBaseElement | null;
+  selectedElementIds: string[];
+  selectionBox: Box | null;
+
   elements: readonly ECadBaseElement[];
 };
 
@@ -70,6 +72,7 @@ export const getDefaultAppState = (): AppState => {
 
     editingElement: null,
     selectedElementIds: [],
+    selectionBox: null,
 
     elements: [],
     pointerButtons: -1,
@@ -99,28 +102,18 @@ export type ActionState = {
   lastX: number;
   lastY: number;
   selectedHandleIdx: number;
+  mode: "selectionbox" | "";
 };
 
 export const defaultActionState: ActionState = {
   lastX: 0,
   lastY: 0,
   selectedHandleIdx: -1,
+  mode: "",
 };
 
 export type ActionResult = {
-  state?: {
-    elements?: ECadBaseElement[];
-    editingElement?: ECadBaseElement | null;
-    selectedElementIds?: string[];
-
-    cursor?: string;
-
-    screenOriginX?: number;
-    screenOriginY?: number;
-
-    gripSize?: number;
-    zoom?: number;
-  };
+  state?: Partial<AppState>;
   actionState?: Partial<ActionState>;
   stopAction?: boolean;
 };
@@ -147,7 +140,7 @@ export type Size = {
   h: number;
 };
 
-export type BoundingBox = {
+export type Box = {
   x1: number;
   y1: number;
   x2: number;
@@ -163,7 +156,7 @@ export type ElementWorker = {
 
   hitTest: (element: ECadBaseElement, pt: Point, epsilon: number) => boolean;
 
-  getBoundingBox: (element: ECadBaseElement) => BoundingBox;
+  getBoundingBox: (element: ECadBaseElement) => Box;
 
   getHandles: (element: ECadBaseElement) => ElementHandle[];
 
