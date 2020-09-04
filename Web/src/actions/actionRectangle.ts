@@ -48,6 +48,7 @@ export const actionRectangle: Action = {
           elements: [...state.elements, state.editingElement],
           editingElement: null,
         },
+        stopAction: true,
       };
     }
   },

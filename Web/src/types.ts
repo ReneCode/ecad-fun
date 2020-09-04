@@ -144,3 +144,42 @@ export type Size = {
   w: number;
   h: number;
 };
+
+export type BoundingBox = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
+
+export type ElementHandle = { x: number; y: number; idx: number };
+
+export type ElementWorker = {
+  type: string;
+
+  render: ElementRenderFn;
+
+  hitTest: (
+    element: ECadBaseElement,
+    x: number,
+    y: number,
+    epsilon: number
+  ) => boolean;
+
+  getBoundingBox: (element: ECadBaseElement) => BoundingBox;
+
+  getHandles: (element: ECadBaseElement) => ElementHandle[];
+};
+
+export type ElementRenderFn = (
+  element: ECadBaseElement,
+  context: CanvasRenderingContext2D,
+  {
+    worldCoordToScreenCoord,
+    worldLengthToScreenLength,
+  }: {
+    worldCoordToScreenCoord: (x: number, y: number) => { x: number; y: number };
+
+    worldLengthToScreenLength: (len: number) => number;
+  }
+) => void;
