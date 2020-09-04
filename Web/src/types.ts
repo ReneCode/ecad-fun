@@ -11,22 +11,24 @@ export type ECadBaseElement = {
   id: string;
   type: ECadElementType;
   color: string;
-  x: number;
-  y: number;
 };
 
 export type ECadLineElement = ECadBaseElement & {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
 };
 
 export type ECadCircleElement = ECadBaseElement & {
+  x: number;
+  y: number;
   radius: number;
 };
 
 export type ECadRectangleElement = ECadBaseElement & {
+  x: number;
+  y: number;
   w: number;
   h: number;
 };
@@ -169,6 +171,13 @@ export type ElementWorker = {
   getBoundingBox: (element: ECadBaseElement) => BoundingBox;
 
   getHandles: (element: ECadBaseElement) => ElementHandle[];
+
+  moveByDelta: (element: ECadBaseElement, delta: Point) => ECadBaseElement;
+  moveHandle: (
+    element: ECadBaseElement,
+    handleIdx: number,
+    pt: Point
+  ) => ECadBaseElement;
 };
 
 export type ElementRenderFn = (

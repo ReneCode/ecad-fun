@@ -3,7 +3,7 @@ import { ElementWorker, ECadBaseElement } from "../types";
 import { normalizeBox } from "../utils/geometric";
 
 export const workerDefault: ElementWorker = {
-  type: "rectangle",
+  type: "default",
 
   render: (
     element,
@@ -11,19 +11,22 @@ export const workerDefault: ElementWorker = {
     { worldCoordToScreenCoord, worldLengthToScreenLength }
   ) => {},
 
-  hitTest: (
-    element: ECadBaseElement,
-    x: number,
-    y: number,
-    epsilon: number
-  ) => {
+  hitTest: (element, x, y, epsilon) => {
     return false;
   },
 
-  getBoundingBox: (element: ECadBaseElement) => {
+  getBoundingBox: (element) => {
     return normalizeBox(0, 0, 0, 0);
   },
-  getHandles: (element: ECadBaseElement) => {
+  getHandles: (element) => {
     return [];
+  },
+
+  moveByDelta: (element, { x: dx, y: dy }): ECadBaseElement => {
+    return element;
+  },
+
+  moveHandle: (element, handleIdx, pt) => {
+    return element;
   },
 };

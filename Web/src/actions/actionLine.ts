@@ -10,10 +10,10 @@ export const actionLine: Action = {
     const element: ECadLineElement = {
       id: randomId(),
       type: "line",
-      x,
-      y,
-      w: 0,
-      h: 0,
+      x1: x,
+      y1: y,
+      x2: x,
+      y2: y,
       color: "#222",
     };
     return {
@@ -28,11 +28,11 @@ export const actionLine: Action = {
       const x = state.pointerX;
       const y = state.pointerY;
 
-      const oldLine = state.editingElement;
+      const oldLine = state.editingElement as ECadLineElement;
       const element: ECadLineElement = {
         ...oldLine,
-        w: x - oldLine.x,
-        h: y - oldLine.y,
+        x2: x,
+        y2: y,
       };
       return {
         state: {

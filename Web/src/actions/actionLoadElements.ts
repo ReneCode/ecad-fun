@@ -8,19 +8,10 @@ export const actionLoadElements: Action = {
     const line: ECadLineElement = {
       id: randomId(),
       type: "line",
-      x: -50,
-      y: 0,
-      w: 200,
-      h: 100,
-      color: "#222",
-    };
-    const line2: ECadLineElement = {
-      id: randomId(),
-      type: "line",
-      x: 210,
-      y: 20,
-      w: -140,
-      h: 80,
+      x1: -50,
+      y1: 0,
+      x2: 200,
+      y2: 100,
       color: "#222",
     };
     const circle: ECadCircleElement = {
@@ -37,10 +28,10 @@ export const actionLoadElements: Action = {
       const l: ECadLineElement = {
         id: randomId(),
         type: "line",
-        x: -200 + 400 * Math.random(),
-        y: -200 + 400 * Math.random(),
-        w: -100 + 200 * Math.random(),
-        h: -100 + 200 * Math.random(),
+        x1: -200 + 400 * Math.random(),
+        y1: -200 + 400 * Math.random(),
+        x2: -200 + 400 * Math.random(),
+        y2: -200 + 400 * Math.random(),
         color: "#ed2",
       };
       lines.push(l);
@@ -48,7 +39,7 @@ export const actionLoadElements: Action = {
 
     return {
       state: {
-        elements: [...lines, line, line2, circle],
+        elements: [...lines, line, circle],
       },
     };
   },

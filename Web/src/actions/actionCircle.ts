@@ -29,12 +29,12 @@ export const actionCircle: Action = {
 
   pointerMove: ({ state }) => {
     if (state.editingElement) {
-      const { x, y } = state.editingElement;
+      const circle = state.editingElement as ECadCircleElement;
       const nx = state.pointerX;
       const ny = state.pointerY;
-      const radius = distancePointToPoint(x, y, nx, ny);
+      const radius = distancePointToPoint(circle.x, circle.y, nx, ny);
       const element: ECadCircleElement = {
-        ...state.editingElement,
+        ...(state.editingElement as ECadCircleElement),
         radius,
       };
       return {

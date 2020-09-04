@@ -58,4 +58,21 @@ export const workerCircle: ElementWorker = {
       { x: circle.x - circle.radius, y: circle.y, idx: 3 },
     ];
   },
+
+  moveByDelta: (element, { x: dx, y: dy }): ECadCircleElement => {
+    const circle = element as ECadCircleElement;
+    return {
+      ...circle,
+      x: circle.x + dx,
+      y: circle.y + dy,
+    };
+  },
+
+  moveHandle: (element, handleIdx, pt) => {
+    const circle = element as ECadCircleElement;
+    return {
+      ...circle,
+      radius: distancePointToPoint(pt.x, pt.y, circle.x, circle.y),
+    };
+  },
 };

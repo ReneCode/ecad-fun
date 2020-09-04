@@ -28,10 +28,11 @@ export const actionRectangle: Action = {
       const x = state.pointerX;
       const y = state.pointerY;
 
+      const rectangle = state.editingElement as ECadRectangleElement;
       const element: ECadRectangleElement = {
-        ...state.editingElement,
-        w: x - state.editingElement.x,
-        h: y - state.editingElement.y,
+        ...rectangle,
+        w: x - rectangle.x,
+        h: y - rectangle.y,
       };
       return {
         state: {

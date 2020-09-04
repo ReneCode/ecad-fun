@@ -25,7 +25,6 @@ export const workerRectangle: ElementWorker = {
     y: number,
     epsilon: number
   ) => {
-    const rectangle = element as ECadRectangleElement;
     return false;
   },
 
@@ -40,8 +39,20 @@ export const workerRectangle: ElementWorker = {
     );
   },
   getHandles: (element: ECadBaseElement) => {
-    const rectangle = element as ECadRectangleElement;
-
     return [];
+  },
+
+  moveByDelta: (element, { x: dx, y: dy }): ECadRectangleElement => {
+    const rectangle = element as ECadRectangleElement;
+    return {
+      ...rectangle,
+      x: rectangle.x + dx,
+      y: rectangle.y + dy,
+    };
+  },
+
+  moveHandle: (element, handleIdx, pt) => {
+    const rectangle = element as ECadRectangleElement;
+    return { ...rectangle };
   },
 };

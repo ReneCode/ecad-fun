@@ -1,4 +1,9 @@
-import { ElementWorker, ECadBaseElement, ElementRenderFn } from "../types";
+import {
+  ElementWorker,
+  ECadBaseElement,
+  ElementRenderFn,
+  Point,
+} from "../types";
 
 import { workerLine } from "./workerLine";
 import { workerCircle } from "./workerCircle";
@@ -44,6 +49,14 @@ class ElementWorkerManager {
 
   getHandles(element: ECadBaseElement) {
     return this.getWorker(element.type).getHandles(element);
+  }
+
+  moveByDelta(element: ECadBaseElement, delta: Point) {
+    return this.getWorker(element.type).moveByDelta(element, delta);
+  }
+
+  moveHandle(element: ECadBaseElement, handleIdx: number, pt: Point) {
+    return this.getWorker(element.type).moveHandle(element, handleIdx, pt);
   }
 
   // ----------------------------------------------------
