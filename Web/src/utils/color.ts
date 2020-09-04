@@ -1,0 +1,9 @@
+export const COLOR = {
+  SELECTED: "#5522ee",
+
+  SELECTION_BOX_BORDER: "#5522ee",
+  SELECTION_BOX_FILL: "#5522ee11",
+
+  GRIPHANDLE_STROKE: "#5522ee",
+  GRIPHANDLE_FILL: "#eee",
+};

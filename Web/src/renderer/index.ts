@@ -5,12 +5,7 @@ import {
 } from "../utils/geometric";
 import { getHandlesElement } from "../elements";
 import elementWorkerManager from "../elements/ElementWorkerManager";
-
-const COLOR = {
-  SELECTED: "#5522ee",
-  GRIPHANDLE_STROKE: "#5522ee",
-  GRIPHANDLE_FILL: "#eee",
-};
+import { COLOR } from "../utils/color";
 
 const GRIP_SIZE = 14;
 

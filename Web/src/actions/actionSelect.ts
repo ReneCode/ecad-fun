@@ -1,4 +1,4 @@
-import { Action, POINTER_BUTTONS } from "../types";
+import { Action, POINTER_BUTTONS, ECadRectangleElement } from "../types";
 import {
   hitTestElement,
   getSelectedElements,
@@ -6,6 +6,7 @@ import {
   moveHandleOfElement,
   moveElementByDelta,
 } from "../elements";
+import { COLOR } from "../utils/color";
 
 export const actionSelect: Action = {
   name: "select",
@@ -66,10 +67,7 @@ export const actionSelect: Action = {
         lastX: x,
         lastY: y,
         selectedElementIds: [],
-        selectionBox: { x1: x, y1: y, x2: x, y2: y },
-      },
-      actionState: {
-        mode: "selectionbox",
+        selectionBox: createSelectionBox(x, y),
       },
     };
   },
@@ -143,4 +141,17 @@ export const actionSelect: Action = {
       },
     };
   },
+};
+
+const createSelectionBox = (x: number, y: number): ECadRectangleElement => {
+  return {
+    id: "",
+    type: "rectangle",
+    color: COLOR.SELECTION_BOX_BORDER,
+    fill: COLOR.SELECTION_BOX_FILL,
+    x1: x,
+    y1: y,
+    x2: x,
+    y2: y,
+  };
 };

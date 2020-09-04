@@ -20,6 +20,10 @@ export const workerRectangle: ElementWorker = {
       rectangle.x2,
       rectangle.y2
     );
+    if (rectangle.fill) {
+      context.fillStyle = rectangle.fill;
+      context.fillRect(x1, y1, x2 - x1, y2 - y1);
+    }
     context.rect(x1, y1, x2 - x1, y2 - y1);
     context.stroke();
   },

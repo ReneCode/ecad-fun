@@ -83,7 +83,7 @@ class Project extends React.Component<Props> {
         elements.push(this.state.editingElement);
       }
       if (this.state.selectionBox) {
-        // element.push(this.state.selectionBox)
+        elements.push(this.state.selectionBox);
       }
       renderScene(this.canvas, elements, this.state);
     }

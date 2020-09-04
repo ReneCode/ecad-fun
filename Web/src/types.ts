@@ -11,6 +11,7 @@ export type ECadBaseElement = {
   id: string;
   type: ECadElementType;
   color: string;
+  fill?: string;
 };
 
 export type ECadLineElement = ECadBaseElement & {
@@ -56,7 +57,7 @@ export type AppState = {
 
   editingElement: ECadBaseElement | null;
   selectedElementIds: string[];
-  selectionBox: Box | null;
+  selectionBox: ECadRectangleElement | null;
 
   elements: readonly ECadBaseElement[];
 };
