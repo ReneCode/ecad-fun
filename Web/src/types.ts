@@ -5,7 +5,7 @@ export const POINTER_BUTTONS = {
   SECONDARY: 2,
 };
 
-type ECadElementType = "line" | "rectangle" | "circle";
+type ECadElementType = "line" | "rectangle" | "circle" | "symbol";
 
 export type ECadBaseElement = {
   id: string;
@@ -32,6 +32,12 @@ export type ECadRectangleElement = ECadBaseElement & {
   y1: number;
   x2: number;
   y2: number;
+};
+
+export type ECadSymbolElement = ECadBaseElement & {
+  children: ECadBaseElement[];
+  refX: number;
+  refY: number;
 };
 
 export type AppState = {

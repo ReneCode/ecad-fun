@@ -162,6 +162,7 @@ export const actionSelect: Action = {
       },
       actionState: {
         selectionMode: "element",
+        selectedHandleIdx: -1,
       },
     };
   },

@@ -5,10 +5,11 @@ import {
   Point,
 } from "../types";
 
+import { workerDefault } from "./workerDefault";
 import { workerLine } from "./workerLine";
 import { workerCircle } from "./workerCircle";
 import { workerRectangle } from "./workerRectangle";
-import { workerDefault } from "./workerDefault";
+import { workerSymbol } from "./workerSymbol";
 
 class ElementWorkerManager {
   private worker: Record<string, ElementWorker> = {};
@@ -17,6 +18,7 @@ class ElementWorkerManager {
     this.register(workerLine);
     this.register(workerCircle);
     this.register(workerRectangle);
+    this.register(workerSymbol);
   }
 
   public register(elementWorker: ElementWorker) {
