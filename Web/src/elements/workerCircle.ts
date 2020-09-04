@@ -36,12 +36,12 @@ export const workerCircle: ElementWorker = {
 
   getBoundingBox: (element: ECadBaseElement) => {
     const circle = element as ECadCircleElement;
-    return normalizeBox(
-      circle.x - circle.radius,
-      circle.y - circle.radius,
-      circle.x + circle.radius,
-      circle.y + circle.radius
-    );
+    return normalizeBox({
+      x1: circle.x - circle.radius,
+      y1: circle.y - circle.radius,
+      x2: circle.x + circle.radius,
+      y2: circle.y + circle.radius,
+    });
   },
 
   getHandles: (element: ECadBaseElement) => {

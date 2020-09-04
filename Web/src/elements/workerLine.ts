@@ -32,7 +32,7 @@ export const workerLine: ElementWorker = {
   getBoundingBox: (element: ECadBaseElement) => {
     const line = element as ECadLineElement;
 
-    return normalizeBox(line.x1, line.y1, line.x2, line.y2);
+    return normalizeBox(line);
   },
 
   getHandles: (element: ECadBaseElement) => {

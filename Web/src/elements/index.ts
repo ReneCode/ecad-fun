@@ -4,8 +4,14 @@ import {
   HitTestResult,
   ECadCircleElement,
   Point,
+  Box,
 } from "../types";
-import { enlargeBox, isPointInsideBox } from "../utils/geometric";
+import {
+  enlargeBox,
+  isPointInsideBox,
+  normalizeBox,
+  intersectBoxWithBox,
+} from "../utils/geometric";
 
 import elementWorkerManager from "../elements/ElementWorkerManager";
 
@@ -89,4 +95,18 @@ export const moveHandleOfElement = (
 
 export const moveElementByDelta = (element: ECadBaseElement, delta: Point) => {
   return elementWorkerManager.moveByDelta(element, delta);
+};
+
+export const insideSelectionBox = (
+  element: ECadBaseElement,
+  selectionBox: Box
+) => {
+  const normElementBox = elementWorkerManager.getBoundingBox(element);
+  const normSelectionBox = normalizeBox(selectionBox);
+
+  // TODO optimize on lines
+  const intersect = intersectBoxWithBox(normElementBox, normSelectionBox);
+  if (intersect) {
+    return true;
+  }
 };

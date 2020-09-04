@@ -1,4 +1,4 @@
-import { Point } from "../types";
+import { Point, Box } from "../types";
 
 export const distancePointToPoint = (
   x1: number,
@@ -84,12 +84,17 @@ export const worldLengthToScreenLength = (
   return len * zoom;
 };
 
-export const normalizeBox = (
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-) => {
+export const normalizeBox = ({
+  x1,
+  y1,
+  x2,
+  y2,
+}: {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}) => {
   return {
     x1: Math.min(x1, x2),
     y1: Math.min(y1, y2),
@@ -115,4 +120,19 @@ export const isPointInsideBox = (
   { x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }
 ) => {
   return x1 <= pt.x && pt.x <= x2 && y1 <= pt.y && pt.y <= y2;
+};
+
+/**
+ * @description box1 and box2 should be normalized
+ */
+export const intersectBoxWithBox = (box1: Box, box2: Box) => {
+  if (
+    box1.x1 > box2.x2 || // box1 right of box2
+    box2.x1 > box1.x2 || // box2 right of box1
+    box1.y1 > box2.y2 || // box1 above box2
+    box2.y1 > box1.y2 // box2 above box1
+  ) {
+    return false;
+  }
+  return true;
 };

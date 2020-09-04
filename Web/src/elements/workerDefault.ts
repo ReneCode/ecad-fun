@@ -16,7 +16,7 @@ export const workerDefault: ElementWorker = {
   },
 
   getBoundingBox: (element) => {
-    return normalizeBox(0, 0, 0, 0);
+    return normalizeBox({ x1: 0, y1: 0, x2: 0, y2: 0 });
   },
   getHandles: (element) => {
     return [];

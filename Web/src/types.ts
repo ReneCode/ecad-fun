@@ -103,14 +103,14 @@ export type ActionState = {
   lastX: number;
   lastY: number;
   selectedHandleIdx: number;
-  mode: "selectionbox" | "";
+  selectionMode: "selectionbox" | "element";
 };
 
 export const defaultActionState: ActionState = {
   lastX: 0,
   lastY: 0,
   selectedHandleIdx: -1,
-  mode: "",
+  selectionMode: "element",
 };
 
 export type ActionResult = {

@@ -5,6 +5,7 @@ import {
   replaceElements,
   moveHandleOfElement,
   moveElementByDelta,
+  insideSelectionBox,
 } from "../elements";
 import { COLOR } from "../utils/color";
 
@@ -15,6 +16,9 @@ export const actionSelect: Action = {
     return {
       state: {
         selectedElementIds: [],
+      },
+      actionState: {
+        selectionMode: "element",
       },
     };
   },
@@ -29,6 +33,18 @@ export const actionSelect: Action = {
     );
     for (let element of selectedElements) {
       const result = hitTestElement(element, { x, y }, state);
+      if (
+        result?.type === "element" &&
+        state.selectedElementIds.includes(result.id)
+      ) {
+        // element is allready selected
+        return {
+          actionState: {
+            lastX: x,
+            lastY: y,
+          },
+        };
+      }
       if (result) {
         return {
           state: {
@@ -61,13 +77,15 @@ export const actionSelect: Action = {
     }
 
     // start select with selection-box
-
     return {
       state: {
         lastX: x,
         lastY: y,
         selectedElementIds: [],
         selectionBox: createSelectionBox(x, y),
+      },
+      actionState: {
+        selectionMode: "selectionbox",
       },
     };
   },
@@ -76,6 +94,7 @@ export const actionSelect: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
     if (
+      actionState.selectionMode === "element" &&
       state.selectedElementIds.length > 0 &&
       state.pointerButtons & POINTER_BUTTONS.MAIN
     ) {
@@ -88,11 +107,6 @@ export const actionSelect: Action = {
 
         const replace = getSelectedElements(state).map((e) => {
           return moveElementByDelta(e, { x: dx, y: dy });
-          // return {
-          //   ...e,
-          //   x: e.x + dx,
-          //   y: e.y + dy,
-          // };
         });
         return {
           state: {
@@ -121,14 +135,21 @@ export const actionSelect: Action = {
     }
 
     // draw selection-box
-    if (state.selectionBox && state.pointerButtons & POINTER_BUTTONS.MAIN) {
+    if (
+      actionState.selectionMode === "selectionbox" &&
+      state.selectionBox &&
+      state.pointerButtons & POINTER_BUTTONS.MAIN
+    ) {
+      const selectionBox = { ...state.selectionBox, x2: x, y2: y };
+      const selectedElementIds = state.elements
+        .filter((element) => {
+          return insideSelectionBox(element, selectionBox);
+        })
+        .map((element) => element.id);
       return {
         state: {
-          selectionBox: {
-            ...state.selectionBox,
-            x2: x,
-            y2: y,
-          },
+          selectionBox: selectionBox,
+          selectedElementIds: selectedElementIds,
         },
       };
     }
@@ -138,6 +159,9 @@ export const actionSelect: Action = {
     return {
       state: {
         selectionBox: null,
+      },
+      actionState: {
+        selectionMode: "element",
       },
     };
   },

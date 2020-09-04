@@ -47,7 +47,7 @@ export const workerRectangle: ElementWorker = {
   getBoundingBox: (element: ECadBaseElement) => {
     const rectangle = element as ECadRectangleElement;
 
-    return normalizeBox(rectangle.x1, rectangle.y1, rectangle.x2, rectangle.y2);
+    return normalizeBox(rectangle);
   },
   getHandles: (element: ECadBaseElement) => {
     const rectangle = element as ECadRectangleElement;
