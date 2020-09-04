@@ -11,6 +11,7 @@ const Toolbox: React.FC<Props> = ({ onClick }) => {
       <ToolButton onClick={() => onClick("line")}>line</ToolButton>
       <ToolButton onClick={() => onClick("circle")}>circle</ToolButton>
       <ToolButton onClick={() => onClick("rectangle")}>rectangle</ToolButton>
+      <ToolButton onClick={() => onClick("delete")}>X</ToolButton>
       {/* <ToolButton onClick={() => onClick("zoomIn")}>+</ToolButton>
       <ToolButton onClick={() => onClick("zoomOut")}>-</ToolButton> */}
       <ToolButton onClick={() => onClick("createSymbol")}>

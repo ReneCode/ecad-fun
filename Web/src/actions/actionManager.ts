@@ -3,6 +3,7 @@ import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";
 import { actionSelect } from "./actionSelect";
+import { actionDelete } from "./actionDelete";
 import { actionLoadElements } from "./actionLoadElements";
 import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
 import { actionPanning } from "./actionPanning";
@@ -47,6 +48,7 @@ export class ActionManager {
     this.register(actionZoomOut);
     this.register(actionZoomPinch);
     this.register(actionPanning);
+    this.register(actionDelete);
 
     // default action
     this.runningActionNames.push("select");
