@@ -1,4 +1,4 @@
-import { Action, AppState, ActionResult } from "../types";
+import { Action } from "../types";
 
 export const actionDelete: Action = {
   name: "delete",
