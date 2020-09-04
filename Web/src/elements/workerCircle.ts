@@ -28,14 +28,9 @@ export const workerCircle: ElementWorker = {
     context.stroke();
   },
 
-  hitTest: (
-    element: ECadBaseElement,
-    x: number,
-    y: number,
-    epsilon: number
-  ) => {
+  hitTest: (element, pt, epsilon) => {
     const circle = element as ECadCircleElement;
-    const dist = distancePointToPoint(x, y, circle.x, circle.y);
+    const dist = distancePointToPoint(pt.x, pt.y, circle.x, circle.y);
     return dist >= circle.radius - epsilon && dist <= circle.radius + epsilon;
   },
 

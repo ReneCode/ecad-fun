@@ -39,8 +39,8 @@ class ElementWorkerManager {
     });
   };
 
-  hitTest(element: ECadBaseElement, x: number, y: number, epsilon: number) {
-    return this.getWorker(element.type).hitTest(element, x, y, epsilon);
+  hitTest(element: ECadBaseElement, pt: Point, epsilon: number) {
+    return this.getWorker(element.type).hitTest(element, pt, epsilon);
   }
 
   getBoundingBox(element: ECadBaseElement) {

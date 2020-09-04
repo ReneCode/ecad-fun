@@ -161,18 +161,14 @@ export type ElementWorker = {
 
   render: ElementRenderFn;
 
-  hitTest: (
-    element: ECadBaseElement,
-    x: number,
-    y: number,
-    epsilon: number
-  ) => boolean;
+  hitTest: (element: ECadBaseElement, pt: Point, epsilon: number) => boolean;
 
   getBoundingBox: (element: ECadBaseElement) => BoundingBox;
 
   getHandles: (element: ECadBaseElement) => ElementHandle[];
 
   moveByDelta: (element: ECadBaseElement, delta: Point) => ECadBaseElement;
+
   moveHandle: (
     element: ECadBaseElement,
     handleIdx: number,

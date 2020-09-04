@@ -19,12 +19,7 @@ export const workerRectangle: ElementWorker = {
     context.stroke();
   },
 
-  hitTest: (
-    element: ECadBaseElement,
-    x: number,
-    y: number,
-    epsilon: number
-  ) => {
+  hitTest: (element, pt, epsilon) => {
     return false;
   },
 

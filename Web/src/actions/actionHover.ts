@@ -13,7 +13,7 @@ export const actionHover: Action = {
       state.selectedElementIds.includes(e.id)
     );
     for (let element of selectedElements) {
-      const result = hitTestElement(element, x, y, state);
+      const result = hitTestElement(element, { x, y }, state);
       if (result) {
         if (result.type === "handle") {
           cursor = "ew-resize";

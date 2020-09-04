@@ -11,7 +11,7 @@ export const workerDefault: ElementWorker = {
     { worldCoordToScreenCoord, worldLengthToScreenLength }
   ) => {},
 
-  hitTest: (element, x, y, epsilon) => {
+  hitTest: (element, pt, epsilon) => {
     return false;
   },
 

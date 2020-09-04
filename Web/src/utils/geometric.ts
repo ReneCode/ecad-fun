@@ -1,3 +1,5 @@
+import { Point } from "../types";
+
 export const distancePointToPoint = (
   x1: number,
   y1: number,
@@ -109,9 +111,8 @@ export const enlargeBox = (
 };
 
 export const isPointInsideBox = (
-  x: number,
-  y: number,
+  pt: Point,
   { x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }
 ) => {
-  return x1 <= x && x <= x2 && y1 <= y && y <= y2;
+  return x1 <= pt.x && pt.x <= x2 && y1 <= pt.y && pt.y <= y2;
 };

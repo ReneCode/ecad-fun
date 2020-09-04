@@ -29,15 +29,14 @@ export const replaceElements = (
 
 export const hitTestElement = (
   element: ECadBaseElement,
-  x: number,
-  y: number,
+  pt: Point,
   { gripSize }: { gripSize: number }
 ): HitTestResult | undefined => {
   const epsilon = gripSize / 2;
 
   // check if outside bounding box
   const bbox = enlargeBox(getBoundingBox(element), epsilon);
-  if (!isPointInsideBox(x, y, bbox)) {
+  if (!isPointInsideBox(pt, bbox)) {
     return;
   }
 
@@ -53,15 +52,14 @@ export const hitTestElement = (
       },
       epsilon
     );
-    if (isPointInsideBox(x, y, bbox)) {
+    if (isPointInsideBox(pt, bbox)) {
       return { id: element.id, type: "handle", handleIdx: handle.idx };
     }
   }
 
   const hitElement = elementWorkerManager.hitTest(
     element as ECadCircleElement,
-    x,
-    y,
+    pt,
     epsilon
   );
   if (hitElement) {

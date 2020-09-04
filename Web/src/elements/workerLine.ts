@@ -16,14 +16,16 @@ export const workerLine: ElementWorker = {
     context.stroke();
   },
 
-  hitTest: (
-    element: ECadBaseElement,
-    x: number,
-    y: number,
-    epsilon: number
-  ) => {
+  hitTest: (element, pt, epsilon) => {
     const line = element as ECadLineElement;
-    const dist = distancePointToLine(x, y, line.x1, line.y1, line.x2, line.y2);
+    const dist = distancePointToLine(
+      pt.x,
+      pt.y,
+      line.x1,
+      line.y1,
+      line.x2,
+      line.y2
+    );
     return dist <= epsilon;
   },
 
