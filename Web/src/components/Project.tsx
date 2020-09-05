@@ -164,24 +164,6 @@ class Project extends React.Component<Props> {
     event: React.PointerEvent<HTMLCanvasElement>
   ) {
     const { x, y } = screenCoordToWorldCoord(event, this.state);
-    // console.log(">", event.button, event.buttons);
-    if (false)
-      console.log(
-        event.clientX,
-        event.clientY,
-        "/",
-        x,
-        y,
-        "/",
-        window.devicePixelRatio,
-        this.state.zoom,
-        "/",
-        this.state.screenWidth,
-        this.state.screenHeight,
-        "/",
-        this.canvas?.width,
-        this.canvas?.height
-      );
     this.setState({
       pointerX: x,
       pointerY: y,

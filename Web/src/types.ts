@@ -99,6 +99,8 @@ export const getDefaultAppState = (): AppState => {
 export type Action = {
   name: string;
 
+  // render?: React.FC<{ state: AppState }>;
+
   stop?: ActionFn;
   start?: ActionFn;
 

@@ -8,6 +8,7 @@ import { actionLoadElements } from "./actionLoadElements";
 import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
 import { actionPanning } from "./actionPanning";
 import { actionCreateSymbol } from "./actionCreateSymbol";
+import { actionPlaceSymbol } from "./actionPlaceSymbol";
 
 export type EventType =
   | "execute"
@@ -23,7 +24,7 @@ export class ActionManager {
   allActions: Action[] = [];
   basicActions: Action[] = [];
   setState: setStateFn;
-  runningActionNames: string[] = [];
+  runningActionName: string = "";
   actionState: ActionState = defaultActionState;
 
   constructor({ setState }: { setState: setStateFn }) {
@@ -42,6 +43,7 @@ export class ActionManager {
     this.register(actionCircle);
     this.register(actionRectangle);
     this.register(actionCreateSymbol);
+    this.register(actionPlaceSymbol);
 
     this.register(actionLoadElements);
     this.register(actionZoomIn);
@@ -51,27 +53,21 @@ export class ActionManager {
     this.register(actionDelete);
 
     // default action
-    this.runningActionNames.push("select");
+    this.runningActionName = "select";
   }
 
   public dispatch(
     type: EventType,
     { state, params }: { state: AppState; params?: any }
   ) {
-    // for (let action of this.basicActions) {
-    //   this.executeActionMethode(action, type, { state, actionState: this.actionState, params });
-    // }
-
-    this.runningActionNames.forEach((name) => {
-      const action = this.getAction(name);
-      if (action) {
-        this.applyActionMethode(action, type, {
-          state,
-          actionState: this.actionState,
-          params,
-        });
-      }
-    });
+    const action = this.getAction(this.runningActionName);
+    if (action) {
+      this.applyActionMethode(action, type, {
+        state,
+        actionState: this.actionState,
+        params,
+      });
+    }
   }
 
   public execute(
@@ -79,27 +75,38 @@ export class ActionManager {
     { state, params }: { state: AppState; params: any }
   ) {
     const action = this.getAction(actionName);
-    if (action) {
-      if (action.execute) {
-        // if execute methode exists, than it is a execute-once-action
-        this.applyActionMethode(action, "execute", {
-          state,
-          actionState: defaultActionState,
-          params,
-        });
-      } else {
-        // otherwise this is a long running action
-        this.dispatch("stop", { state });
-        this.runningActionNames = [];
-        this.runningActionNames.push(actionName);
+    if (!action) {
+      console.error(`action ${actionName} not found`);
+      return;
+    }
 
-        this.applyActionMethode(action, "start", {
-          state,
-          actionState: defaultActionState,
-        });
-      }
+    if (action.execute) {
+      // if execute methode exists, than it is a execute-once-action
+      this.applyActionMethode(action, "execute", {
+        state,
+        actionState: defaultActionState,
+        params,
+      });
+    } else {
+      // otherwise this is a long running action
+
+      // stop the current long-running action
+      this.dispatch("stop", { state });
+      this.actionState = defaultActionState;
+
+      // and make actionName to the new long-running actino
+      // and start it
+      this.runningActionName = actionName;
+      this.dispatch("start", { state });
     }
   }
+
+  // public getRenderComponent() {
+  //   const action = this.getAction(this.runningActionName);
+  //   if (action) {
+  //     return action.render;
+  //   }
+  // }
 
   private getAction(actionName: string) {
     return this.allActions.find((action) => action.name === actionName);
@@ -125,12 +132,7 @@ export class ActionManager {
           this.setActionState(result.actionState);
         }
         if (result.stopAction) {
-          this.runningActionNames = this.runningActionNames.filter(
-            (name) => name !== action.name
-          );
-          if (this.runningActionNames.length === 0) {
-            this.execute("select", { state, params });
-          }
+          this.execute("select", { state, params });
         }
       }
     }
