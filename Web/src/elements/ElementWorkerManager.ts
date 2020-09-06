@@ -10,6 +10,7 @@ import { workerLine } from "./workerLine";
 import { workerCircle } from "./workerCircle";
 import { workerRectangle } from "./workerRectangle";
 import { workerSymbol } from "./workerSymbol";
+import { workerSymbolRef } from "./workerSymbolRef";
 
 class ElementWorkerManager {
   private worker: Record<string, ElementWorker> = {};
@@ -19,6 +20,7 @@ class ElementWorkerManager {
     this.register(workerCircle);
     this.register(workerRectangle);
     this.register(workerSymbol);
+    this.register(workerSymbolRef);
   }
 
   public register(elementWorker: ElementWorker) {
@@ -30,15 +32,8 @@ class ElementWorkerManager {
     this.worker[elementWorker.type] = elementWorker;
   }
 
-  public render: ElementRenderFn = (
-    element,
-    context,
-    { worldCoordToScreenCoord, worldLengthToScreenLength }
-  ) => {
-    this.getWorker(element.type).render(element, context, {
-      worldCoordToScreenCoord,
-      worldLengthToScreenLength,
-    });
+  public render: ElementRenderFn = (element, context, params) => {
+    this.getWorker(element.type).render(element, context, params);
   };
 
   hitTest(element: ECadBaseElement, pt: Point, epsilon: number) {

@@ -1,11 +1,33 @@
 import React from "react";
-import ToolButton from "./ToolButton";
+import { AppState, ECadSymbolElement } from "../types";
+import SymbolListItem from "./SymbolListItem";
+import "./SymbolList.scss";
+import { ActionManager } from "../actions/actionManager";
 
 type Props = {
-  onClick: (symbolName: string) => void;
+  state: AppState;
+  actionManager: ActionManager;
 };
-const SymbolList: React.FC<Props> = ({ onClick }) => {
-  return <div className="symbollist"></div>;
+const SymbolList: React.FC<Props> = ({ state, actionManager }) => {
+  const onSelectSymbol = (id: string) => {
+    actionManager.execute("placeSymbol", { params: id });
+  };
+
+  return (
+    <div className="symbollist">
+      {state.elements
+        .filter((e) => e.type === "symbol")
+        .map((e) => {
+          return (
+            <SymbolListItem
+              key={e.id}
+              symbol={e as ECadSymbolElement}
+              onClick={() => onSelectSymbol(e.id)}
+            />
+          );
+        })}
+    </div>
+  );
 };
 
 export default SymbolList;

@@ -7,7 +7,7 @@ import {
   Box,
 } from "../types";
 import {
-  enlargeBox,
+  enlargeBoxByDelta,
   isPointInsideBox,
   normalizeBox,
   intersectBoxWithBox,
@@ -41,7 +41,7 @@ export const hitTestElement = (
   const epsilon = gripSize / 2;
 
   // check if outside bounding box
-  const bbox = enlargeBox(getBoundingBox(element), epsilon);
+  const bbox = enlargeBoxByDelta(getBoundingBox(element), epsilon);
   if (!isPointInsideBox(pt, bbox)) {
     return;
   }
@@ -49,7 +49,7 @@ export const hitTestElement = (
   // check if handle it hit
   const handles = getHandlesElement(element);
   for (let handle of handles) {
-    const bbox = enlargeBox(
+    const bbox = enlargeBoxByDelta(
       {
         x1: handle.x,
         y1: handle.y,

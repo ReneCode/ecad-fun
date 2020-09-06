@@ -55,7 +55,7 @@ const renderElement = (
   if (selected) {
     context.strokeStyle = COLOR.SELECTED;
   } else {
-    context.strokeStyle = element.color;
+    context.strokeStyle = element.color ? element.color : "";
   }
 
   elementWorkerManager.render(element, context, {
@@ -65,6 +65,8 @@ const renderElement = (
     worldLengthToScreenLength: (len: number) => {
       return worldLengthToScreenLength(len, state);
     },
+    offsetX: 0,
+    offsetY: 0,
   });
 
   if (selected) {

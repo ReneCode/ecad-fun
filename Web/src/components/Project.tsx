@@ -2,6 +2,7 @@ import React from "react";
 import { canvasState } from "../canvas";
 import Toolbox from "./Toobox";
 import Status from "./Status";
+import SymbolList from "./SymbolList";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/actionManager";
 import { screenCoordToWorldCoord } from "../utils/geometric";
@@ -45,6 +46,7 @@ class Project extends React.Component<Props> {
 
     this.actionMananger = new ActionManager({
       setState: this.setState.bind(this),
+      getState: this.getState.bind(this),
     });
 
     this.actionMananger.registerAll();
@@ -68,6 +70,9 @@ class Project extends React.Component<Props> {
     this.unsubscribe.forEach((fn) => fn());
   }
 
+  getState = (): AppState => {
+    return this.state;
+  };
   onResize() {
     this.setState({
       screenWidth: this.canvas?.width,
@@ -100,6 +105,7 @@ class Project extends React.Component<Props> {
 
     return (
       <div className="main">
+        <SymbolList state={this.state} actionManager={this.actionMananger} />
         <Toolbox onClick={this.onToolboxClick.bind(this)} />
         <Status x={this.state.pointerX} y={this.state.pointerY} />
         <canvas
@@ -131,20 +137,20 @@ class Project extends React.Component<Props> {
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       this.actionMananger.execute("zoomPinch", {
-        state: this.state,
         params: event,
       });
     } else {
       this.actionMananger.execute("panning", {
-        state: this.state,
         params: event,
       });
     }
   }
 
   private onToolboxClick(action: string) {
-    this.actionMananger.execute(action, { state: this.state, params: null });
+    this.actionMananger.execute(action, { params: null });
   }
+
+  private onSelectSymbol(symbolId: string) {}
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
     if (canvas) {
@@ -169,9 +175,7 @@ class Project extends React.Component<Props> {
       pointerY: y,
       pointerButtons: event.buttons,
     });
-    this.actionMananger.dispatch(eventType, {
-      state: this.state,
-    });
+    this.actionMananger.dispatch(eventType, {});
   }
 }
 

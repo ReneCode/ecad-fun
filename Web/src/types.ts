@@ -5,12 +5,12 @@ export const POINTER_BUTTONS = {
   SECONDARY: 2,
 };
 
-type ECadElementType = "line" | "rectangle" | "circle" | "symbol";
+type ECadElementType = "line" | "rectangle" | "circle" | "symbol" | "symbolRef";
 
 export type ECadBaseElement = {
   id: string;
   type: ECadElementType;
-  color: string;
+  color?: string;
   fill?: string;
 };
 
@@ -38,6 +38,13 @@ export type ECadSymbolElement = ECadBaseElement & {
   children: ECadBaseElement[];
   refX: number;
   refY: number;
+};
+
+export type ECadSymbolRefElement = ECadBaseElement & {
+  x: number;
+  y: number;
+  symbolId: string;
+  symbol: ECadSymbolElement;
 };
 
 export type AppState = {
@@ -104,7 +111,7 @@ export type Action = {
   stop?: ActionFn;
   start?: ActionFn;
 
-  execute?: ActionFn; //
+  execute?: ActionFn;
   pointerDown?: ActionFn;
   pointerUp?: ActionFn;
   pointerMove?: ActionFn;
@@ -126,13 +133,13 @@ export const defaultActionState: ActionState = {
 
 export type ActionResult = {
   state?: Partial<AppState>;
-  actionState?: Partial<ActionState>;
+  actionState?: Partial<ActionState> | any;
   stopAction?: boolean;
 };
 
 type ActionFn = (args: {
   state: AppState;
-  actionState: ActionState;
+  actionState: ActionState | any;
   params: any;
 }) => ActionResult | void;
 
@@ -181,15 +188,15 @@ export type ElementWorker = {
   ) => ECadBaseElement;
 };
 
+export type ElementRenderParams = {
+  worldCoordToScreenCoord: (x: number, y: number) => { x: number; y: number };
+  worldLengthToScreenLength: (len: number) => number;
+  offsetX: number;
+  offsetY: number;
+};
+
 export type ElementRenderFn = (
   element: ECadBaseElement,
   context: CanvasRenderingContext2D,
-  {
-    worldCoordToScreenCoord,
-    worldLengthToScreenLength,
-  }: {
-    worldCoordToScreenCoord: (x: number, y: number) => { x: number; y: number };
-
-    worldLengthToScreenLength: (len: number) => number;
-  }
+  params: ElementRenderParams
 ) => void;

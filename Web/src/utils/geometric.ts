@@ -84,17 +84,7 @@ export const worldLengthToScreenLength = (
   return len * zoom;
 };
 
-export const normalizeBox = ({
-  x1,
-  y1,
-  x2,
-  y2,
-}: {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-}) => {
+export const normalizeBox = ({ x1, y1, x2, y2 }: Box) => {
   return {
     x1: Math.min(x1, x2),
     y1: Math.min(y1, y2),
@@ -103,10 +93,10 @@ export const normalizeBox = ({
   };
 };
 
-export const enlargeBox = (
-  { x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number },
+export const enlargeBoxByDelta = (
+  { x1, y1, x2, y2 }: Box,
   delta: number
-) => {
+): Box => {
   return {
     x1: x1 - delta,
     y1: y1 - delta,
@@ -115,10 +105,16 @@ export const enlargeBox = (
   };
 };
 
-export const isPointInsideBox = (
-  pt: Point,
-  { x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }
-) => {
+export const enlargeBoxByBox = (b1: Box, b2: Box): Box => {
+  return normalizeBox({
+    x1: Math.min(b1.x1, b2.x1),
+    y1: Math.min(b1.y1, b2.y1),
+    x2: Math.max(b1.x2, b2.x2),
+    y2: Math.max(b1.y2, b2.y2),
+  });
+};
+
+export const isPointInsideBox = (pt: Point, { x1, y1, x2, y2 }: Box) => {
   return x1 <= pt.x && pt.x <= x2 && y1 <= pt.y && pt.y <= y2;
 };
 

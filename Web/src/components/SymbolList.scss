@@ -1,0 +1,17 @@
+.symbollist {
+  position: fixed;
+  background-color: #eeeeee88;
+  padding: 10px;
+  border: 1px solid #aaaaaa88;
+  border-radius: 5px;
+  top: 70px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  .symbollistitem {
+    &:hover {
+      background-color: rgb(230, 230, 199);
+      cursor: pointer;
+    }
+  }
+}

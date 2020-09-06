@@ -12,6 +12,7 @@ export const actionCreateSymbol: Action = {
     const children = state.elements.filter((element) =>
       state.selectedElementIds.includes(element.id)
     );
+
     const lastChildId = children[children.length - 1].id;
     const symbol: ECadSymbolElement = {
       id: randomId(),

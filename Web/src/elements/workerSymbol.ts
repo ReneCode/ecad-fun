@@ -5,7 +5,11 @@ import {
   ECadSymbolElement,
 } from "../types";
 import elementWorkerManager from "./ElementWorkerManager";
-import { distancePointToLine, normalizeBox } from "../utils/geometric";
+import {
+  distancePointToLine,
+  normalizeBox,
+  enlargeBoxByBox,
+} from "../utils/geometric";
 
 export const workerSymbol: ElementWorker = {
   type: "symbol",
@@ -13,6 +17,11 @@ export const workerSymbol: ElementWorker = {
   render: (element, context, params) => {
     const symbol = element as ECadSymbolElement;
 
+    // const { x: offsetX, y: offsetY } = params.worldCoordToScreenCoord(
+    //   params.offsetX,
+    //   params.offsetY
+    // );
+    // context.translate(offsetX, offsetY);
     symbol.children.forEach((element) =>
       elementWorkerManager.render(element, context, params)
     );
@@ -32,9 +41,14 @@ export const workerSymbol: ElementWorker = {
   },
 
   getBoundingBox: (element: ECadBaseElement) => {
-    const line = element as ECadLineElement;
+    const symbol = element as ECadSymbolElement;
 
-    return normalizeBox(line);
+    let bbox = elementWorkerManager.getBoundingBox(symbol.children[0]);
+    for (let i = 1; i < symbol.children.length; i++) {
+      let childBox = elementWorkerManager.getBoundingBox(symbol.children[0]);
+      bbox = enlargeBoxByBox(bbox, childBox);
+    }
+    return bbox;
   },
 
   getHandles: (element: ECadBaseElement) => {
