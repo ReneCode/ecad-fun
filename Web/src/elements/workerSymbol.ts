@@ -1,11 +1,6 @@
-import {
-  ElementWorker,
-  ECadBaseElement,
-  ECadLineElement,
-  ECadSymbolElement,
-} from "../types";
+import { ElementWorker, ECadBaseElement, ECadSymbolElement } from "../types";
 import elementWorkerManager from "./ElementWorkerManager";
-import { distancePointToLine, enlargeBoxByBox } from "../utils/geometric";
+import { enlargeBoxByBox } from "../utils/geometric";
 
 export const workerSymbol: ElementWorker = {
   type: "symbol",
@@ -18,16 +13,13 @@ export const workerSymbol: ElementWorker = {
   },
 
   hitTest: (element, pt, epsilon) => {
-    const line = element as ECadLineElement;
-    const dist = distancePointToLine(
-      pt.x,
-      pt.y,
-      line.x1,
-      line.y1,
-      line.x2,
-      line.y2
-    );
-    return dist <= epsilon;
+    const symbol = element as ECadSymbolElement;
+    for (const element of symbol.children) {
+      if (elementWorkerManager.hitTest(element, pt, epsilon)) {
+        return true;
+      }
+    }
+    return false;
   },
 
   getBoundingBox: (element: ECadBaseElement) => {
@@ -35,14 +27,21 @@ export const workerSymbol: ElementWorker = {
 
     let bbox = elementWorkerManager.getBoundingBox(symbol.children[0]);
     for (let i = 1; i < symbol.children.length; i++) {
-      let childBox = elementWorkerManager.getBoundingBox(symbol.children[0]);
+      let childBox = elementWorkerManager.getBoundingBox(symbol.children[i]);
       bbox = enlargeBoxByBox(bbox, childBox);
     }
     return bbox;
   },
 
   getHandles: (element: ECadBaseElement) => {
-    return [];
+    const bbox = elementWorkerManager.getBoundingBox(element);
+
+    return [
+      { x: bbox.x1, y: bbox.y1, idx: 0 },
+      { x: bbox.x1, y: bbox.y2, idx: 1 },
+      { x: bbox.x2, y: bbox.y2, idx: 2 },
+      { x: bbox.x2, y: bbox.y1, idx: 3 },
+    ];
   },
 
   moveByDelta: (element, { x: dx, y: dy }) => {

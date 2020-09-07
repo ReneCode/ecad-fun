@@ -116,6 +116,15 @@ export const enlargeBoxByBox = (b1: Box, b2: Box): Box => {
   });
 };
 
+export const moveBoxByPoint = (box: Box, pt: Point): Box => {
+  return {
+    x1: box.x1 + pt.x,
+    y1: box.y1 + pt.y,
+    x2: box.x2 + pt.x,
+    y2: box.y2 + pt.y,
+  };
+};
+
 export const isPointInsideBox = (pt: Point, { x1, y1, x2, y2 }: Box) => {
   return x1 <= pt.x && pt.x <= x2 && y1 <= pt.y && pt.y <= y2;
 };
