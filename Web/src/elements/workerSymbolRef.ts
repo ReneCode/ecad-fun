@@ -8,10 +8,12 @@ export const workerSymbolRef: ElementWorker = {
   render: (element, context, params) => {
     const symbolRef = element as ECadSymbolRefElement;
 
-    const m = Matrix.multiply(
-      Matrix.translate(40, 40),
+    // translate Symbol on changing the worldToScreen matrix (and the inverse screenToWorldMatrix)
+    let m = Matrix.multiply(
+      Matrix.translate(-symbolRef.symbol.refX, -symbolRef.symbol.refY),
       params.worldToScreenMatrix
     );
+    m = Matrix.multiply(Matrix.translate(symbolRef.x, symbolRef.y), m);
     const mInverse = Matrix.inverse(m);
 
     elementWorkerManager.render(symbolRef.symbol, context, {

@@ -1,5 +1,6 @@
 import { Action, ECadSymbolElement } from "../types";
 import { randomId } from "../utils/randomId";
+import elementWorkerManager from "../elements/ElementWorkerManager";
 
 export const actionCreateSymbol: Action = {
   name: "createSymbol",
@@ -23,7 +24,14 @@ export const actionCreateSymbol: Action = {
       refY: 0,
     };
 
+    // if there is no referencePoint-Element in the symbol then we
+    // take the lower-left-corder of the bounding box as the referencePoint
+    const bbox = elementWorkerManager.getBoundingBox(symbol);
+    symbol.refX = bbox.x1;
+    symbol.refY = bbox.x2;
+
     // remove selected elements from state.element and put them into symbol.children
+    // symbol S will put at the position of the last symbol.children
     //
     //  elements:  a, b, c, d, e, f, g
     //  selected:     b,    d, e

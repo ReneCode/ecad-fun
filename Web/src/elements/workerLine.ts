@@ -23,7 +23,6 @@ export const workerLine: ElementWorker = {
       line.y2,
       worldToScreenMatrix
     );
-    console.log("x1", line.x1, x1);
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
     context.stroke();

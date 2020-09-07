@@ -1,8 +1,13 @@
-import { Action, ECadSymbolRefElement, ECadSymbolElement } from "../types";
+import {
+  Action,
+  ECadSymbolRefElement,
+  ECadSymbolElement,
+  ActionState,
+} from "../types";
 import { randomId } from "../utils/randomId";
 
 type MyActionState = {
-  symbolId: string;
+  symbol: ECadSymbolElement;
   symbolRef: ECadSymbolRefElement;
 };
 
@@ -32,11 +37,13 @@ export const actionPlaceSymbol: Action = {
       },
       actionState: {
         symbolRef,
+        symbol,
       },
     };
   },
 
-  pointerMove: ({ state }) => {
+  pointerMove: ({ state, actionState }) => {
+    const myState: MyActionState = actionState;
     console.log("pointerMove place symbol");
     if (state.editingElement) {
       const x = state.pointerX;
@@ -54,15 +61,17 @@ export const actionPlaceSymbol: Action = {
   },
 
   pointerUp: ({ state, actionState }) => {
-    const as: MyActionState = actionState;
+    const myState: MyActionState = actionState;
 
-    console.log("pointerup place symbol", as.symbolId, as.symbolRef);
-
-    return {
-      state: {
-        elements: [...state.elements, as.symbolRef],
-      },
-      stopAction: true,
-    };
+    console.log("pointerup place symbol", myState.symbol.id, myState.symbolRef);
+    if (state.editingElement) {
+      return {
+        state: {
+          elements: [...state.elements, state.editingElement],
+          editingElement: null,
+        },
+        stopAction: true,
+      };
+    }
   },
 };

@@ -135,6 +135,22 @@ export const intersectBoxWithBox = (box1: Box, box2: Box) => {
   return true;
 };
 
+export const calcTransformationMatrix = (
+  screenOriginX: number,
+  screenOriginY: number,
+  zoom: number
+) => {
+  const m1 = MatrixNS.translate(-screenOriginX, -screenOriginY);
+  const m2 = MatrixNS.scale(1, -1);
+  const m3 = MatrixNS.scale(1 / zoom, 1 / zoom);
+  const screenToWorldMatrix = MatrixNS.multiply(MatrixNS.multiply(m1, m2), m3);
+  const worldToScreenMatrix = MatrixNS.inverse(screenToWorldMatrix);
+  return {
+    screenToWorldMatrix,
+    worldToScreenMatrix,
+  };
+};
+
 export const transformPoint = (x: number, y: number, matrix: Matrix) => {
   return MatrixNS.transform({ x, y }, matrix);
 };

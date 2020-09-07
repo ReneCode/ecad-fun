@@ -9,7 +9,7 @@ import { AppState, getDefaultAppState } from "../types";
 import { Gesture } from "../utils/Gesture";
 import { loadFromLocalStorage } from "../state";
 import * as Matrix from "../utils/Matrix";
-import { transformPoint } from "../utils/geometric";
+import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 
 type Props = {
   width: number;
@@ -54,15 +54,15 @@ class Project extends React.Component<Props> {
   }
 
   componentDidMount() {
-    // if (this.canvas) {
-    //   const elements = canvasState.getElements();
-    //   renderScene(this.canvas, elements, this.state, window.devicePixelRatio);
-    // }
-
-    // this.actionMananger.execute("loadElements", this.state);
-
     window.addEventListener("resize", this.onResize);
-    this.setState(loadFromLocalStorage());
+
+    const initState = loadFromLocalStorage();
+    const matrix = calcTransformationMatrix(
+      initState.screenOriginX,
+      initState.screenOriginY,
+      initState.zoom
+    );
+    this.setState({ ...initState, ...matrix });
   }
 
   componentWillUnmount() {
@@ -82,12 +82,12 @@ class Project extends React.Component<Props> {
         : this.state.screenOriginY) as number;
       const zoom = ("zoom" in vals ? vals.zoom : this.state.zoom) as number;
 
-      const m1 = Matrix.translate(-screenOriginX, -screenOriginY);
-      const m2 = Matrix.scale(1, -1);
-      const m3 = Matrix.scale(1 / zoom, 1 / zoom);
-      const screenToWorldMatrix = Matrix.multiply(Matrix.multiply(m1, m2), m3);
-      const worldToScreenMatrix = Matrix.inverse(screenToWorldMatrix);
-      this.setState({ ...vals, screenToWorldMatrix, worldToScreenMatrix });
+      const matrix = calcTransformationMatrix(
+        screenOriginX,
+        screenOriginY,
+        zoom
+      );
+      this.setState({ ...vals, ...matrix });
     } else {
       this.setState(vals);
     }
