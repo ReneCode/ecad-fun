@@ -28,7 +28,7 @@ export const actionCreateSymbol: Action = {
     // take the lower-left-corder of the bounding box as the referencePoint
     const bbox = elementWorkerManager.getBoundingBox(symbol);
     symbol.refX = bbox.x1;
-    symbol.refY = bbox.x2;
+    symbol.refY = bbox.y1;
 
     // remove selected elements from state.element and put them into symbol.children
     // symbol S will put at the position of the last symbol.children

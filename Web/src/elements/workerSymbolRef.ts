@@ -16,6 +16,7 @@ export const workerSymbolRef: ElementWorker = {
     m = Matrix.multiply(Matrix.translate(symbolRef.x, symbolRef.y), m);
     const mInverse = Matrix.inverse(m);
 
+    context.strokeStyle = "red";
     elementWorkerManager.render(symbolRef.symbol, context, {
       ...params,
       worldToScreenMatrix: m,

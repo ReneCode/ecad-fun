@@ -8,7 +8,6 @@ import { ActionManager, EventType } from "../actions/actionManager";
 import { AppState, getDefaultAppState } from "../types";
 import { Gesture } from "../utils/Gesture";
 import { loadFromLocalStorage } from "../state";
-import * as Matrix from "../utils/Matrix";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 
 type Props = {

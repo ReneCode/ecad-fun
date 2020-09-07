@@ -1,9 +1,4 @@
-import {
-  Action,
-  ECadSymbolRefElement,
-  ECadSymbolElement,
-  ActionState,
-} from "../types";
+import { Action, ECadSymbolRefElement, ECadSymbolElement } from "../types";
 import { randomId } from "../utils/randomId";
 
 type MyActionState = {
@@ -15,7 +10,6 @@ export const actionPlaceSymbol: Action = {
   name: "placeSymbol",
 
   start: ({ state, params }) => {
-    console.log("placeSymbol:", params);
     const symbolId: string = params;
     const symbol = state.elements.find(
       (e) => e.type === "symbol" && e.id === symbolId
@@ -43,7 +37,7 @@ export const actionPlaceSymbol: Action = {
   },
 
   pointerMove: ({ state, actionState }) => {
-    const myState: MyActionState = actionState;
+    // const myState: MyActionState = actionState;
     console.log("pointerMove place symbol");
     if (state.editingElement) {
       const x = state.pointerX;
