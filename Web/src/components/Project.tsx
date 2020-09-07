@@ -5,10 +5,11 @@ import Status from "./Status";
 import SymbolList from "./SymbolList";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/actionManager";
-import { screenCoordToWorldCoord } from "../utils/geometric";
 import { AppState, getDefaultAppState } from "../types";
 import { Gesture } from "../utils/Gesture";
 import { loadFromLocalStorage } from "../state";
+import * as Matrix from "../utils/Matrix";
+import { transformPoint } from "../utils/geometric";
 
 type Props = {
   width: number;
@@ -45,7 +46,7 @@ class Project extends React.Component<Props> {
     );
 
     this.actionMananger = new ActionManager({
-      setState: this.setState.bind(this),
+      setState: this.setStateValues.bind(this),
       getState: this.getState.bind(this),
     });
 
@@ -70,9 +71,32 @@ class Project extends React.Component<Props> {
     this.unsubscribe.forEach((fn) => fn());
   }
 
+  setStateValues = (vals: Partial<AppState>) => {
+    if ("screenOriginX" in vals || "screenOriginY" in vals || "zoom" in vals) {
+      // recalc transformation matrix if relevant state properties are changed
+      const screenOriginX = ("screenOriginX" in vals
+        ? vals.screenOriginX
+        : this.state.screenOriginX) as number;
+      const screenOriginY = ("screenOriginY" in vals
+        ? vals.screenOriginY
+        : this.state.screenOriginY) as number;
+      const zoom = ("zoom" in vals ? vals.zoom : this.state.zoom) as number;
+
+      const m1 = Matrix.translate(-screenOriginX, -screenOriginY);
+      const m2 = Matrix.scale(1, -1);
+      const m3 = Matrix.scale(1 / zoom, 1 / zoom);
+      const screenToWorldMatrix = Matrix.multiply(Matrix.multiply(m1, m2), m3);
+      const worldToScreenMatrix = Matrix.inverse(screenToWorldMatrix);
+      this.setState({ ...vals, screenToWorldMatrix, worldToScreenMatrix });
+    } else {
+      this.setState(vals);
+    }
+  };
+
   getState = (): AppState => {
     return this.state;
   };
+
   onResize() {
     this.setState({
       screenWidth: this.canvas?.width,
@@ -169,7 +193,11 @@ class Project extends React.Component<Props> {
     eventType: EventType,
     event: React.PointerEvent<HTMLCanvasElement>
   ) {
-    const { x, y } = screenCoordToWorldCoord(event, this.state);
+    const { x, y } = transformPoint(
+      event.clientX,
+      event.clientY,
+      this.state.screenToWorldMatrix
+    );
     this.setState({
       pointerX: x,
       pointerY: y,

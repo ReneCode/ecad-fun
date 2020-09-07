@@ -1,16 +1,29 @@
 import { ElementWorker, ECadBaseElement, ECadLineElement } from "../types";
 
-import { distancePointToLine, normalizeBox } from "../utils/geometric";
+import {
+  distancePointToLine,
+  normalizeBox,
+  transformPoint,
+} from "../utils/geometric";
 
 export const workerLine: ElementWorker = {
   type: "line",
 
-  render: (element, context, { worldCoordToScreenCoord }) => {
+  render: (element, context, { worldToScreenMatrix }) => {
     const line = element as ECadLineElement;
 
     context.beginPath();
-    const { x: x1, y: y1 } = worldCoordToScreenCoord(line.x1, line.y1);
-    const { x: x2, y: y2 } = worldCoordToScreenCoord(line.x2, line.y2);
+    const { x: x1, y: y1 } = transformPoint(
+      line.x1,
+      line.y1,
+      worldToScreenMatrix
+    );
+    const { x: x2, y: y2 } = transformPoint(
+      line.x2,
+      line.y2,
+      worldToScreenMatrix
+    );
+    console.log("x1", line.x1, x1);
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
     context.stroke();

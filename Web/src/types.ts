@@ -61,6 +61,9 @@ export type AppState = {
   // project-coords view
   zoom: number;
 
+  worldToScreenMatrix: Matrix;
+  screenToWorldMatrix: Matrix;
+
   // screen-coords view
   screenWidth: number;
   screenHeight: number;
@@ -78,6 +81,14 @@ export type AppState = {
 export const getDefaultAppState = (): AppState => {
   return {
     cursor: "default",
+    pointerButtons: -1,
+    pointerX: 0,
+    pointerY: 0,
+    gripSize: 12,
+    zoom: 1.0,
+
+    worldToScreenMatrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
+    screenToWorldMatrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
 
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
@@ -89,13 +100,6 @@ export const getDefaultAppState = (): AppState => {
     selectionBox: null,
 
     elements: [],
-    pointerButtons: -1,
-
-    gripSize: 12,
-    zoom: 1.0,
-
-    pointerX: 0,
-    pointerY: 0,
   };
 };
 
@@ -154,6 +158,22 @@ export type Point = {
   y: number;
 };
 
+/**
+ * @description
+ * | a c e |
+ * | b d f |
+ * | 0 0 1 |
+ * e,f translate
+ * a,d scale
+ */
+export type Matrix = {
+  a: number;
+  b: number;
+  c: number;
+  d: number;
+  e: number;
+  f: number;
+};
 export type Size = {
   w: number;
   h: number;
@@ -189,10 +209,8 @@ export type ElementWorker = {
 };
 
 export type ElementRenderParams = {
-  worldCoordToScreenCoord: (x: number, y: number) => { x: number; y: number };
-  worldLengthToScreenLength: (len: number) => number;
-  offsetX: number;
-  offsetY: number;
+  worldToScreenMatrix: Matrix;
+  screenToWorldMatrix: Matrix;
 };
 
 export type ElementRenderFn = (

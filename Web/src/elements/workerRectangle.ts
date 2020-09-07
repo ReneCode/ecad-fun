@@ -1,24 +1,26 @@
 import { ElementWorker, ECadBaseElement, ECadRectangleElement } from "../types";
 
-import { normalizeBox, distancePointToLine } from "../utils/geometric";
+import {
+  normalizeBox,
+  distancePointToLine,
+  transformPoint,
+} from "../utils/geometric";
 
 export const workerRectangle: ElementWorker = {
   type: "rectangle",
 
-  render: (
-    element,
-    context,
-    { worldCoordToScreenCoord, worldLengthToScreenLength }
-  ) => {
+  render: (element, context, { worldToScreenMatrix }) => {
     context.beginPath();
     const rectangle = element as ECadRectangleElement;
-    const { x: x1, y: y1 } = worldCoordToScreenCoord(
+    const { x: x1, y: y1 } = transformPoint(
       rectangle.x1,
-      rectangle.y1
+      rectangle.y1,
+      worldToScreenMatrix
     );
-    const { x: x2, y: y2 } = worldCoordToScreenCoord(
+    const { x: x2, y: y2 } = transformPoint(
       rectangle.x2,
-      rectangle.y2
+      rectangle.y2,
+      worldToScreenMatrix
     );
     if (rectangle.fill) {
       context.fillStyle = rectangle.fill;

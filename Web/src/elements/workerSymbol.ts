@@ -5,23 +5,13 @@ import {
   ECadSymbolElement,
 } from "../types";
 import elementWorkerManager from "./ElementWorkerManager";
-import {
-  distancePointToLine,
-  normalizeBox,
-  enlargeBoxByBox,
-} from "../utils/geometric";
+import { distancePointToLine, enlargeBoxByBox } from "../utils/geometric";
 
 export const workerSymbol: ElementWorker = {
   type: "symbol",
 
   render: (element, context, params) => {
     const symbol = element as ECadSymbolElement;
-
-    // const { x: offsetX, y: offsetY } = params.worldCoordToScreenCoord(
-    //   params.offsetX,
-    //   params.offsetY
-    // );
-    // context.translate(offsetX, offsetY);
     symbol.children.forEach((element) =>
       elementWorkerManager.render(element, context, params)
     );

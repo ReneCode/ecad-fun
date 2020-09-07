@@ -1,4 +1,5 @@
-import { Point, Box } from "../types";
+import { Point, Box, Matrix } from "../types";
+import * as MatrixNS from "./Matrix";
 
 export const distancePointToPoint = (
   x1: number,
@@ -36,53 +37,54 @@ export const lineLength = (
 ): number => {
   return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
 };
-export const screenCoordToWorldCoord = (
-  { clientX, clientY }: { clientX: number; clientY: number },
-  {
-    screenOriginX,
-    screenOriginY,
-    zoom,
-  }: {
-    screenOriginX: number;
-    screenOriginY: number;
-    zoom: number;
-  }
-) => {
-  return {
-    x: (clientX - screenOriginX) / zoom,
-    y: -(clientY - screenOriginY) / zoom,
-  };
-};
 
-export const worldCoordToScreenCoord = (
-  x: number,
-  y: number,
-  {
-    screenOriginX,
-    screenOriginY,
-    zoom,
-  }: {
-    screenOriginX: number;
-    screenOriginY: number;
-    zoom: number;
-  }
-) => {
-  return {
-    x: x * zoom + screenOriginX,
-    y: screenOriginY - y * zoom,
-  };
-};
+// export const screenCoordToWorldCoord = (
+//   { clientX, clientY }: { clientX: number; clientY: number },
+//   {
+//     screenOriginX,
+//     screenOriginY,
+//     zoom,
+//   }: {
+//     screenOriginX: number;
+//     screenOriginY: number;
+//     zoom: number;
+//   }
+// ) => {
+//   return {
+//     x: (clientX - screenOriginX) / zoom,
+//     y: -(clientY - screenOriginY) / zoom,
+//   };
+// };
 
-export const worldLengthToScreenLength = (
-  len: number,
-  {
-    zoom,
-  }: {
-    zoom: number;
-  }
-) => {
-  return len * zoom;
-};
+// export const worldCoordToScreenCoord = (
+//   x: number,
+//   y: number,
+//   {
+//     screenOriginX,
+//     screenOriginY,
+//     zoom,
+//   }: {
+//     screenOriginX: number;
+//     screenOriginY: number;
+//     zoom: number;
+//   }
+// ) => {
+//   return {
+//     x: x * zoom + screenOriginX,
+//     y: screenOriginY - y * zoom,
+//   };
+// };
+
+// export const worldLengthToScreenLength = (
+//   len: number,
+//   {
+//     zoom,
+//   }: {
+//     zoom: number;
+//   }
+// ) => {
+//   return len * zoom;
+// };
 
 export const normalizeBox = ({ x1, y1, x2, y2 }: Box) => {
   return {
@@ -131,4 +133,12 @@ export const intersectBoxWithBox = (box1: Box, box2: Box) => {
     return false;
   }
   return true;
+};
+
+export const transformPoint = (x: number, y: number, matrix: Matrix) => {
+  return MatrixNS.transform({ x, y }, matrix);
+};
+
+export const transformLength = (len: number, matrix: Matrix) => {
+  return matrix.a * len;
 };

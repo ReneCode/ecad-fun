@@ -1,5 +1,6 @@
 import { ElementWorker, ECadBaseElement, ECadSymbolRefElement } from "../types";
 import elementWorkerManager from "./ElementWorkerManager";
+import * as Matrix from "../utils/Matrix";
 
 export const workerSymbolRef: ElementWorker = {
   type: "symbolRef",
@@ -7,18 +8,21 @@ export const workerSymbolRef: ElementWorker = {
   render: (element, context, params) => {
     const symbolRef = element as ECadSymbolRefElement;
 
-    context.translate(40, 20);
-    context.strokeStyle = "red";
+    const m = Matrix.multiply(
+      Matrix.translate(40, 40),
+      params.worldToScreenMatrix
+    );
+    const mInverse = Matrix.inverse(m);
 
     elementWorkerManager.render(symbolRef.symbol, context, {
       ...params,
-      offsetX: symbolRef.x,
-      offsetY: symbolRef.y,
+      worldToScreenMatrix: m,
+      screenToWorldMatrix: mInverse,
     });
   },
 
   hitTest: (element, pt, epsilon) => {
-    const symbolRef = element as ECadSymbolRefElement;
+    // const symbolRef = element as ECadSymbolRefElement;
     return false;
   },
 
@@ -28,7 +32,7 @@ export const workerSymbolRef: ElementWorker = {
   },
 
   getHandles: (element: ECadBaseElement) => {
-    const symbolRef = element as ECadSymbolRefElement;
+    // const symbolRef = element as ECadSymbolRefElement;
 
     return [];
   },

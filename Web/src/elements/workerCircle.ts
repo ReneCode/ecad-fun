@@ -1,6 +1,11 @@
 import { ElementWorker, ECadBaseElement, ECadCircleElement } from "../types";
 
-import { distancePointToPoint, normalizeBox } from "../utils/geometric";
+import {
+  distancePointToPoint,
+  normalizeBox,
+  transformPoint,
+  transformLength,
+} from "../utils/geometric";
 
 export const workerCircle: ElementWorker = {
   type: "circle",
@@ -8,22 +13,12 @@ export const workerCircle: ElementWorker = {
   render: (
     element: ECadBaseElement,
     context: CanvasRenderingContext2D,
-    {
-      worldCoordToScreenCoord,
-      worldLengthToScreenLength,
-    }: {
-      worldCoordToScreenCoord: (
-        x: number,
-        y: number
-      ) => { x: number; y: number };
-
-      worldLengthToScreenLength: (len: number) => number;
-    }
+    { worldToScreenMatrix }
   ) => {
     context.beginPath();
     const circle = element as ECadCircleElement;
-    const { x, y } = worldCoordToScreenCoord(circle.x, circle.y);
-    const radius = worldLengthToScreenLength(circle.radius);
+    const { x, y } = transformPoint(circle.x, circle.y, worldToScreenMatrix);
+    const radius = transformLength(circle.radius, worldToScreenMatrix);
     context.arc(x, y, radius, 0, Math.PI * 2);
     context.stroke();
   },

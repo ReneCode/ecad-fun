@@ -8,7 +8,7 @@ export const workerDefault: ElementWorker = {
   render: (
     element,
     context,
-    { worldCoordToScreenCoord, worldLengthToScreenLength }
+    { worldToScreenMatrix, screenToWorldMatrix }
   ) => {},
 
   hitTest: (element, pt, epsilon) => {

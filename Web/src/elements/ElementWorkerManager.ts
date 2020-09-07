@@ -33,6 +33,8 @@ class ElementWorkerManager {
   }
 
   public render: ElementRenderFn = (element, context, params) => {
+    console.log("render:", element.type, params.worldToScreenMatrix);
+
     this.getWorker(element.type).render(element, context, params);
   };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, ECadBaseElement, ECadSymbolElement } from "../types";
+import { ECadSymbolElement } from "../types";
 
 import "./SymbolList.scss";
 

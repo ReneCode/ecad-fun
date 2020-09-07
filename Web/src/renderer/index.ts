@@ -1,8 +1,11 @@
-import { ECadBaseElement, AppState } from "../types";
 import {
-  worldCoordToScreenCoord,
-  worldLengthToScreenLength,
-} from "../utils/geometric";
+  ECadBaseElement,
+  AppState,
+  ElementRenderParams,
+  Matrix,
+} from "../types";
+import { transformPoint } from "../utils/geometric";
+
 import { getHandlesElement } from "../elements";
 import elementWorkerManager from "../elements/ElementWorkerManager";
 import { COLOR } from "../utils/color";
@@ -28,16 +31,21 @@ export const renderScene = (
 
   renderBackground(context, canvasWidth, canvasHeight);
 
+  const renderParams = {
+    screenToWorldMatrix: state.screenToWorldMatrix,
+    worldToScreenMatrix: state.worldToScreenMatrix,
+  };
+
   for (let element of elements) {
     if (!state.selectedElementIds.includes(element.id)) {
-      renderElement(context, element, state);
+      renderElement(context, element, renderParams);
     }
   }
 
   for (let id of state.selectedElementIds) {
     const element = elements.find((el) => el.id === id);
     if (element) {
-      renderElement(context, element, state, { selected: true });
+      renderElement(context, element, renderParams, { selected: true });
     }
   }
 };
@@ -45,7 +53,7 @@ export const renderScene = (
 const renderElement = (
   context: CanvasRenderingContext2D,
   element: ECadBaseElement,
-  state: AppState,
+  renderParams: ElementRenderParams,
   options: RenderOptions = {}
 ) => {
   context.save();
@@ -58,21 +66,17 @@ const renderElement = (
     context.strokeStyle = element.color ? element.color : "";
   }
 
-  elementWorkerManager.render(element, context, {
-    worldCoordToScreenCoord: (x: number, y: number) => {
-      return worldCoordToScreenCoord(x, y, state);
-    },
-    worldLengthToScreenLength: (len: number) => {
-      return worldLengthToScreenLength(len, state);
-    },
-    offsetX: 0,
-    offsetY: 0,
-  });
+  elementWorkerManager.render(element, context, renderParams);
 
   if (selected) {
     const handles = getHandlesElement(element);
     handles.forEach((handle) => {
-      renderHandle(context, handle.x, handle.y, state);
+      renderHandle(
+        context,
+        handle.x,
+        handle.y,
+        renderParams.worldToScreenMatrix
+      );
     });
   }
   context.restore();
@@ -99,9 +103,9 @@ const renderHandle = (
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
-  state: AppState
+  worldToScreenMatrix: Matrix
 ) => {
-  const { x: sx, y: sy } = worldCoordToScreenCoord(x, y, state);
+  const { x: sx, y: sy } = transformPoint(x, y, worldToScreenMatrix);
 
   context.beginPath();
   context.strokeStyle = COLOR.GRIPHANDLE_STROKE;

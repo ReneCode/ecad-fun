@@ -1,24 +1,5 @@
-type Point = {
-  x: number;
-  y: number;
-};
-
-/**
- * @description
- * | a c e |
- * | b d f |
- * | 0 0 1 |
- * e,f translate
- * a,d scale
- */
-export type Matrix = {
-  a: number;
-  b: number;
-  c: number;
-  d: number;
-  e: number;
-  f: number;
-};
+//
+import { Matrix, Point } from "../types";
 
 export function create() {
   return {
@@ -31,7 +12,41 @@ export function create() {
   };
 }
 
-export function multiply(m1: Matrix, m2: Matrix) {
+export function scale(scaleX: number, scaleY: number) {
+  return {
+    a: scaleX,
+    b: 0,
+    c: 0,
+    d: scaleY,
+    e: 0,
+    f: 0,
+  };
+}
+
+export function translate(dx: number, dy: number) {
+  return {
+    a: 1,
+    b: 0,
+    c: 0,
+    d: 1,
+    e: dx,
+    f: dy,
+  };
+}
+
+export function inverse(m: Matrix) {
+  const det = m.a * m.d - m.b * m.c;
+  return {
+    a: m.d / det,
+    b: -m.b / det,
+    c: -m.c / det,
+    d: m.a / det,
+    e: (m.c * m.f - m.d * m.e) / det,
+    f: (m.b * m.e - m.a * m.f) / det,
+  };
+}
+
+export function multiply(m2: Matrix, m1: Matrix) {
   return {
     a: m1.a * m2.a + m1.c * m2.b,
     b: m1.b * m2.a + m1.d * m2.b,
@@ -41,24 +56,7 @@ export function multiply(m1: Matrix, m2: Matrix) {
     f: m1.b * m2.e + m1.d * m2.f + m1.f,
   };
 }
-
-export function scale(m: Matrix, scale: number) {
-  return {
-    ...m,
-    a: m.a * scale,
-    d: m.d * scale,
-  };
-}
-
-export function translate(m: Matrix, dx: number, dy: number) {
-  return {
-    ...m,
-    e: m.e + dx,
-    f: m.f + dy,
-  };
-}
-
-export function transform(m: Matrix, pt: Point) {
+export function transform(pt: Point, m: Matrix) {
   return {
     x: m.a * pt.x + m.c * pt.y + m.e,
     y: m.b * pt.x + m.d * pt.y + m.f,
