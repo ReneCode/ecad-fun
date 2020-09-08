@@ -6,4 +6,6 @@ export const COLOR = {
 
   GRIPHANDLE_STROKE: "#5522ee",
   GRIPHANDLE_FILL: "#eee",
+
+  DEFAULT_STROKE: "#000",
 };

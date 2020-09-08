@@ -5,11 +5,12 @@ import {
   distancePointToLine,
   transformPoint,
 } from "../utils/geometric";
+import { COLOR } from "../utils/color";
 
 export const workerRectangle: ElementWorker = {
   type: "rectangle",
 
-  render: (element, context, { worldToScreenMatrix }) => {
+  render: (element, context, { worldToScreenMatrix, selected }) => {
     context.beginPath();
     const rectangle = element as ECadRectangleElement;
     const { x: x1, y: y1 } = transformPoint(
@@ -27,6 +28,13 @@ export const workerRectangle: ElementWorker = {
       context.fillRect(x1, y1, x2 - x1, y2 - y1);
     }
     context.rect(x1, y1, x2 - x1, y2 - y1);
+
+    context.strokeStyle = selected
+      ? COLOR.SELECTED
+      : element.color
+      ? element.color
+      : COLOR.DEFAULT_STROKE;
+
     context.stroke();
   },
 

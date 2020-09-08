@@ -5,12 +5,12 @@ import "./SymbolList.scss";
 
 type Props = {
   symbol: ECadSymbolElement;
-  onClick: () => void;
+  onPointerDown: () => void;
 };
-const SymbolList: React.FC<Props> = ({ symbol, onClick }) => {
+const SymbolList: React.FC<Props> = ({ symbol, onPointerDown }) => {
   return (
-    <div className="symbollistitem" onClick={onClick}>
-      {symbol.id}
+    <div className="symbollistitem" onPointerDown={onPointerDown}>
+      {symbol.name}
     </div>
   );
 };

@@ -22,7 +22,7 @@ const SymbolList: React.FC<Props> = ({ state, actionManager }) => {
             <SymbolListItem
               key={e.id}
               symbol={e as ECadSymbolElement}
-              onClick={() => onSelectSymbol(e.id)}
+              onPointerDown={() => onSelectSymbol(e.id)}
             />
           );
         })}

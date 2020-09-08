@@ -3,12 +3,9 @@ import {
   getDefaultAppState,
   ECadBaseElement,
   ECadSymbolRefElement,
-  ECadSymbolElement,
-  ECadLineElement,
-  ECadCircleElement,
 } from "../types";
 import { debounce } from "../utils";
-import { randomId } from "../utils/randomId";
+import { getNotFoundSymbol } from "../elements/notFoundSymbol";
 
 const DELAY_SAVE = 1000;
 const LOCAL_STORAGE_STATE_KEY = "ecad-fun-state";
@@ -60,44 +57,6 @@ const removeSymbolFromSymbolRef = (
       return e;
     }
   });
-};
-
-const getNotFoundSymbol = () => {
-  const l1: ECadLineElement = {
-    id: randomId(),
-    type: "line",
-    x1: -10,
-    y1: -10,
-    x2: 10,
-    y2: 10,
-    color: "orange",
-  };
-  const l2: ECadLineElement = {
-    id: randomId(),
-    type: "line",
-    x1: -10,
-    y1: 10,
-    x2: 10,
-    y2: -10,
-    color: "orange",
-  };
-  const circle: ECadCircleElement = {
-    id: randomId(),
-    type: "circle",
-    x: 0,
-    y: 0,
-    radius: 10,
-    color: "red",
-  };
-
-  const symbol: ECadSymbolElement = {
-    id: randomId(),
-    type: "symbol",
-    refX: -10,
-    refY: -10,
-    children: [l1, l2, circle],
-  };
-  return symbol;
 };
 
 const addSymbolToSymbolRef = (

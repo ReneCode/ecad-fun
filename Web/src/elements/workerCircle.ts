@@ -6,6 +6,7 @@ import {
   transformPoint,
   transformLength,
 } from "../utils/geometric";
+import { COLOR } from "../utils/color";
 
 export const workerCircle: ElementWorker = {
   type: "circle",
@@ -13,13 +14,20 @@ export const workerCircle: ElementWorker = {
   render: (
     element: ECadBaseElement,
     context: CanvasRenderingContext2D,
-    { worldToScreenMatrix }
+    { worldToScreenMatrix, selected }
   ) => {
     context.beginPath();
     const circle = element as ECadCircleElement;
     const { x, y } = transformPoint(circle.x, circle.y, worldToScreenMatrix);
     const radius = transformLength(circle.radius, worldToScreenMatrix);
     context.arc(x, y, radius, 0, Math.PI * 2);
+
+    context.strokeStyle = selected
+      ? COLOR.SELECTED
+      : element.color
+      ? element.color
+      : COLOR.DEFAULT_STROKE;
+
     context.stroke();
   },
 

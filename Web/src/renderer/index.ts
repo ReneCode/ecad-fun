@@ -34,6 +34,7 @@ export const renderScene = (
   const renderParams = {
     screenToWorldMatrix: state.screenToWorldMatrix,
     worldToScreenMatrix: state.worldToScreenMatrix,
+    selected: false,
   };
 
   for (let element of elements) {
@@ -42,10 +43,14 @@ export const renderScene = (
     }
   }
 
+  const renderParamsSelected = {
+    ...renderParams,
+    selected: true,
+  };
   for (let id of state.selectedElementIds) {
     const element = elements.find((el) => el.id === id);
     if (element) {
-      renderElement(context, element, renderParams, { selected: true });
+      renderElement(context, element, renderParamsSelected);
     }
   }
 };
@@ -53,22 +58,15 @@ export const renderScene = (
 const renderElement = (
   context: CanvasRenderingContext2D,
   element: ECadBaseElement,
-  renderParams: ElementRenderParams,
-  options: RenderOptions = {}
+  renderParams: ElementRenderParams
 ) => {
   context.save();
 
   // context.beginPath();
-  const { selected } = options;
-  if (selected) {
-    context.strokeStyle = COLOR.SELECTED;
-  } else {
-    context.strokeStyle = element.color ? element.color : "";
-  }
 
   elementWorkerManager.render(element, context, renderParams);
 
-  if (selected) {
+  if (renderParams.selected) {
     const handles = getHandlesElement(element);
     handles.forEach((handle) => {
       renderHandle(

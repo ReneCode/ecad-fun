@@ -35,6 +35,7 @@ export type ECadRectangleElement = ECadBaseElement & {
 };
 
 export type ECadSymbolElement = ECadBaseElement & {
+  name: string;
   children: ECadBaseElement[];
   refX: number;
   refY: number;
@@ -211,6 +212,7 @@ export type ElementWorker = {
 export type ElementRenderParams = {
   worldToScreenMatrix: Matrix;
   screenToWorldMatrix: Matrix;
+  selected: Boolean;
 };
 
 export type ElementRenderFn = (

@@ -5,11 +5,12 @@ import {
   normalizeBox,
   transformPoint,
 } from "../utils/geometric";
+import { COLOR } from "../utils/color";
 
 export const workerLine: ElementWorker = {
   type: "line",
 
-  render: (element, context, { worldToScreenMatrix }) => {
+  render: (element, context, { worldToScreenMatrix, selected }) => {
     const line = element as ECadLineElement;
 
     context.beginPath();
@@ -25,6 +26,12 @@ export const workerLine: ElementWorker = {
     );
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
+    context.strokeStyle = selected
+      ? COLOR.SELECTED
+      : element.color
+      ? element.color
+      : COLOR.DEFAULT_STROKE;
+
     context.stroke();
   },
 

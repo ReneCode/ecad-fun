@@ -38,7 +38,6 @@ export const actionPlaceSymbol: Action = {
 
   pointerMove: ({ state, actionState }) => {
     // const myState: MyActionState = actionState;
-    console.log("pointerMove place symbol");
     if (state.editingElement) {
       const x = state.pointerX;
       const y = state.pointerY;
@@ -55,9 +54,6 @@ export const actionPlaceSymbol: Action = {
   },
 
   pointerUp: ({ state, actionState }) => {
-    const myState: MyActionState = actionState;
-
-    console.log("pointerup place symbol", myState.symbol.id, myState.symbolRef);
     if (state.editingElement) {
       return {
         state: {

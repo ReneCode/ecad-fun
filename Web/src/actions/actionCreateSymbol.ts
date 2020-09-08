@@ -10,6 +10,13 @@ export const actionCreateSymbol: Action = {
       return;
     }
 
+    const cntSymbols = state.elements.reduce((acc, e) => {
+      if (e.type === "symbol") {
+        acc++;
+      }
+      return acc;
+    }, 0);
+
     const children = state.elements.filter((element) =>
       state.selectedElementIds.includes(element.id)
     );
@@ -18,6 +25,7 @@ export const actionCreateSymbol: Action = {
     const symbol: ECadSymbolElement = {
       id: randomId(),
       type: "symbol",
+      name: `Symbol-${cntSymbols + 1}`,
       color: "black",
       children: children,
       refX: 0,

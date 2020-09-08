@@ -18,7 +18,6 @@ export const workerSymbolRef: ElementWorker = {
     const mInverse = Matrix.inverse(m);
 
     // context.strokeStyle = "yellow";
-    // context.setLineDash([5, 5]);
     elementWorkerManager.render(symbolRef.symbol, context, {
       ...params,
       worldToScreenMatrix: m,

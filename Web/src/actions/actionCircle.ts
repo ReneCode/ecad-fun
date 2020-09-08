@@ -14,7 +14,6 @@ export const actionCircle: Action = {
       x,
       y,
       radius: 0,
-      color: "black",
     };
     return {
       state: {

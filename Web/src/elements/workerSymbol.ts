@@ -7,9 +7,9 @@ export const workerSymbol: ElementWorker = {
 
   render: (element, context, params) => {
     const symbol = element as ECadSymbolElement;
-    symbol.children.forEach((element) =>
-      elementWorkerManager.render(element, context, params)
-    );
+    symbol.children.forEach((element) => {
+      elementWorkerManager.render(element, context, params);
+    });
   },
 
   hitTest: (element, pt, epsilon) => {
