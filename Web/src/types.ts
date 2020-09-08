@@ -45,6 +45,7 @@ export type ECadSymbolRefElement = ECadBaseElement & {
   x: number;
   y: number;
   symbolId: string;
+  symbolName: string;
   symbol: ECadSymbolElement;
 };
 

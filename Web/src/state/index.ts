@@ -16,10 +16,7 @@ export const saveDebounced = debounce((appState: AppState) => {
 
 const saveToLocalStorage = (appState: AppState) => {
   try {
-    const state = {
-      ...appState,
-      elements: removeSymbolFromSymbolRef(appState.elements),
-    };
+    const state = cleanupAppStateForExport(appState);
 
     localStorage.setItem(LOCAL_STORAGE_STATE_KEY, JSON.stringify(state));
   } catch (err) {
@@ -42,6 +39,13 @@ export const loadFromLocalStorage = (): AppState => {
     console.error(err);
   }
   return state;
+};
+
+export const cleanupAppStateForExport = (appState: AppState): AppState => {
+  return {
+    ...appState,
+    elements: removeSymbolFromSymbolRef(appState.elements),
+  };
 };
 
 const removeSymbolFromSymbolRef = (

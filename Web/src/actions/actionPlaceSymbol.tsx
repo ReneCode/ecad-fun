@@ -23,6 +23,7 @@ export const actionPlaceSymbol: Action = {
       x: 100,
       y: 50,
       symbolId: symbolId,
+      symbolName: symbol.name,
       symbol: symbol,
     };
     return {

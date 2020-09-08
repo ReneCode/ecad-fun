@@ -1,6 +1,7 @@
 import { fileSave } from "browser-nativefs";
 
 import { AppState } from "../types";
+import { cleanupAppStateForExport } from "../state";
 
 const serializeData = (appState: AppState) => {
   return JSON.stringify({
@@ -11,7 +12,7 @@ const serializeData = (appState: AppState) => {
 };
 
 export const exportToJsonFile = async (appState: AppState) => {
-  const serialized = serializeData(appState);
+  const serialized = serializeData(cleanupAppStateForExport(appState));
 
   const blob = new Blob([serialized], { type: "application/json" });
   const name = "ecad.json";

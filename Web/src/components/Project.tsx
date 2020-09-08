@@ -31,13 +31,6 @@ class Project extends React.Component<Props> {
       height: props.height,
     });
 
-    // this.updateScreenProjectMatrix()
-    this.setState = this.setState.bind(this);
-    this.onPointerDown = this.onPointerDown.bind(this);
-    this.onPointerMove = this.onPointerMove.bind(this);
-    this.onPointerUp = this.onPointerUp.bind(this);
-    this.onResize = this.onResize.bind(this);
-    this.onWheel = this.onWheel.bind(this);
     this.unsubscribe.push(
       canvasState.subscribe(() => {
         // this.setState({});
@@ -45,8 +38,8 @@ class Project extends React.Component<Props> {
     );
 
     this.actionMananger = new ActionManager({
-      setState: this.setStateValues.bind(this),
-      getState: this.getState.bind(this),
+      setState: this.setStateValues,
+      getState: this.getState,
     });
 
     this.actionMananger.registerAll();
@@ -96,12 +89,12 @@ class Project extends React.Component<Props> {
     return this.state;
   };
 
-  onResize() {
+  onResize = () => {
     this.setState({
       screenWidth: this.canvas?.width,
       screenHeight: this.canvas?.height,
     });
-  }
+  };
 
   componentDidUpdate() {
     if (this.canvas) {
@@ -129,7 +122,7 @@ class Project extends React.Component<Props> {
     return (
       <div className="main">
         <SymbolList state={this.state} actionManager={this.actionMananger} />
-        <Toolbox onClick={this.onToolboxClick.bind(this)} />
+        <Toolbox onClick={this.onToolboxClick} />
         <Status x={this.state.pointerX} y={this.state.pointerY} />
         <canvas
           ref={this.handleCanvasRef}
@@ -139,22 +132,23 @@ class Project extends React.Component<Props> {
           onPointerDown={this.onPointerDown}
           onPointerUp={this.onPointerUp}
           onPointerMove={this.onPointerMove}
-          // onWheel={this.onWheel}
+          onDrop={this.onDrop}
         ></canvas>
       </div>
     );
   }
 
-  private onPointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
+  private onPointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
     this.dispatchPointerEvent("pointerMove", event);
-  }
-  private onPointerUp(event: React.PointerEvent<HTMLCanvasElement>) {
+  };
+  private onPointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
     this.dispatchPointerEvent("pointerUp", event);
-  }
-  private onPointerDown(event: React.PointerEvent<HTMLCanvasElement>) {
+  };
+  private onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     this.dispatchPointerEvent("pointerDown", event);
-  }
-  private onWheel(event: WheelEvent) {
+  };
+  private onDrop = (event: React.DragEvent<HTMLCanvasElement>) => {};
+  private onWheel = (event: WheelEvent) => {
     event.preventDefault();
 
     // note that event.ctrlKey is necessary to handle pinch zooming
@@ -167,11 +161,11 @@ class Project extends React.Component<Props> {
         params: event,
       });
     }
-  }
+  };
 
-  private onToolboxClick(action: string) {
+  private onToolboxClick = (action: string) => {
     this.actionMananger.execute(action, { params: null });
-  }
+  };
 
   private onSelectSymbol(symbolId: string) {}
 
