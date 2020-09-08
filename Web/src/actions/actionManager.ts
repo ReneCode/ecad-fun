@@ -9,6 +9,7 @@ import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
 import { actionPanning } from "./actionPanning";
 import { actionCreateSymbol } from "./actionCreateSymbol";
 import { actionPlaceSymbol } from "./actionPlaceSymbol";
+import { actionExportDocument } from "./actionExportDocument";
 
 export type EventType =
   | "execute"
@@ -60,6 +61,8 @@ export class ActionManager {
     this.register(actionZoomPinch);
     this.register(actionPanning);
     this.register(actionDelete);
+
+    this.register(actionExportDocument);
 
     // default action
     this.runningActionName = "select";

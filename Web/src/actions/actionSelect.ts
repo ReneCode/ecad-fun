@@ -79,8 +79,6 @@ export const actionSelect: Action = {
     // start select with selection-box
     return {
       state: {
-        lastX: x,
-        lastY: y,
         selectedElementIds: [],
         selectionBox: createSelectionBox(x, y),
       },
