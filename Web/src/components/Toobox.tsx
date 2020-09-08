@@ -17,9 +17,7 @@ const Toolbox: React.FC<Props> = ({ onClick }) => {
       <ToolButton onClick={() => onClick("createSymbol")}>
         create symbol
       </ToolButton>
-      <ToolButton onClick={() => onClick("placeSymbol")}>
-        place Symbol
-      </ToolButton>
+      <ToolButton onClick={() => onClick("exportDocument")}>export</ToolButton>
     </div>
   );
 };
