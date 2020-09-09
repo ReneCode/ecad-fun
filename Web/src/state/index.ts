@@ -82,7 +82,7 @@ export const removeSymbolFromSymbolRef = (
   });
 };
 
-const addSymbolToSymbolRef = (
+export const addSymbolToSymbolRef = (
   elements: readonly ECadBaseElement[]
 ): ECadBaseElement[] => {
   return elements.map((e) => {

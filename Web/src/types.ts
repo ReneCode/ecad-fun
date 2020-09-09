@@ -112,6 +112,7 @@ export type Action = {
   stop?: ActionFn;
   start?: ActionFn;
 
+  run?: ActionFn; // () => Promise<boolean>;
   execute?: ActionFn;
   pointerDown?: ActionFn;
   pointerUp?: ActionFn;
@@ -144,7 +145,7 @@ type ActionFn = (args: {
   elements: readonly ECadBaseElement[];
   actionState: ActionState | any;
   params: any;
-}) => ActionResult | void;
+}) => ActionResult | void | Promise<ActionResult | void>;
 
 export type HitTestResult = {
   id: string;

@@ -21,6 +21,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
 
   state: AppState = getDefaultAppState();
   project: Project;
+  symbolLibraries: Project[] = [];
 
   constructor(props: Props) {
     super(props);

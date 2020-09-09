@@ -4,6 +4,7 @@ import {
   ActionState,
   defaultActionState,
   ECadBaseElement,
+  ActionResult,
 } from "../types";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
@@ -81,17 +82,17 @@ export class ActionManager {
     this.runningActionName = "select";
   }
 
-  public dispatch(type: EventType, { params }: { params?: any }) {
+  public async dispatch(type: EventType, { params }: { params?: any }) {
     const action = this.getAction(this.runningActionName);
     if (action) {
-      this.applyActionMethode(action, type, {
+      await this.applyActionMethode(action, type, {
         actionState: this.actionState,
         params,
       });
     }
   }
 
-  public execute(actionName: string, { params }: { params: any }) {
+  public async execute(actionName: string, { params }: { params: any }) {
     const action = this.getAction(actionName);
     if (!action) {
       console.error(`action ${actionName} not found`);
@@ -100,7 +101,7 @@ export class ActionManager {
 
     if (action.execute) {
       // if execute methode exists, than it is a execute-once-action
-      this.applyActionMethode(action, "execute", {
+      await this.applyActionMethode(action, "execute", {
         actionState: defaultActionState,
         params,
       });
@@ -129,25 +130,33 @@ export class ActionManager {
     return this.allActions.find((action) => action.name === actionName);
   }
 
-  private applyActionMethode(
+  private async applyActionMethode(
     action: Action,
     type: EventType,
     { actionState, params }: { actionState: ActionState; params?: any }
   ) {
     const fn = action[type];
     if (fn) {
-      const result = fn({
+      const resultOrPromise = fn({
         state: this.getState(),
         elements: this.getElements(),
         actionState,
         params,
       });
+      let result: ActionResult | void;
+      if (resultOrPromise instanceof Promise) {
+        result = await resultOrPromise;
+      } else {
+        result = resultOrPromise;
+      }
       if (result) {
         if (result.state) {
           this.setState(result.state);
         }
         if (result.elements) {
           this.setElements(result.elements);
+          // re-render
+          this.setState({});
         }
         if (result.actionState) {
           this.setActionState(result.actionState);
