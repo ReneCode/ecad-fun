@@ -1,10 +1,15 @@
 import { ECadBaseElement, ECadSymbolElement } from "../types";
 
 export class Project {
-  name: string = "";
   id: number = -1;
   elements: ECadBaseElement[] = [];
   symbolLibraries: Project[] = [];
+
+  constructor(private name: string) {}
+
+  public getName(): string {
+    return this.name;
+  }
 
   public getElements(): readonly ECadBaseElement[] {
     return this.elements;

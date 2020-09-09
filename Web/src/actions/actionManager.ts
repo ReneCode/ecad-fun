@@ -32,15 +32,18 @@ type getStateFn = () => AppState;
 type getElementsFn = () => readonly ECadBaseElement[];
 type setElementsFn = (elements: readonly ECadBaseElement[]) => void;
 
+type AddinFn = (data: any) => void;
+
 export class ActionManager {
   allActions: Action[] = [];
-  basicActions: Action[] = [];
   runningActionName: string = "";
   actionState: ActionState = defaultActionState;
   getState: getStateFn;
   setState: setStateFn;
   getElements: getElementsFn;
   setElements: setElementsFn;
+
+  addins: Record<string, AddinFn> = {};
 
   constructor(
     getState: getStateFn,
@@ -58,8 +61,6 @@ export class ActionManager {
     this.allActions.push(action);
   }
   registerAll() {
-    // this.basicActions.push(actionHover);
-
     this.register(actionSelect);
 
     this.register(actionLine);
@@ -80,6 +81,10 @@ export class ActionManager {
 
     // default action
     this.runningActionName = "select";
+  }
+
+  public registerAddin(name: string, fn: AddinFn) {
+    this.addins[name] = fn;
   }
 
   public async dispatch(type: EventType, { params }: { params?: any }) {
@@ -143,13 +148,20 @@ export class ActionManager {
         actionState,
         params,
       });
-      let result: ActionResult | void;
+      let result: (ActionResult & Record<string, any>) | void;
       if (resultOrPromise instanceof Promise) {
         result = await resultOrPromise;
       } else {
         result = resultOrPromise;
       }
       if (result) {
+        // addins
+        for (let name in this.addins) {
+          if (name in result) {
+            this.addins[name](result[name]);
+          }
+        }
+
         if (result.state) {
           this.setState(result.state);
         }
@@ -161,6 +173,7 @@ export class ActionManager {
         if (result.actionState) {
           this.setActionState(result.actionState);
         }
+
         if (result.stopAction) {
           this.execute("select", { params });
         }

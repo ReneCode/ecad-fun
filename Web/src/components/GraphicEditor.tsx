@@ -8,6 +8,7 @@ import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
 import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 import { Project } from "../data/Project";
+import SymbolLibManager from "../data/SymbolLibManager";
 
 type Props = {
   width: number;
@@ -20,21 +21,32 @@ class GraphicEditor extends React.Component<Props, AppState> {
   actionMananger: ActionManager;
 
   state: AppState = getDefaultAppState();
-  project: Project;
-  symbolLibraries: Project[] = [];
+  projects: Record<string, Project> = {};
 
   constructor(props: Props) {
     super(props);
-    this.project = new Project();
+
+    const project = new Project("main");
+    this.projects["main"] = project;
 
     this.actionMananger = new ActionManager(
       () => this.getState(),
       this.setStateValues,
-      () => this.project.getElements(),
-      (elements) => this.project.setElements(elements)
+      () => this.getMainProject().getElements(),
+      (elements) => this.getMainProject().setElements(elements)
     );
 
     this.actionMananger.registerAll();
+
+    const symbolLibManager = new SymbolLibManager(this.projects);
+    this.actionMananger.registerAddin(
+      "symbollib",
+      symbolLibManager.applyResult
+    );
+  }
+
+  getMainProject(): Project {
+    return this.projects["main"];
   }
 
   componentDidMount() {
@@ -45,7 +57,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
       state.zoom
     );
     this.setState({ ...state, ...matrix });
-    this.project.setElements(elements);
+    this.getMainProject().setElements(elements);
     this.addEventListeners();
   }
 
@@ -98,7 +110,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
   componentDidUpdate() {
     if (this.canvas) {
       this.canvas.style.cursor = this.state.cursor;
-      let elements = [...this.project.getElements()];
+      let elements = [...this.getMainProject().getElements()];
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
       }
@@ -121,7 +133,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
       <div className="main">
         <SymbolList
           state={this.state}
-          elements={this.project.getElements()}
+          projects={this.projects}
           actionManager={this.actionMananger}
         />
         <Toolbox onClick={this.onToolboxClick} />

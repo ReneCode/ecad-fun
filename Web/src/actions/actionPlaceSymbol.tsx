@@ -10,10 +10,11 @@ export const actionPlaceSymbol: Action = {
   name: "placeSymbol",
 
   start: ({ state, elements, params }) => {
-    const symbolId: string = params;
-    const symbol = elements.find(
-      (e) => e.type === "symbol" && e.id === symbolId
-    ) as ECadSymbolElement;
+    // const symbolId: string = params;
+    // const symbol = elements.find(
+    //   (e) => e.type === "symbol" && e.id === symbolId
+    // ) as ECadSymbolElement;
+    const symbol = params as ECadSymbolElement;
     if (!symbol) {
       return;
     }
@@ -22,7 +23,7 @@ export const actionPlaceSymbol: Action = {
       type: "symbolRef",
       x: 100,
       y: 50,
-      symbolId: symbolId,
+      symbolId: symbol.id,
       symbolName: symbol.name,
       symbol: symbol,
     };

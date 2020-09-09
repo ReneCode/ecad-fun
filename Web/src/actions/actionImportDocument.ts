@@ -1,4 +1,4 @@
-import { Action } from "../types";
+import { Action, ECadBaseElement } from "../types";
 
 import { addSymbolToSymbolRef } from "../state";
 
@@ -12,9 +12,22 @@ export const actionImportDocument: Action = {
   }) => {
     const file = params.dataTransfer?.files[0];
     if (file.type === "application/json") {
-      const { elements } = await importFromJsonFile(file);
-      if (elements) {
-        return { elements: addSymbolToSymbolRef(elements) };
+      const content = await importFromJsonFile(file);
+      if (content.type === "ecad-symbollib") {
+        return {
+          symbollib: {
+            name: content.name,
+            elements: content.elements.filter(
+              (e: ECadBaseElement) => e.type === "symbol"
+            ),
+          },
+          state: {},
+        };
+      }
+      if (content.elements) {
+        return {
+          elements: addSymbolToSymbolRef(content.elements),
+        };
       }
     }
   },
