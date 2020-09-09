@@ -5,19 +5,19 @@ import elementWorkerManager from "../elements/ElementWorkerManager";
 export const actionCreateSymbol: Action = {
   name: "createSymbol",
 
-  execute: ({ state }) => {
+  execute: ({ state, elements }) => {
     if (state.selectedElementIds.length === 0) {
       return;
     }
 
-    const cntSymbols = state.elements.reduce((acc, e) => {
+    const cntSymbols = elements.reduce((acc, e) => {
       if (e.type === "symbol") {
         acc++;
       }
       return acc;
     }, 0);
 
-    const children = state.elements.filter((element) =>
+    const children = elements.filter((element) =>
       state.selectedElementIds.includes(element.id)
     );
 
@@ -48,20 +48,20 @@ export const actionCreateSymbol: Action = {
     return {
       state: {
         selectedElementIds: [symbol.id],
-        elements: state.elements
-          .filter(
-            (element) =>
-              !state.selectedElementIds.includes(element.id) ||
-              lastChildId === element.id
-          )
-          .map((element) => {
-            if (element.id === lastChildId) {
-              return symbol;
-            } else {
-              return element;
-            }
-          }),
       },
+      elements: elements
+        .filter(
+          (element) =>
+            !state.selectedElementIds.includes(element.id) ||
+            lastChildId === element.id
+        )
+        .map((element) => {
+          if (element.id === lastChildId) {
+            return symbol;
+          } else {
+            return element;
+          }
+        }),
     };
   },
 };

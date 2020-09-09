@@ -1,4 +1,9 @@
-import { Action, POINTER_BUTTONS, ECadRectangleElement } from "../types";
+import {
+  Action,
+  POINTER_BUTTONS,
+  ECadRectangleElement,
+  ActionResult,
+} from "../types";
 import {
   hitTestElement,
   getSelectedElements,
@@ -23,12 +28,12 @@ export const actionSelect: Action = {
     };
   },
 
-  pointerDown: ({ state }) => {
+  pointerDown: ({ state, elements }): ActionResult | void => {
     const x = state.pointerX;
     const y = state.pointerY;
 
     //  check selection on the selected elements
-    const selectedElements = state.elements.filter((e) =>
+    const selectedElements = elements.filter((e) =>
       state.selectedElementIds.includes(e.id)
     );
     for (let element of selectedElements) {
@@ -60,7 +65,7 @@ export const actionSelect: Action = {
     }
 
     // select new element be picking
-    for (let element of state.elements) {
+    for (let element of elements) {
       const result = hitTestElement(element, { x, y }, state);
       if (result) {
         return {
@@ -88,7 +93,7 @@ export const actionSelect: Action = {
     };
   },
 
-  pointerMove: ({ state, actionState }) => {
+  pointerMove: ({ state, elements, actionState }): ActionResult | void => {
     const x = state.pointerX;
     const y = state.pointerY;
     if (
@@ -103,13 +108,11 @@ export const actionSelect: Action = {
       if (handleIdx < 0) {
         // move element
 
-        const replace = getSelectedElements(state).map((e) => {
+        const replace = getSelectedElements(state, elements).map((e) => {
           return moveElementByDelta(e, { x: dx, y: dy });
         });
         return {
-          state: {
-            elements: replaceElements(replace, state),
-          },
+          elements: replaceElements(elements, replace),
           actionState: {
             lastX: x,
             lastY: y,
@@ -117,13 +120,11 @@ export const actionSelect: Action = {
         };
       } else {
         // move handle
-        const replace = getSelectedElements(state).map((e) => {
+        const replace = getSelectedElements(state, elements).map((e) => {
           return moveHandleOfElement(e, handleIdx, { x, y });
         });
         return {
-          state: {
-            elements: replaceElements(replace, state),
-          },
+          elements: replaceElements(elements, replace),
           actionState: {
             lastX: x,
             lastY: y,
@@ -139,7 +140,7 @@ export const actionSelect: Action = {
       state.pointerButtons & POINTER_BUTTONS.MAIN
     ) {
       const selectionBox = { ...state.selectionBox, x2: x, y2: y };
-      const selectedElementIds = state.elements
+      const selectedElementIds = elements
         .filter((element) => {
           return insideSelectionBox(element, selectionBox);
         })
@@ -153,7 +154,7 @@ export const actionSelect: Action = {
     }
   },
 
-  pointerUp: ({ state, actionState }) => {
+  pointerUp: ({ state, actionState }): ActionResult | void => {
     return {
       state: {
         selectionBox: null,

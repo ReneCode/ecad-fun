@@ -3,17 +3,15 @@ import { Action } from "../types";
 export const actionDelete: Action = {
   name: "delete",
 
-  execute: ({ state, params }) => {
+  execute: ({ state, elements }) => {
     if (!state.selectedElementIds.length) {
       return;
     }
 
     return {
-      state: {
-        elements: state.elements.filter(
-          (element) => !state.selectedElementIds.includes(element.id)
-        ),
-      },
+      elements: elements.filter(
+        (element) => !state.selectedElementIds.includes(element.id)
+      ),
     };
   },
 };

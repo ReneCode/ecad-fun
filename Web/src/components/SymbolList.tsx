@@ -1,21 +1,22 @@
 import React from "react";
-import { AppState, ECadSymbolElement } from "../types";
+import { AppState, ECadSymbolElement, ECadBaseElement } from "../types";
 import SymbolListItem from "./SymbolListItem";
 import "./SymbolList.scss";
 import { ActionManager } from "../actions/actionManager";
 
 type Props = {
   state: AppState;
+  elements: readonly ECadBaseElement[];
   actionManager: ActionManager;
 };
-const SymbolList: React.FC<Props> = ({ state, actionManager }) => {
+const SymbolList: React.FC<Props> = ({ state, elements, actionManager }) => {
   const onSelectSymbol = (id: string) => {
     actionManager.execute("placeSymbol", { params: id });
   };
 
   return (
     <div className="symbollist">
-      {state.elements
+      {elements
         .filter((e) => e.type === "symbol")
         .map((e) => {
           return (

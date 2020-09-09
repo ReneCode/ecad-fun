@@ -9,9 +9,9 @@ type MyActionState = {
 export const actionPlaceSymbol: Action = {
   name: "placeSymbol",
 
-  start: ({ state, params }) => {
+  start: ({ state, elements, params }) => {
     const symbolId: string = params;
-    const symbol = state.elements.find(
+    const symbol = elements.find(
       (e) => e.type === "symbol" && e.id === symbolId
     ) as ECadSymbolElement;
     if (!symbol) {
@@ -54,13 +54,13 @@ export const actionPlaceSymbol: Action = {
     }
   },
 
-  pointerUp: ({ state, actionState }) => {
+  pointerUp: ({ state, elements, actionState }) => {
     if (state.editingElement) {
       return {
         state: {
-          elements: [...state.elements, state.editingElement],
           editingElement: null,
         },
+        elements: [...elements, state.editingElement],
         stopAction: true,
       };
     }

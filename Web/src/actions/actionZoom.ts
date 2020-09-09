@@ -3,11 +3,11 @@ import { Action, AppState, ActionResult } from "../types";
 const zoom = (
   appState: AppState,
   zoomFactor: number,
-  centerX?: number,
-  centerY?: number
+  centerX: number,
+  centerY: number
 ): ActionResult => {
-  const zoomCenterX = centerX || appState.screenWidth / 2;
-  const zoomCenterY = centerY || appState.screenHeight / 2;
+  const zoomCenterX = centerX;
+  const zoomCenterY = centerY;
 
   const dx = appState.screenOriginX - zoomCenterX;
   const dy = appState.screenOriginY - zoomCenterY;
@@ -30,7 +30,7 @@ export const actionZoomIn: Action = {
   name: "zoomIn",
 
   execute: ({ state }) => {
-    return zoom(state, 1.1);
+    return zoom(state, 1.1, window.innerWidth / 2, window.innerHeight / 2);
   },
 };
 
@@ -38,14 +38,14 @@ export const actionZoomOut: Action = {
   name: "zoomOut",
 
   execute: ({ state }) => {
-    return zoom(state, 1 / 1.1);
+    return zoom(state, 1 / 1.1, window.innerWidth / 2, window.innerHeight / 2);
   },
 };
 
 export const actionZoomPinch: Action = {
   name: "zoomPinch",
 
-  execute: ({ state, params }) => {
+  execute: ({ state, params }: { state: AppState; params: WheelEvent }) => {
     const MAX_DELTA = 10;
     let delta = Math.min(Math.abs(params.deltaY), MAX_DELTA);
     const sign = Math.sign(params.deltaY);

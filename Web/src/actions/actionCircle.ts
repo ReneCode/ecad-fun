@@ -44,13 +44,13 @@ export const actionCircle: Action = {
     }
   },
 
-  pointerUp: ({ state }) => {
+  pointerUp: ({ state, elements }) => {
     if (state.editingElement) {
       return {
         state: {
-          elements: [...state.elements, state.editingElement],
           editingElement: null,
         },
+        elements: [...elements, state.editingElement],
         stopAction: true,
       };
     }

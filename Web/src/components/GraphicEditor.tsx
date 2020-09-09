@@ -1,69 +1,74 @@
 import React from "react";
-import { canvasState } from "../canvas";
 import Toolbox from "./Toobox";
 import Status from "./Status";
 import SymbolList from "./SymbolList";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/actionManager";
-import { AppState, getDefaultAppState } from "../types";
-import { Gesture } from "../utils/Gesture";
+import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
 import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
+import { Project } from "../data/Project";
 
 type Props = {
   width: number;
   height: number;
-  onChange: (appState: AppState) => void;
+  onChange: (appState: AppState, elements: readonly ECadBaseElement[]) => void;
 };
 
-class Project extends React.Component<Props> {
+class GraphicEditor extends React.Component<Props, AppState> {
   canvas: HTMLCanvasElement | null = null;
   actionMananger: ActionManager;
-  gesture = new Gesture();
-  unsubscribe: (() => void)[] = [];
 
   state: AppState = getDefaultAppState();
+  project: Project;
 
   constructor(props: Props) {
     super(props);
-    this.setState({
-      width: props.width,
-      height: props.height,
-    });
+    this.project = new Project();
 
-    this.unsubscribe.push(
-      canvasState.subscribe(() => {
-        // this.setState({});
-      })
+    this.actionMananger = new ActionManager(
+      () => this.getState(),
+      this.setStateValues,
+      () => this.project.getElements(),
+      (elements) => this.project.setElements(elements)
     );
-
-    this.actionMananger = new ActionManager({
-      setState: this.setStateValues,
-      getState: this.getState,
-    });
 
     this.actionMananger.registerAll();
   }
 
   componentDidMount() {
-    window.addEventListener("resize", this.onResize);
-
-    const initState = loadFromLocalStorage();
+    const { state, elements } = loadFromLocalStorage();
     const matrix = calcTransformationMatrix(
-      initState.screenOriginX,
-      initState.screenOriginY,
-      initState.zoom
+      state.screenOriginX,
+      state.screenOriginY,
+      state.zoom
     );
-    this.setState({ ...initState, ...matrix });
+    this.setState({ ...state, ...matrix });
+    this.project.setElements(elements);
+    this.addEventListeners();
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.onResize);
-
-    this.unsubscribe.forEach((fn) => fn());
+    this.removeEventListeners();
   }
 
-  setStateValues = (vals: Partial<AppState>) => {
+  addEventListeners = () => {
+    // window.addEventListener("resize", this.onResize);
+    window.addEventListener("dragover", this.disableEvent, false);
+    window.addEventListener("drop", this.disableEvent, false);
+  };
+
+  removeEventListeners = () => {
+    // window.removeEventListener("resize", this.onResize);
+    window.removeEventListener("dragover", this.disableEvent, false);
+    window.removeEventListener("drop", this.disableEvent, false);
+  };
+
+  private disableEvent = (event: UIEvent) => {
+    event.preventDefault();
+  };
+
+  setStateValues = (vals: AppState) => {
     if ("screenOriginX" in vals || "screenOriginY" in vals || "zoom" in vals) {
       // recalc transformation matrix if relevant state properties are changed
       const screenOriginX = ("screenOriginX" in vals
@@ -89,17 +94,10 @@ class Project extends React.Component<Props> {
     return this.state;
   };
 
-  onResize = () => {
-    this.setState({
-      screenWidth: this.canvas?.width,
-      screenHeight: this.canvas?.height,
-    });
-  };
-
   componentDidUpdate() {
     if (this.canvas) {
       this.canvas.style.cursor = this.state.cursor;
-      let elements = [...this.state.elements];
+      let elements = [...this.project.getElements()];
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
       }
@@ -107,12 +105,11 @@ class Project extends React.Component<Props> {
         elements.push(this.state.selectionBox);
       }
       renderScene(this.canvas, elements, this.state);
+      this.props.onChange(this.state, elements);
     }
-    this.props.onChange(this.state);
   }
 
   public render() {
-    // window.devicePixelRatio will be used much more later
     const canvasScale = 1.0;
     const canvasDOMWidth = this.props.width;
     const canvasDOMHeight = this.props.height;
@@ -121,7 +118,11 @@ class Project extends React.Component<Props> {
 
     return (
       <div className="main">
-        <SymbolList state={this.state} actionManager={this.actionMananger} />
+        <SymbolList
+          state={this.state}
+          elements={this.project.getElements()}
+          actionManager={this.actionMananger}
+        />
         <Toolbox onClick={this.onToolboxClick} />
         <Status x={this.state.pointerX} y={this.state.pointerY} />
         <canvas
@@ -147,7 +148,9 @@ class Project extends React.Component<Props> {
   private onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     this.dispatchPointerEvent("pointerDown", event);
   };
-  private onDrop = (event: React.DragEvent<HTMLCanvasElement>) => {};
+  private onDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
+    this.actionMananger.execute("importDocument", { params: event });
+  };
   private onWheel = (event: WheelEvent) => {
     event.preventDefault();
 
@@ -166,8 +169,6 @@ class Project extends React.Component<Props> {
   private onToolboxClick = (action: string) => {
     this.actionMananger.execute(action, { params: null });
   };
-
-  private onSelectSymbol(symbolId: string) {}
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
     if (canvas) {
@@ -200,4 +201,4 @@ class Project extends React.Component<Props> {
   }
 }
 
-export default Project;
+export default GraphicEditor;

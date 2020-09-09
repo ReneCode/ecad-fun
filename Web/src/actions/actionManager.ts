@@ -1,4 +1,10 @@
-import { Action, AppState, ActionState, defaultActionState } from "../types";
+import {
+  Action,
+  AppState,
+  ActionState,
+  defaultActionState,
+  ECadBaseElement,
+} from "../types";
 import { actionLine } from "./actionLine";
 import { actionCircle } from "./actionCircle";
 import { actionRectangle } from "./actionRectangle";
@@ -10,6 +16,7 @@ import { actionPanning } from "./actionPanning";
 import { actionCreateSymbol } from "./actionCreateSymbol";
 import { actionPlaceSymbol } from "./actionPlaceSymbol";
 import { actionExportDocument } from "./actionExportDocument";
+import { actionImportDocument } from "./actionImportDocument";
 
 export type EventType =
   | "execute"
@@ -21,24 +28,29 @@ export type EventType =
 
 type setStateFn = (data: any) => void;
 type getStateFn = () => AppState;
+type getElementsFn = () => readonly ECadBaseElement[];
+type setElementsFn = (elements: readonly ECadBaseElement[]) => void;
 
 export class ActionManager {
   allActions: Action[] = [];
   basicActions: Action[] = [];
-  setState: setStateFn;
-  getState: getStateFn;
   runningActionName: string = "";
   actionState: ActionState = defaultActionState;
+  getState: getStateFn;
+  setState: setStateFn;
+  getElements: getElementsFn;
+  setElements: setElementsFn;
 
-  constructor({
-    setState,
-    getState,
-  }: {
-    setState: setStateFn;
-    getState: getStateFn;
-  }) {
-    this.setState = setState;
+  constructor(
+    getState: getStateFn,
+    setState: setStateFn,
+    getElements: getElementsFn,
+    setElements: setElementsFn
+  ) {
     this.getState = getState;
+    this.setState = setState;
+    this.getElements = getElements;
+    this.setElements = setElements;
   }
 
   register(action: Action) {
@@ -63,6 +75,7 @@ export class ActionManager {
     this.register(actionDelete);
 
     this.register(actionExportDocument);
+    this.register(actionImportDocument);
 
     // default action
     this.runningActionName = "select";
@@ -123,10 +136,18 @@ export class ActionManager {
   ) {
     const fn = action[type];
     if (fn) {
-      const result = fn({ state: this.getState(), actionState, params });
+      const result = fn({
+        state: this.getState(),
+        elements: this.getElements(),
+        actionState,
+        params,
+      });
       if (result) {
         if (result.state) {
           this.setState(result.state);
+        }
+        if (result.elements) {
+          this.setElements(result.elements);
         }
         if (result.actionState) {
           this.setActionState(result.actionState);

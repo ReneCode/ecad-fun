@@ -15,15 +15,18 @@ import {
 
 import elementWorkerManager from "../elements/ElementWorkerManager";
 
-export const getSelectedElements = (state: AppState) => {
-  return state.elements.filter((e) => state.selectedElementIds.includes(e.id));
+export const getSelectedElements = (
+  state: AppState,
+  elements: readonly ECadBaseElement[]
+) => {
+  return elements.filter((e) => state.selectedElementIds.includes(e.id));
 };
 
 export const replaceElements = (
-  replacements: ECadBaseElement[],
-  state: AppState
+  elements: readonly ECadBaseElement[],
+  replacements: ECadBaseElement[]
 ) => {
-  return state.elements.map((e) => {
+  return elements.map((e) => {
     const newElement = replacements.find((re) => re.id === e.id);
     if (newElement) {
       return newElement;

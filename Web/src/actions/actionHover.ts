@@ -4,12 +4,12 @@ import { hitTestElement } from "../elements";
 export const actionHover: Action = {
   name: "hover",
 
-  pointerMove: ({ state }) => {
+  pointerMove: ({ state, elements }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     let cursor = "default";
 
-    const selectedElements = state.elements.filter((e) =>
+    const selectedElements = elements.filter((e) =>
       state.selectedElementIds.includes(e.id)
     );
     for (let element of selectedElements) {

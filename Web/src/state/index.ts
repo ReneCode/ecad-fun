@@ -8,47 +8,66 @@ import { debounce } from "../utils";
 import { getNotFoundSymbol } from "../elements/notFoundSymbol";
 
 const DELAY_SAVE = 1000;
-const LOCAL_STORAGE_STATE_KEY = "ecad-fun-state";
+const LOCAL_STORAGE_STATE_KEY = "ecad-state";
+const LOCAL_STORAGE_ELEMENTS_KEY = "ecad-elements";
 
-export const saveDebounced = debounce((appState: AppState) => {
-  saveToLocalStorage(appState);
-}, DELAY_SAVE);
+export const saveDebounced = debounce(
+  (state: AppState, elements: readonly ECadBaseElement[]) => {
+    saveToLocalStorage(state, elements);
+  },
+  DELAY_SAVE
+);
 
-const saveToLocalStorage = (appState: AppState) => {
+const saveToLocalStorage = (
+  state: AppState,
+  elements: readonly ECadBaseElement[]
+) => {
   try {
-    const state = cleanupAppStateForExport(appState);
+    const cleanedElements = cleanupElementsForExport(elements);
 
     localStorage.setItem(LOCAL_STORAGE_STATE_KEY, JSON.stringify(state));
+    localStorage.setItem(
+      LOCAL_STORAGE_ELEMENTS_KEY,
+      JSON.stringify(cleanedElements)
+    );
   } catch (err) {
     console.error(err);
   }
 };
 
-export const loadFromLocalStorage = (): AppState => {
-  let state = getDefaultAppState();
+export const loadFromLocalStorage = () => {
   try {
-    const json = localStorage.getItem(LOCAL_STORAGE_STATE_KEY);
-    if (json) {
-      const state: AppState = JSON.parse(json);
-      return {
-        ...state,
-        elements: addSymbolToSymbolRef(state.elements),
-      };
+    const jsonState = localStorage.getItem(LOCAL_STORAGE_STATE_KEY);
+    const jsonElements = localStorage.getItem(LOCAL_STORAGE_ELEMENTS_KEY);
+
+    let state: AppState = getDefaultAppState();
+    if (jsonState) {
+      state = JSON.parse(jsonState);
     }
+    let elements = [];
+    if (jsonElements) {
+      elements = JSON.parse(jsonElements);
+    }
+    return {
+      state,
+      elements: addSymbolToSymbolRef(elements),
+    };
   } catch (err) {
     console.error(err);
+    return {
+      state: getDefaultAppState(),
+      elements: [],
+    };
   }
-  return state;
 };
 
-export const cleanupAppStateForExport = (appState: AppState): AppState => {
-  return {
-    ...appState,
-    elements: removeSymbolFromSymbolRef(appState.elements),
-  };
+export const cleanupElementsForExport = (
+  elements: readonly ECadBaseElement[]
+): readonly ECadBaseElement[] => {
+  return removeSymbolFromSymbolRef(elements);
 };
 
-const removeSymbolFromSymbolRef = (
+export const removeSymbolFromSymbolRef = (
   elements: readonly ECadBaseElement[]
 ): ECadBaseElement[] => {
   return elements.map((e) => {

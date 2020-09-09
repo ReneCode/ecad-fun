@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Project from "./Project";
-import { AppState } from "../types";
+import GraphicEditor from "./GraphicEditor";
+import { AppState, ECadBaseElement } from "../types";
 import { saveDebounced } from "../state";
 
 const ProjectStart = () => {
@@ -18,12 +18,19 @@ const ProjectStart = () => {
     setSize({ width: window.innerWidth, height: window.innerHeight });
   };
 
-  const onChange = (appState: AppState) => {
-    saveDebounced(appState);
+  const onChange = (
+    appState: AppState,
+    elements: readonly ECadBaseElement[]
+  ) => {
+    saveDebounced(appState, elements);
   };
 
   return (
-    <Project width={size.width} height={size.height} onChange={onChange} />
+    <GraphicEditor
+      width={size.width}
+      height={size.height}
+      onChange={onChange}
+    />
   );
 };
 

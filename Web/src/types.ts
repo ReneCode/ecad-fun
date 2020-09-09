@@ -66,10 +66,7 @@ export type AppState = {
   worldToScreenMatrix: Matrix;
   screenToWorldMatrix: Matrix;
 
-  // screen-coords view
-  screenWidth: number;
-  screenHeight: number;
-  // there is the word 0,0 point
+  // there is the word 0,0 point in screenCoord
   screenOriginX: number;
   screenOriginY: number;
 
@@ -77,7 +74,7 @@ export type AppState = {
   selectedElementIds: string[];
   selectionBox: ECadRectangleElement | null;
 
-  elements: readonly ECadBaseElement[];
+  // elements: readonly ECadBaseElement[];
 };
 
 export const getDefaultAppState = (): AppState => {
@@ -92,8 +89,6 @@ export const getDefaultAppState = (): AppState => {
     worldToScreenMatrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
     screenToWorldMatrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
 
-    screenWidth: window.innerWidth,
-    screenHeight: window.innerHeight,
     screenOriginX: window.innerWidth / 2,
     screenOriginY: window.innerHeight / 2,
 
@@ -101,7 +96,7 @@ export const getDefaultAppState = (): AppState => {
     selectedElementIds: [],
     selectionBox: null,
 
-    elements: [],
+    // elements: [],
   };
 };
 
@@ -139,12 +134,14 @@ export const defaultActionState: ActionState = {
 
 export type ActionResult = {
   state?: Partial<AppState>;
+  elements?: readonly ECadBaseElement[];
   actionState?: Partial<ActionState> | any;
   stopAction?: boolean;
 };
 
 type ActionFn = (args: {
   state: AppState;
+  elements: readonly ECadBaseElement[];
   actionState: ActionState | any;
   params: any;
 }) => ActionResult | void;
