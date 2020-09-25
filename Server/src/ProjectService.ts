@@ -1,13 +1,16 @@
-import ProjectStore from "./multiplayer/ProjectStore";
+import { Project } from "./ObjectStore/Project";
+import { wait } from "./utils";
 
 class ProjectService {
-  open(projectId: string) {
-    return {};
-    // throw new Error("Method not implemented.");
-  }
+  projects: Record<string, Project> = {};
 
-  get(projectId: string) {
-    return {};
+  async open(projectId: string) {
+    await wait();
+    let project = this.projects[projectId];
+    if (!project) {
+      project = new Project(projectId, "new project");
+    }
+    return project;
   }
 }
 

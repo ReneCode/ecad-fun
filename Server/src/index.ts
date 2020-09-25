@@ -8,15 +8,14 @@ const bodyParser = require("body-parser");
 import debug from "debug";
 import { setupExpressRouting } from "./routing";
 import { setupSocketServer } from "./setupSocketServer";
-import clientService from "./ClientService";
-import DataStore from "./DataStore";
+import clientService from "./ObjectStore/ClientService";
+import projectService from "./ProjectService";
+import { ChangeObjectType } from "./ObjectStore/types";
 
 const serverDebug = debug("server");
 const socketDebug = debug("socket");
 
 const app = express();
-
-const dataStore = new DataStore();
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -66,11 +65,11 @@ const io = SocketIO(server, {
 });
 
 io.on("connection", (socket) => {
-  socketDebug("connection established!");
+  socketDebug(`${socket.id} connection established!`);
   io.to(`${socket.id}`).emit("init-room");
 
   socket.on("join-room", (roomID) => {
-    socketDebug(`${socket.id} has joined ${roomID}`);
+    socketDebug(`${socket.id} join-room ${roomID}`);
     socket.join(roomID);
     socketDebug(
       `${io.sockets.adapter.rooms[roomID].length} users in room: ${roomID}`
@@ -94,30 +93,30 @@ io.on("connection", (socket) => {
     // push
   });
 
-  // socket.on("open-project", async (projectId) => {
-  //   const clientId = clientService.connectClient(socket.id, projectId);
+  socket.on("open-project", async (projectId) => {
+    const clientId = clientService.connectClient(socket.id, projectId);
+    io.to(socket.id).emit("send-clientid", clientId);
 
-  //   socketDebug(`socket:${socket.id} open-project:${projectId}`);
-  //   const project = await projectService.open(projectId);
-  //   if (project) {
-  //     socket.join(projectId);
-  //     const socketId = socket.id;
-  //     io.to(socket.id).emit("send-clientid", clientId);
-  //     io.to(socket.id).emit("send-project", project);
-  //   }
-  // });
+    socketDebug(`${socket.id} open-project:${projectId}`);
+    const project = await projectService.open(projectId);
+    if (project) {
+      socket.join(projectId);
+      io.to(socket.id).emit("open-project", { s: "ok", d: project.getRoot() });
+    }
+  });
 
-  // socket.on("change-data", async (changeData: ChangeDataType[]) => {
-  //   socketDebug(`socket:${socket.id} change-data`);
-  //   const projectId = clientService.getProjectIdBySocketId(socket.id);
-  //   if (projectId) {
-  //     const project = await projectService.get(projectId);
-  //     if (project) {
-  //       // TODO
-  //       // const result = await project.changeData(changeData);
-  //     }
-  //   }
-  // });
+  socket.on("change-object", async (changeObjects: ChangeObjectType[]) => {
+    socketDebug(`socket:${socket.id} change-object`);
+    const projectId = clientService.getProjectIdBySocketId(socket.id);
+    if (projectId) {
+      const project = await projectService.open(projectId);
+      if (project) {
+        const result = project.changeObjects(changeObjects);
+        // TODO
+        // const result = await project.changeData(changeData);
+      }
+    }
+  });
 
   socket.on("disconnecting", () => {
     clientService.disconnectClient(socket.id);

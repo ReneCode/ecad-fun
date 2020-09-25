@@ -18,9 +18,6 @@ class ClientService {
    * @return clientId
    */
   public connectClient(socketId: string, projectId: string): number {
-    if (this.clientAlreadyConnected(socketId)) {
-      throw new Error(`client with socketId: ${socketId} already connected`);
-    }
     const clientId = this.getNextClientIdForProject(projectId);
     this.add(socketId, projectId, clientId);
     return clientId;
@@ -31,10 +28,6 @@ class ClientService {
   }
 
   // --------------------------
-
-  private clientAlreadyConnected(socketId: string) {
-    return !!clientRecordDb.find((r) => r.socketId === socketId);
-  }
 
   private getNextClientIdForProject(projectId: string) {
     const ids = clientRecordDb

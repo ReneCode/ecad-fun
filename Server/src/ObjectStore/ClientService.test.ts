@@ -1,4 +1,4 @@
-import clientService from "../src/ClientService";
+import clientService from "./ClientService";
 
 describe("ClientService", () => {
   beforeEach(() => {});
@@ -22,8 +22,13 @@ describe("ClientService", () => {
     expect(clientIdC).toBe(1);
   });
 
-  it("connect twice => exception", () => {
-    clientService.connectClient("SOCKET-A", "doc-A");
-    expect(() => clientService.connectClient("SOCKET-A", "doc-B")).toThrow();
+  it("clientIds starts on 1 for each project", () => {
+    const socketIdA = "A";
+    const socketIdB = "B";
+    const projectIdX = "prjX";
+    const projectIdY = "prjY";
+    expect(clientService.connectClient(socketIdA, projectIdX)).toEqual(1);
+    expect(clientService.connectClient(socketIdB, projectIdX)).toEqual(2);
+    expect(clientService.connectClient(socketIdA, projectIdY)).toEqual(1);
   });
 });

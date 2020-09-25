@@ -3,6 +3,7 @@ import {
   getDefaultAppState,
   ECadBaseElement,
   ECadSymbolRefElement,
+  ECadSymbolElement,
 } from "../types";
 import { debounce } from "../utils";
 import { getNotFoundSymbol } from "../elements/notFoundSymbol";
@@ -101,5 +102,16 @@ export const addSymbolToSymbolRef = (
     } else {
       return e;
     }
+  });
+};
+
+export const fixElementData = (elements: readonly ECadBaseElement[]) => {
+  return elements.map((e) => {
+    if (e.type === "symbol") {
+      const symbol = e as ECadSymbolElement;
+      symbol.refX = symbol.refX ? symbol.refX : 0;
+      symbol.refY = symbol.refY ? symbol.refY : 0;
+    }
+    return e;
   });
 };
