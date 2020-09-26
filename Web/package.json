@@ -11,6 +11,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "@types/socket.io-client": "1.4.33",
     "browser-nativefs": "0.10.2",
     "dotenv": "^8.2.0",
     "nanoid": "2.1.11",
@@ -20,14 +21,14 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "socket.io-client": "2.3.0",
     "typescript": "3.9.6"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "devtools": "overmind-devtools"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -46,7 +47,6 @@
   },
   "devDependencies": {
     "@types/react-router": "^5.1.8",
-    "@types/react-router-dom": "^5.1.5",
-    "overmind-devtools": "^25.1.1"
+    "@types/react-router-dom": "^5.1.5"
   }
 }

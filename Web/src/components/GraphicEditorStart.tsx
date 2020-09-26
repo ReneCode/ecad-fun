@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import GraphicEditor from "./GraphicEditor";
 import { AppState, ECadBaseElement } from "../types";
 import { saveDebounced } from "../state";
+import Socket from "./Socket";
 
 const ProjectStart = () => {
+  const { id: projectId } = useParams();
+
   const [size, setSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -26,11 +30,14 @@ const ProjectStart = () => {
   };
 
   return (
-    <GraphicEditor
-      width={size.width}
-      height={size.height}
-      onChange={onChange}
-    />
+    <div>
+      <Socket projectId={projectId} />
+      <GraphicEditor
+        width={size.width}
+        height={size.height}
+        onChange={onChange}
+      />
+    </div>
   );
 };
 

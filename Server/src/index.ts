@@ -65,7 +65,7 @@ const io = SocketIO(server, {
 });
 
 io.on("connection", (socket) => {
-  // socketDebug(`${socket.id} connection established!`);
+  socketDebug(`connection ${socket.id}`);
   io.to(`${socket.id}`).emit("init-room");
 
   socket.on("join-room", (roomID) => {
@@ -154,7 +154,7 @@ io.on("connection", (socket) => {
   socket.on("disconnecting", () => {
     clientService.disconnectClient(socket.id);
 
-    // socketDebug("disconnecting...", socket.id);
+    socketDebug(`disconnect ${socket.id}`);
     const rooms = io.sockets.adapter.rooms;
     for (const roomID in socket.rooms) {
       const clients = Object.keys(rooms[roomID].sockets).filter(
