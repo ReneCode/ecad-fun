@@ -1,5 +1,11 @@
+import { nanoid } from "nanoid";
 import io from "socket.io-client";
 import { SOCKET_URL, wait, waitUntilTrue } from "./utils";
+import {} from "nanoid";
+
+const randomId = () => {
+  return nanoid(6);
+};
 
 describe("socket-io", () => {
   it("init-room / first-in-room", async () => {
@@ -44,59 +50,61 @@ describe("socket-io", () => {
 
     await wait();
 
-    const projectId = "prjA";
+    const projectId = randomId();
     socketA.emit("open-project", projectId);
 
-    let gotData: { s: string; d: any[] } = undefined;
+    let gotData: any = undefined;
 
     socketA.on("open-project", (data: any) => {
       gotData = data;
     });
 
     await waitUntilTrue(() => gotData !== undefined);
-    expect(gotData).toBeTruthy();
-    expect(gotData.s).toBe("ok");
-    expect(gotData.d).toEqual({ _id: "0:0", _type: "project" });
+    expect(gotData).toEqual({ _id: "0:0", _type: "project" });
 
     socketA.close();
   });
 
-  it("change-object", async () => {
+  it("create-object single", async () => {
     const socket = await openProject();
 
-    let gotData: { s: string; d: any[] } = undefined;
-    socket.on("change-object", (data: any) => {
+    let gotData: any = undefined;
+    socket.on("create-object", (data: any) => {
       gotData = data;
     });
 
-    socket.emit("change-object", [
-      { c: { _id: "1:0", name: "page" } }, // create
-      { c: { _id: "1:1", name: "line" } }, // create
-    ]);
+    socket.emit("create-object", { _id: "1:0", name: "page" });
     await waitUntilTrue(() => gotData !== undefined);
     expect(gotData).toBeTruthy();
-    expect(gotData.s).toEqual("ok");
-    expect(gotData.d).toEqual([
-      { _id: "1:0", name: "page" },
-      { _id: "1:1", name: "line" },
-    ]);
-
-    socket.emit("change-object", [
-      { u: { _id: "1:0", name: "page-name" } }, // update
-      { d: "1:1" }, // delete
-    ]);
+    expect(gotData).toEqual({ _id: "1:0", name: "page" });
 
     socket.close();
   });
 });
 
-const openProject = async () => {
-  const socket = io(SOCKET_URL);
-  const projectId = "newProjectId";
+it("delete-object single", async () => {
+  const socket = await openProject();
+
+  let gotId: string = undefined;
+  socket.on("delete-object", (id: string) => {
+    gotId = id;
+  });
+
+  socket.emit("create-object", { _id: "1:0", name: "page" });
   await wait();
-  socket.emit("open-project", projectId);
-  let gotData: { s: string; d: any[] } = undefined;
-  socket.on("open-project", (data) => {
+  socket.emit("delete-object", "1:0");
+  await waitUntilTrue(() => gotId !== undefined);
+  expect(gotId).toEqual("1:0");
+
+  socket.close();
+});
+
+const openProject = async (projectId: string = "") => {
+  const socket = io(SOCKET_URL);
+  await wait();
+  socket.emit("open-project", projectId ? projectId : randomId());
+  let gotData: any = undefined;
+  socket.on("open-project", (data: any) => {
     gotData = data;
   });
 

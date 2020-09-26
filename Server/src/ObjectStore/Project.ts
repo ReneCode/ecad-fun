@@ -1,4 +1,5 @@
-import { ChangeObjectType, ObjectType } from "./types";
+import { Dispatcher } from "./Dispatcher";
+import { ObjectType } from "./types";
 import {
   combineParentProperty,
   mergeIntoArray,
@@ -10,6 +11,7 @@ export class Project {
   private name: string;
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
+  private dispatcher = new Dispatcher<string>();
 
   constructor(id: string, name: string) {
     this.id = id;
@@ -24,20 +26,23 @@ export class Project {
     return this.root;
   }
 
-  createObject(obj: ObjectType) {
+  createObject(o: ObjectType) {
+    const obj = this.cloneObject(o);
     this.applyParentProperty(obj);
     this.addObject(obj);
-    const createdObject = this.getObject(obj._id);
-    this.dispatch("create-object", createdObject);
-    return createdObject;
+
+    const result = this.getObject(obj._id);
+    this.dispatcher.dispatch("create-object", result);
+    return result;
   }
 
-  updateObject(obj: ObjectType) {
-    const currentObject = this.getObject(obj._id);
+  updateObject(o: ObjectType) {
+    const currentObject = this.getObject(o._id);
     if (!currentObject) {
-      throw new Error(`object with id ${obj._id} does not exist`);
+      throw new Error(`object with id ${o._id} does not exist`);
     }
 
+    const obj = this.cloneObject(o);
     for (const key of Object.keys(obj)) {
       if (key === "_id") {
       } else if (key === "_parent") {
@@ -49,9 +54,9 @@ export class Project {
       }
     }
 
-    const updatedObject = this.getObject(obj._id);
-    this.dispatch("update-object", updatedObject);
-    return updatedObject;
+    const result = this.getObject(obj._id);
+    this.dispatcher.dispatch("update-object", result);
+    return result;
   }
 
   public deleteObject(id: string) {
@@ -70,23 +75,39 @@ export class Project {
       }
     }
     delete this.objects[id];
-    this.dispatch("delete-object", id);
+    this.dispatcher.dispatch("delete-object", id);
   }
 
   public getObject(id: string) {
     return this.objects[id];
   }
 
-  public changeObjects(changeObjects: ChangeObjectType[]) {
-    // collect dispatch
-    // apply each changeObject
-    // dispatch collectedDispatch
-  }
+  // public changeObject(changeObjects: ChangeObjectType[]) {
+  //   // collect dispatch
+  //   // apply each changeObject
+  //   // dispatch collectedDispatch
 
+  //   const results = [];
+  //   for (const change of changeObjects) {
+  //     if (change.c) {
+  //       results.push({ c: this.createObject(change.c) });
+  //     } else if (change.d) {
+  //       results.push({ d: this.deleteObject(change.d) });
+  //     } else if (change.u) {
+  //       results.push({ u: this.updateObject(change.u) });
+  //     }
+  //   }
+
+  //   this.dispatcher.dispatch("change-object", results);
+  // }
+
+  public subscribe(type: string, handler: (...params: any) => void) {
+    this.dispatcher.subscribe(type, handler);
+  }
   // -----------------------------------------------------
 
-  private dispatch(type: string, data: any) {
-    // TODO dispatch to webSocket, so REST calls will be reflected to webSocket
+  private cloneObject(o: ObjectType): ObjectType {
+    return { ...o };
   }
 
   private applyParentProperty(obj: ObjectType) {

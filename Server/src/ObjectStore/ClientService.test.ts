@@ -1,7 +1,9 @@
 import clientService from "./ClientService";
 
 describe("ClientService", () => {
-  beforeEach(() => {});
+  beforeEach(() => {
+    clientService.reset();
+  });
 
   it("connect", () => {
     const projectId = "FILE";
@@ -25,10 +27,25 @@ describe("ClientService", () => {
   it("clientIds starts on 1 for each project", () => {
     const socketIdA = "A";
     const socketIdB = "B";
+    const socketIdC = "C";
     const projectIdX = "prjX";
     const projectIdY = "prjY";
     expect(clientService.connectClient(socketIdA, projectIdX)).toEqual(1);
     expect(clientService.connectClient(socketIdB, projectIdX)).toEqual(2);
-    expect(clientService.connectClient(socketIdA, projectIdY)).toEqual(1);
+    expect(clientService.connectClient(socketIdC, projectIdY)).toEqual(1);
+  });
+
+  it("getProjectIdFromSocketId", () => {
+    const socketIdA = "A";
+    const socketIdB = "B";
+    const socketIdC = "C";
+    const projectIdX = "prjX";
+    const projectIdY = "prjY";
+    clientService.connectClient(socketIdA, projectIdX);
+    clientService.connectClient(socketIdB, projectIdX);
+    clientService.connectClient(socketIdC, projectIdY);
+    expect(clientService.getProjectIdBySocketId(socketIdA)).toEqual(projectIdX);
+    expect(clientService.getProjectIdBySocketId(socketIdB)).toEqual(projectIdX);
+    expect(clientService.getProjectIdBySocketId(socketIdC)).toEqual(projectIdY);
   });
 });

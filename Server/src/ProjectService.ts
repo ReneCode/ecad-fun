@@ -9,11 +9,25 @@ class ProjectService {
     let project = this.projects[projectId];
     if (!project) {
       project = new Project(projectId, "new project");
+      this.projects[projectId] = project;
     }
     return project;
   }
+
+  async close(projectId: string) {
+    await wait();
+  }
 }
 
-const projectService = new ProjectService();
+// let projectService: ProjectService;
 
-export default projectService;
+// export const createProjectService = () => {
+//   if (projectService) {
+//     throw new Error("projectService allready created");
+//   }
+//   projectService = new ProjectService();
+// };
+
+// export const getProjectService = () => projectService;
+
+export const projectService = new ProjectService();

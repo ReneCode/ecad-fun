@@ -4,14 +4,14 @@ export type ObjectType = Record<string, unknown> & {
   _children?: readonly ObjectType[];
 };
 
-/**
- * @description
- *  c = create
- *  u = update
- *  d = delete
- */
-export type ChangeObjectType = {
-  c?: ObjectType;
-  u?: ObjectType;
-  d?: string;
-};
+// /**
+//  * @description
+//  *  c = create
+//  *  u = update
+//  *  d = delete
+//  */
+// export type ChangeObjectType = {
+//   c?: ObjectType;
+//   u?: ObjectType;
+//   d?: string;
+// };

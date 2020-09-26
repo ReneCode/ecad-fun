@@ -7,13 +7,13 @@ const bodyParser = require("body-parser");
 
 import debug from "debug";
 import { setupExpressRouting } from "./routing";
-import { setupSocketServer } from "./setupSocketServer";
 import clientService from "./ObjectStore/ClientService";
-import projectService from "./ProjectService";
-import { ChangeObjectType } from "./ObjectStore/types";
+import { projectService } from "./ProjectService";
+import { ObjectType } from "./ObjectStore/types";
 
 const serverDebug = debug("server");
 const socketDebug = debug("socket");
+const errorDebug = debug("error");
 
 const app = express();
 
@@ -65,15 +65,15 @@ const io = SocketIO(server, {
 });
 
 io.on("connection", (socket) => {
-  socketDebug(`${socket.id} connection established!`);
+  // socketDebug(`${socket.id} connection established!`);
   io.to(`${socket.id}`).emit("init-room");
 
   socket.on("join-room", (roomID) => {
-    socketDebug(`${socket.id} join-room ${roomID}`);
+    // socketDebug(`${socket.id} join-room ${roomID}`);
     socket.join(roomID);
-    socketDebug(
-      `${io.sockets.adapter.rooms[roomID].length} users in room: ${roomID}`
-    );
+    // socketDebug(
+    //   `${io.sockets.adapter.rooms[roomID].length} users in room: ${roomID}`
+    // );
     if (io.sockets.adapter.rooms[roomID].length <= 1) {
       io.to(`${socket.id}`).emit("first-in-room");
     } else {
@@ -94,26 +94,59 @@ io.on("connection", (socket) => {
   });
 
   socket.on("open-project", async (projectId) => {
+    if (!projectId) {
+      return;
+    }
+
     const clientId = clientService.connectClient(socket.id, projectId);
     io.to(socket.id).emit("send-clientid", clientId);
 
-    socketDebug(`${socket.id} open-project:${projectId}`);
+    socketDebug(`open-project ${socket.id} ${projectId}`);
     const project = await projectService.open(projectId);
     if (project) {
       socket.join(projectId);
-      io.to(socket.id).emit("open-project", { s: "ok", d: project.getRoot() });
+      project.subscribe("create-object", (data) => {
+        io.to(socket.id).emit("create-object", data);
+      });
+      project.subscribe("update-object", (data) => {
+        io.to(socket.id).emit("update-object", data);
+      });
+      project.subscribe("delete-object", (data) => {
+        io.to(socket.id).emit("delete-object", data);
+      });
+      io.to(socket.id).emit("open-project", project.getRoot());
     }
   });
 
-  socket.on("change-object", async (changeObjects: ChangeObjectType[]) => {
-    socketDebug(`socket:${socket.id} change-object`);
+  socket.on("create-object", async (obj: ObjectType) => {
     const projectId = clientService.getProjectIdBySocketId(socket.id);
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
-        const result = project.changeObjects(changeObjects);
-        // TODO
-        // const result = await project.changeData(changeData);
+        const result = project.createObject(obj);
+      }
+    } else {
+      errorDebug(`no project for socket ${socket.id}`);
+    }
+  });
+
+  socket.on("update-object", async (obj: ObjectType) => {
+    socketDebug(`update-object ${socket.id}`);
+    const projectId = clientService.getProjectIdBySocketId(socket.id);
+    if (projectId) {
+      const project = await projectService.open(projectId);
+      if (project) {
+        const result = project.updateObject(obj);
+      }
+    }
+  });
+  socket.on("delete-object", async (id: string) => {
+    socketDebug(`delete-object ${socket.id}`);
+    const projectId = clientService.getProjectIdBySocketId(socket.id);
+    if (projectId) {
+      const project = await projectService.open(projectId);
+      if (project) {
+        const result = project.deleteObject(id);
       }
     }
   });
@@ -121,7 +154,7 @@ io.on("connection", (socket) => {
   socket.on("disconnecting", () => {
     clientService.disconnectClient(socket.id);
 
-    socketDebug("disconnecting...", socket.id);
+    // socketDebug("disconnecting...", socket.id);
     const rooms = io.sockets.adapter.rooms;
     for (const roomID in socket.rooms) {
       const clients = Object.keys(rooms[roomID].sockets).filter(
@@ -134,7 +167,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    socketDebug("disconnect");
+    // socketDebug("disconnect");
 
     socket.removeAllListeners();
   });

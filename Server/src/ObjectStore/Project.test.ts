@@ -15,22 +15,35 @@ describe("Project", () => {
     const project = new Project("a", "hallo");
     const root = project.getRoot();
 
+    const fn = jest.fn();
+    project.subscribe("create-object", fn);
+
     const child = { _id: "1:0", _type: "page", _parent: `${root._id}-5` };
     const c = project.createObject(child);
     expect(c).toEqual(child);
     const r2 = project.getRoot();
     expect(r2).toHaveProperty("_children", [child]);
+
+    expect(fn).toBeCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(child);
   });
 
-  it("update object", () => {
+  it("update root-object", () => {
     const project = new Project("a", "hallo");
     const root = project.getRoot();
+    const fn = jest.fn();
+    project.subscribe("update-object", fn);
 
-    const update = { ...root, name: "root" };
-    project.updateObject(update);
+    const update = { ...root, name: "newName" };
+    const result = project.updateObject(update);
+    expect(result.name).toEqual("newName");
+    expect(result._id).toEqual(root._id);
     const r = project.getRoot();
     expect(r).toHaveProperty("_id", "0:0");
-    expect(r).toHaveProperty("name", "root");
+    expect(r).toHaveProperty("name", "newName");
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toBeCalledWith(update);
   });
 
   it("append children to root", () => {
@@ -65,7 +78,7 @@ describe("Project", () => {
     // change fIndex
     expect(project.createObject(c3)).toHaveProperty("_parent", `${root._id}-5`);
     let r = project.getRoot();
-    expect(r).toHaveProperty("_children", [c2, c1, c3]);
+    expect(r._children?.map((o) => o.name)).toEqual(["p2", "p1", "p3"]);
   });
 
   it("update parent", () => {
@@ -106,6 +119,8 @@ describe("Project", () => {
   it("delete object", () => {
     const project = new Project("a", "hallo");
     const root = project.getRoot();
+    const fn = jest.fn();
+    project.subscribe("delete-object", fn);
 
     const page1 = { _id: "1:1", name: "p1", _parent: `${root._id}-5` };
     project.createObject(page1);
@@ -114,6 +129,9 @@ describe("Project", () => {
     const r = project.getRoot();
     expect(r).toHaveProperty("_children", []);
     expect(project.getObject(page1._id)).toBeUndefined();
+
+    expect(fn).toBeCalledTimes(1);
+    expect(fn).toBeCalledWith(page1._id);
   });
 
   it("delete object with childs", () => {
@@ -135,4 +153,32 @@ describe("Project", () => {
     expect(project.getObject(page._id)).toBeUndefined();
     expect(project.getObject(element._id)).toBeUndefined();
   });
+
+  // it("change-objects", () => {
+  //   const project = new Project("a", "hallo");
+
+  //   const fn = jest.fn();
+  //   project.subscribe("change-object", fn);
+
+  //   const pageA = {
+  //     _id: "1:0",
+  //     name: "pageA",
+  //     _parent: `${project.getRoot()._id}-5`,
+  //   };
+  //   const pageB = {
+  //     _id: "1:1",
+  //     name: "pageB",
+  //     _parent: `${project.getRoot()._id}-5`,
+  //   };
+  //   project.changeObject([
+  //     {
+  //       c: pageA,
+  //     },
+  //     {
+  //       c: pageB,
+  //     },
+  //   ]);
+  //   expect(fn).toBeCalledTimes(1);
+  //   expect(fn).toBeCalledWith([{ c: pageA }, { c: pageB }]);
+  // });
 });

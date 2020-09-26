@@ -8,6 +8,11 @@ type ClientRecord = {
 let clientRecordDb: ClientRecord[] = [];
 
 class ClientService {
+  // for testing
+  reset() {
+    clientRecordDb = [];
+  }
+
   getProjectIdBySocketId(socketId: string) {
     const r = clientRecordDb.find((r) => r.socketId === socketId);
     return r?.projectId;
@@ -18,6 +23,12 @@ class ClientService {
    * @return clientId
    */
   public connectClient(socketId: string, projectId: string): number {
+    if (!socketId || !projectId) {
+      throw new Error("ClientService.connectClient bad parameters");
+    }
+    if (this.clientAlreadyConnected(socketId)) {
+      throw new Error(`client with socketId: ${socketId} already connected`);
+    }
     const clientId = this.getNextClientIdForProject(projectId);
     this.add(socketId, projectId, clientId);
     return clientId;
@@ -28,6 +39,10 @@ class ClientService {
   }
 
   // --------------------------
+
+  private clientAlreadyConnected(socketId: string) {
+    return !!clientRecordDb.find((r) => r.socketId === socketId);
+  }
 
   private getNextClientIdForProject(projectId: string) {
     const ids = clientRecordDb
