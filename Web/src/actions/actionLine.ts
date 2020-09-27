@@ -42,14 +42,15 @@ export const actionLine: Action = {
     }
   },
 
-  pointerUp: ({ state, elements }) => {
+  pointerUp: ({ state, elements, project }) => {
     if (state.editingElement) {
+      console.log(">>>>");
       return {
         state: {
           editingElement: null,
         },
         elements: [...elements, state.editingElement],
-        createObject: state.editingElement,
+        createObject: { _parent: `0:0-5`, ...state.editingElement },
         stopAction: true,
       };
     }

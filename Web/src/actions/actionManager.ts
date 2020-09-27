@@ -19,6 +19,7 @@ import { actionPlaceSymbol } from "./actionPlaceSymbol";
 import { actionExportDocument } from "./actionExportDocument";
 import { actionImportDocument } from "./actionImportDocument";
 import { Project } from "multiplayer";
+import { Socket } from "../data/Socket";
 
 export type EventType =
   | "execute"
@@ -44,6 +45,7 @@ export class ActionManager {
   getElements: getElementsFn;
   setElements: setElementsFn;
   project: Project;
+  socket: Socket;
 
   addins: Record<string, AddinFn> = {};
 
@@ -52,13 +54,15 @@ export class ActionManager {
     setState: setStateFn,
     getElements: getElementsFn,
     setElements: setElementsFn,
-    project: Project
+    project: Project,
+    socket: Socket
   ) {
     this.getState = getState;
     this.setState = setState;
     this.getElements = getElements;
     this.setElements = setElements;
     this.project = project;
+    this.socket = socket;
   }
 
   register(action: Action) {
@@ -151,6 +155,7 @@ export class ActionManager {
         elements: this.getElements(),
         actionState,
         params,
+        project: this.project,
       });
       let result: (ActionResult & Record<string, any>) | void;
       if (resultOrPromise instanceof Promise) {
@@ -166,6 +171,11 @@ export class ActionManager {
           }
         }
 
+        if (result.createObject) {
+          const obj = this.project.createObject(result.createObject);
+          this.socket.emit("create-object", obj);
+        }
+
         if (result.state) {
           this.setState(result.state);
         }
@@ -173,10 +183,6 @@ export class ActionManager {
           this.setElements(result.elements);
           // re-render
           this.setState({});
-        }
-
-        if (result.createObject) {
-          this.project.createObject(result.createObject);
         }
 
         if (result.actionState) {

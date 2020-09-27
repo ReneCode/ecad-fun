@@ -8,12 +8,14 @@ import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
 import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 import { Project } from "multiplayer";
+import { Socket } from "../data/Socket";
 
 type Props = {
   width: number;
   height: number;
   onChange: (appState: AppState, elements: readonly ECadBaseElement[]) => void;
   project: Project;
+  socket: Socket;
 };
 
 class GraphicEditor extends React.Component<Props, AppState> {
@@ -24,13 +26,14 @@ class GraphicEditor extends React.Component<Props, AppState> {
 
   constructor(props: Props) {
     super(props);
-
+    console.log("new ActionManager");
     this.actionMananger = new ActionManager(
       () => this.getState(),
       this.setStateValues,
       () => [],
       () => {},
-      this.props.project
+      this.props.project,
+      this.props.socket
       // () => this.project.getElements(),
       // (elements) => this.project.setElements(elements)
     );
@@ -109,8 +112,15 @@ class GraphicEditor extends React.Component<Props, AppState> {
   componentDidUpdate() {
     if (this.canvas) {
       this.canvas.style.cursor = this.state.cursor;
+
+      let elements: ECadBaseElement[] = [];
+      const children = this.props.project.getRoot()._children;
+      console.log(">>", children);
+      if (children) {
+        elements = [...(children as ECadBaseElement[])];
+      }
       // let elements = [...this.project.getElements()];
-      let elements = [];
+
       if (this.state.editingElement) {
         elements.push(this.state.editingElement);
       }

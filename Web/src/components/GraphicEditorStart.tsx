@@ -3,12 +3,13 @@ import { useParams } from "react-router-dom";
 import GraphicEditor from "./GraphicEditor";
 import { AppState, ECadBaseElement } from "../types";
 import { saveDebounced } from "../state";
-import Socket from "./Socket";
+import { Socket } from "../data/Socket";
 import { Project } from "multiplayer";
 
 const ProjectStart = () => {
   const { id: projectId } = useParams();
-  const [project] = useState(new Project("local"));
+  const [project, setProject] = useState((null as unknown) as Project);
+  const [socket, setSocket] = useState((null as unknown) as Socket);
 
   const [size, setSize] = useState({
     width: window.innerWidth,
@@ -16,8 +17,15 @@ const ProjectStart = () => {
   });
 
   useEffect(() => {
+    console.log("init");
+    const project = new Project(projectId);
+    setProject(project);
+    setSocket(new Socket(project));
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      setSocket((undefined as unknown) as Socket);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   const onResize = () => {
@@ -31,17 +39,21 @@ const ProjectStart = () => {
     saveDebounced(appState, elements);
   };
 
-  return (
-    <div>
-      <Socket projectId={projectId} project={project} />
-      <GraphicEditor
-        width={size.width}
-        height={size.height}
-        onChange={onChange}
-        project={project}
-      />
-    </div>
-  );
+  if (project && socket) {
+    return (
+      <div>
+        <GraphicEditor
+          width={size.width}
+          height={size.height}
+          onChange={onChange}
+          project={project}
+          socket={socket}
+        />
+      </div>
+    );
+  } else {
+    return null;
+  }
 };
 
 export default ProjectStart;

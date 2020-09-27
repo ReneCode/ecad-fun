@@ -1,3 +1,4 @@
+import { Project } from "multiplayer";
 import { ObjectType } from "multiplayer";
 
 export type ActionName = string;
@@ -150,6 +151,7 @@ export type ActionResult = {
 type ActionFn = (args: {
   state: AppState;
   elements: readonly ECadBaseElement[];
+  project: Project;
   actionState: ActionState | any;
   params: any;
 }) => ActionResult | void | Promise<ActionResult | void>;

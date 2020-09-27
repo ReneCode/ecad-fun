@@ -1,4 +1,4 @@
-import { Project } from "./ObjectStore/Project";
+import { Project } from "multiplayer";
 import { wait } from "./utils";
 
 class ProjectService {
@@ -8,7 +8,7 @@ class ProjectService {
     await wait();
     let project = this.projects[projectId];
     if (!project) {
-      project = new Project(projectId, "new project");
+      project = new Project(projectId);
       this.projects[projectId] = project;
     }
     return project;

@@ -7,7 +7,8 @@ import {
 } from "./utils";
 
 export class Project {
-  private id: string;
+  public readonly id: string;
+
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
   private dispatcher = new Dispatcher();
@@ -15,7 +16,7 @@ export class Project {
   constructor(id: string) {
     this.id = id;
 
-    const root = { id: "0:0", _type: "project" };
+    const root = { id: "0:0", projectId: id, _type: "project" };
     this.addObject(root);
     this.root = root;
   }
@@ -70,21 +71,20 @@ export class Project {
     }
 
     const currentObject = this.getObject(id);
-    if (!currentObject) {
-      return;
-    }
-
-    if (currentObject._parent) {
-      this.removeFromCurrentParent(currentObject);
-    }
-    // delete also the children
-    if (currentObject._children) {
-      for (const child of currentObject._children) {
-        this.deleteObject(child.id);
+    if (currentObject) {
+      if (currentObject._parent) {
+        this.removeFromCurrentParent(currentObject);
       }
+      // delete also the children
+      if (currentObject._children) {
+        for (const child of currentObject._children) {
+          this.deleteObject(child.id);
+        }
+      }
+      delete this.objects[id];
+      this.dispatcher.dispatch("delete-object", id);
     }
-    delete this.objects[id];
-    this.dispatcher.dispatch("delete-object", id);
+    return id;
   }
 
   public getObject(id: string) {

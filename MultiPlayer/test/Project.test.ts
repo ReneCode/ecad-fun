@@ -7,7 +7,12 @@ describe("Project", () => {
 
     expect(project).toBeTruthy();
     const r2 = project.getRoot();
-    expect(r2).toEqual(root);
+    expect(r2).toEqual({ id: "0:0", _type: "project", projectId: "a" });
+  });
+
+  it("project.id", () => {
+    const project = new Project("new");
+    expect(project.id).toEqual("new");
   });
 
   it("createObject", () => {

@@ -2,6 +2,7 @@ import { nanoid } from "nanoid";
 import io from "socket.io-client";
 import { SOCKET_URL, wait, waitUntilTrue } from "./utils";
 import {} from "nanoid";
+import { ObjectType } from "../old-src/multiplayer/types";
 
 const randomId = () => {
   return nanoid(6);
@@ -60,7 +61,11 @@ describe("socket-io", () => {
     });
 
     await waitUntilTrue(() => gotData !== undefined);
-    expect(gotData).toEqual({ _id: "0:0", _type: "project" });
+    expect(gotData).toEqual({
+      id: "0:0",
+      _type: "project",
+      projectId: projectId,
+    });
 
     socketA.close();
   });
@@ -68,15 +73,15 @@ describe("socket-io", () => {
   it("create-object single", async () => {
     const socket = await openProject();
 
-    let gotData: any = undefined;
-    socket.on("create-object", (data: any) => {
+    let gotData: ObjectType = undefined;
+    socket.on("create-object", (data: ObjectType) => {
       gotData = data;
     });
 
-    socket.emit("create-object", { _id: "1:0", name: "page" });
+    socket.emit("create-object", { id: "1:0", name: "page" });
     await waitUntilTrue(() => gotData !== undefined);
     expect(gotData).toBeTruthy();
-    expect(gotData).toEqual({ _id: "1:0", name: "page" });
+    expect(gotData).toEqual({ id: "1:0", name: "page" });
 
     socket.close();
   });
@@ -85,12 +90,12 @@ describe("socket-io", () => {
 it("delete-object single", async () => {
   const socket = await openProject();
 
-  let gotId: string = undefined;
+  let gotId: string = "";
   socket.on("delete-object", (id: string) => {
     gotId = id;
   });
 
-  socket.emit("create-object", { _id: "1:0", name: "page" });
+  socket.emit("create-object", { id: "1:0", name: "page" });
   await wait();
   socket.emit("delete-object", "1:0");
   await waitUntilTrue(() => gotId !== undefined);

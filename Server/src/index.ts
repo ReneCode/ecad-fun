@@ -9,7 +9,7 @@ import debug from "debug";
 import { setupExpressRouting } from "./routing";
 import clientService from "./ObjectStore/ClientService";
 import { projectService } from "./ProjectService";
-import { ObjectType } from "./ObjectStore/types";
+import { ObjectType } from "multiplayer";
 
 const serverDebug = debug("server");
 const socketDebug = debug("socket");
@@ -120,12 +120,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("create-object", async (obj: ObjectType) => {
+    socketDebug(`${socket.id} create-object`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
-        projectDebug("create-object");
         const result = project.createObject(obj);
+        socket.emit("create-object", "ack", result);
+        socket.broadcast.emit("create-object", "ok", result);
       }
     } else {
       errorDebug(`no project for socket ${socket.id}`);
