@@ -18,6 +18,7 @@ import { actionCreateSymbol } from "./actionCreateSymbol";
 import { actionPlaceSymbol } from "./actionPlaceSymbol";
 import { actionExportDocument } from "./actionExportDocument";
 import { actionImportDocument } from "./actionImportDocument";
+import { Project } from "multiplayer";
 
 export type EventType =
   | "execute"
@@ -42,6 +43,7 @@ export class ActionManager {
   setState: setStateFn;
   getElements: getElementsFn;
   setElements: setElementsFn;
+  project: Project;
 
   addins: Record<string, AddinFn> = {};
 
@@ -49,12 +51,14 @@ export class ActionManager {
     getState: getStateFn,
     setState: setStateFn,
     getElements: getElementsFn,
-    setElements: setElementsFn
+    setElements: setElementsFn,
+    project: Project
   ) {
     this.getState = getState;
     this.setState = setState;
     this.getElements = getElements;
     this.setElements = setElements;
+    this.project = project;
   }
 
   register(action: Action) {
@@ -170,6 +174,11 @@ export class ActionManager {
           // re-render
           this.setState({});
         }
+
+        if (result.createObject) {
+          this.project.createObject(result.createObject);
+        }
+
         if (result.actionState) {
           this.setActionState(result.actionState);
         }

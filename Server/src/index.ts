@@ -14,6 +14,7 @@ import { ObjectType } from "./ObjectStore/types";
 const serverDebug = debug("server");
 const socketDebug = debug("socket");
 const errorDebug = debug("error");
+const projectDebug = debug("project");
 
 const app = express();
 
@@ -105,15 +106,15 @@ io.on("connection", (socket) => {
     const project = await projectService.open(projectId);
     if (project) {
       socket.join(projectId);
-      project.subscribe("create-object", (data) => {
-        io.to(socket.id).emit("create-object", data);
-      });
-      project.subscribe("update-object", (data) => {
-        io.to(socket.id).emit("update-object", data);
-      });
-      project.subscribe("delete-object", (data) => {
-        io.to(socket.id).emit("delete-object", data);
-      });
+      // project.subscribe("create-object", (data) => {
+      //   io.to(socket.id).emit("create-object", data);
+      // });
+      // project.subscribe("update-object", (data) => {
+      //   io.to(socket.id).emit("update-object", data);
+      // });
+      // project.subscribe("delete-object", (data) => {
+      //   io.to(socket.id).emit("delete-object", data);
+      // });
       io.to(socket.id).emit("open-project", project.getRoot());
     }
   });
@@ -123,6 +124,7 @@ io.on("connection", (socket) => {
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
+        projectDebug("create-object");
         const result = project.createObject(obj);
       }
     } else {

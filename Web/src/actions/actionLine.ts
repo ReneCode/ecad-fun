@@ -49,6 +49,7 @@ export const actionLine: Action = {
           editingElement: null,
         },
         elements: [...elements, state.editingElement],
+        createObject: state.editingElement,
         stopAction: true,
       };
     }

@@ -4,9 +4,11 @@ import GraphicEditor from "./GraphicEditor";
 import { AppState, ECadBaseElement } from "../types";
 import { saveDebounced } from "../state";
 import Socket from "./Socket";
+import { Project } from "multiplayer";
 
 const ProjectStart = () => {
   const { id: projectId } = useParams();
+  const [project] = useState(new Project("local"));
 
   const [size, setSize] = useState({
     width: window.innerWidth,
@@ -31,11 +33,12 @@ const ProjectStart = () => {
 
   return (
     <div>
-      <Socket projectId={projectId} />
+      <Socket projectId={projectId} project={project} />
       <GraphicEditor
         width={size.width}
         height={size.height}
         onChange={onChange}
+        project={project}
       />
     </div>
   );

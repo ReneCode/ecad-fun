@@ -1,3 +1,5 @@
+import { ObjectType } from "multiplayer";
+
 export type ActionName = string;
 
 export const POINTER_BUTTONS = {
@@ -136,6 +138,11 @@ export const defaultActionState: ActionState = {
 export type ActionResult = {
   state?: Partial<AppState>;
   elements?: readonly ECadBaseElement[];
+
+  createObject?: ObjectType;
+  updateObject?: ObjectType;
+  deleteObject?: string;
+
   actionState?: Partial<ActionState> | any;
   stopAction?: boolean;
 };
