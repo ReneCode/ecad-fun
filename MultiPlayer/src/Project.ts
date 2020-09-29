@@ -67,9 +67,9 @@ export class Project {
     if (!o.id) {
       throw new Error("id missing");
     }
-    if (!this.validateNewObjectId(o.id)) {
-      throw new Error(`bad objectId ${o.id}`);
-    }
+    // if (!this.validateNewObjectId(o.id)) {
+    //   throw new Error(`bad objectId ${o.id}`);
+    // }
     const obj = this.cloneObject(o);
     delete obj._children;
     this.applyParentProperty(obj);
@@ -202,16 +202,13 @@ export class Project {
     if (this.objects[obj.id]) {
       throw new Error(`object with id ${obj.id} allready exists`);
     }
-    this.objects[obj.id] = obj;
-  }
-
-  private validateNewObjectId(id: string) {
-    const [clientId, index] = id.split(":");
-    const foundIndex = parseInt(index);
-    if (clientId !== this.clientId) {
-      return false;
+    // update lastObjectIndex on *my* clientId
+    const [clientId, index] = obj.id.split(":");
+    if (clientId === this.clientId) {
+      const foundIndex = parseInt(index);
+      this.lastObjectIndex = Math.max(this.lastObjectIndex, foundIndex);
     }
-    this.lastObjectIndex = Math.max(this.lastObjectIndex, foundIndex);
-    return true;
+
+    this.objects[obj.id] = obj;
   }
 }

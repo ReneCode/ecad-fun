@@ -18,6 +18,11 @@ export class Socket {
       console.log("project:", data);
     });
 
+    this.socket.on("send-clientid", (clientId: string) => {
+      console.log("set clientId", clientId);
+      project.setClientId(parseInt(clientId));
+    });
+
     this.socket.on("create-object", (response: string, data: ObjectType) => {
       console.log(">>> createObject", response, data);
       if (response === "ack") {

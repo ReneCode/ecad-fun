@@ -21,10 +21,10 @@ describe("Project", () => {
     expect(o).toEqual({ id: "0:1", name: "hello" });
   });
 
-  it("createObject - throw on wrong clientId", () => {
-    const project = new Project("a");
-    expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
-  });
+  // it("createObject - throw on wrong clientId", () => {
+  //   const project = new Project("a");
+  //   expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
+  // });
 
   it("createObject - throw on bad id", () => {
     const project = new Project("a");
@@ -234,5 +234,16 @@ describe("Project", () => {
 
     const id = project.createNewId();
     expect(id).toEqual("3:8");
+  });
+
+  it("createObjects only my clientId will increment id-counter", () => {
+    const project = new Project("ABC");
+    project.setClientId(1);
+    project.createObject({ id: "1:5", name: "p1" });
+    project.createObject({ id: "2:10", name: "p2" });
+    project.createObject({ id: "3:20", name: "p3" });
+
+    const id = project.createNewId();
+    expect(id).toEqual("1:6");
   });
 });
