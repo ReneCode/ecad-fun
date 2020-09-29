@@ -7,22 +7,33 @@ import {
   splitParentProperty,
 } from "./utils";
 
+const DEFAULT_CLIENTID = "0";
+
 export class Project {
   public readonly id: string;
 
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
   private dispatcher = new Dispatcher();
-  private clientId: string = "";
-  private lastObjectIndex: number = -1;
+  private clientId: string = DEFAULT_CLIENTID;
+  private lastObjectIndex: number = 0;
 
-  constructor(id: string, clientId: number) {
+  constructor(id: string) {
     this.id = id;
-    this.clientId = `${clientId}`;
 
     const root = { id: "0:0", projectId: id, _type: "project" };
+    this.clientId = DEFAULT_CLIENTID;
+    this.lastObjectIndex = 0; // 0 is allready used
     this.addObject(root);
     this.root = root;
+  }
+
+  public setClientId(clientId: number) {
+    if (this.clientId !== DEFAULT_CLIENTID) {
+      throw new Error("clientId can only be set once");
+    }
+    this.clientId = `${clientId}`;
+    this.lastObjectIndex = -1;
   }
 
   public traverse(o: ObjectType, callback: (o: ObjectType) => void) {

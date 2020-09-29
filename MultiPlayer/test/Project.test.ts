@@ -2,7 +2,7 @@ import { Project } from "../src/Project";
 
 describe("Project", () => {
   it("create Project", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
 
     expect(project).toBeTruthy();
@@ -11,33 +11,33 @@ describe("Project", () => {
   });
 
   it("project.id", () => {
-    const project = new Project("new", 1);
+    const project = new Project("new");
     expect(project.id).toEqual("new");
   });
 
   it("createObject", () => {
-    const project = new Project("a", 1);
-    const o = project.createObject({ id: "1:0", name: "hello" });
-    expect(o).toEqual({ id: "1:0", name: "hello" });
+    const project = new Project("a");
+    const o = project.createObject({ id: "0:1", name: "hello" });
+    expect(o).toEqual({ id: "0:1", name: "hello" });
   });
 
   it("createObject - throw on wrong clientId", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
   });
 
   it("createObject - throw on bad id", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     expect(() => project.createObject({ id: "", name: "hello" })).toThrow();
   });
   it("append to root", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
 
     const fn = jest.fn();
     project.subscribe("create-object", fn);
 
-    const child = { id: "1:0", _type: "page", _parent: `${root.id}-5` };
+    const child = { id: "0:1", _type: "page", _parent: `${root.id}-5` };
     const c = project.createObject(child);
     expect(c).toEqual(child);
     const r2 = project.getRoot();
@@ -48,7 +48,7 @@ describe("Project", () => {
   });
 
   it("update root-object", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
     const fn = jest.fn();
     project.subscribe("update-object", fn);
@@ -66,12 +66,12 @@ describe("Project", () => {
   });
 
   it("append children to root", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
 
-    const c1 = { id: "1:1", _type: "p1", _parent: `${root.id}-5` };
-    const c2 = { id: "1:2", _type: "p2", _parent: `${root.id}-6` };
-    const c3 = { id: "1:3", _type: "p3", _parent: `${root.id}-7` };
+    const c1 = { id: "0:1", _type: "p1", _parent: `${root.id}-5` };
+    const c2 = { id: "0:2", _type: "p2", _parent: `${root.id}-6` };
+    const c3 = { id: "0:3", _type: "p3", _parent: `${root.id}-7` };
     project.createObject(c3);
     let r = project.getRoot();
     expect(r).toHaveProperty("_children", [c3]);
@@ -86,12 +86,12 @@ describe("Project", () => {
   });
 
   it("append children with same fIndex to root", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
 
-    const c1 = { id: "1:1", name: "p1", _parent: `${root.id}-4` };
-    const c2 = { id: "1:2", name: "p2", _parent: `${root.id}-3` };
-    const c3 = { id: "1:3", name: "p3", _parent: `${root.id}-4` };
+    const c1 = { id: "0:1", name: "p1", _parent: `${root.id}-4` };
+    const c2 = { id: "0:2", name: "p2", _parent: `${root.id}-3` };
+    const c3 = { id: "0:3", name: "p3", _parent: `${root.id}-4` };
     expect(project.createObject(c1)).toHaveProperty("_parent", `${root.id}-4`);
     expect(project.createObject(c2)).toHaveProperty("_parent", `${root.id}-3`);
     // change fIndex
@@ -101,12 +101,12 @@ describe("Project", () => {
   });
 
   it("update parent", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
 
-    const page1 = { id: "1:1", name: "p1", _parent: `${root.id}-5` };
+    const page1 = { id: "0:1", name: "p1", _parent: `${root.id}-5` };
     project.createObject(page1);
-    const page2 = { id: "1:2", name: "p2", _parent: `${root.id}-6` };
+    const page2 = { id: "0:2", name: "p2", _parent: `${root.id}-6` };
     project.createObject(page2);
 
     let p1 = project.getObject(page1.id);
@@ -114,7 +114,7 @@ describe("Project", () => {
     let p2 = project.getObject(page2.id);
     expect(p2).toHaveProperty("name", "p2");
 
-    const element = { id: "1:3", name: "line", _parent: `${page1.id}-5` };
+    const element = { id: "0:3", name: "line", _parent: `${page1.id}-5` };
     project.createObject(element);
     p1 = project.getObject(page1.id);
     expect(p1).toHaveProperty("name", "p1");
@@ -136,12 +136,12 @@ describe("Project", () => {
   });
 
   it("delete object", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
     const fn = jest.fn();
     project.subscribe("delete-object", fn);
 
-    const page1 = { id: "1:1", name: "p1", _parent: `${root.id}-5` };
+    const page1 = { id: "0:1", name: "p1", _parent: `${root.id}-5` };
     project.createObject(page1);
 
     project.deleteObject(page1.id);
@@ -154,13 +154,13 @@ describe("Project", () => {
   });
 
   it("delete object with childs", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
 
-    const page = { id: "1:1", name: "page", _parent: `${root.id}-5` };
+    const page = { id: "0:1", name: "page", _parent: `${root.id}-5` };
     project.createObject(page);
     const element = project.createObject({
-      id: "1:2",
+      id: "0:2",
       name: "line",
       _parent: `${page.id}-1`,
     });
@@ -174,38 +174,65 @@ describe("Project", () => {
   });
 
   it("createNewId", () => {
-    const project = new Project("new", 4);
-    const id = project.createNewId();
-    expect(id).toEqual("4:0");
+    const project = new Project("new");
+
+    const idA = project.createNewId();
+    expect(idA).toEqual("0:1");
+    const idB = project.createNewId();
+    expect(idB).toEqual("0:2");
   });
 
   it("createNewId considers existing objectIds", () => {
-    const project = new Project("a", 1);
+    const project = new Project("a");
     const root = project.getRoot();
 
-    project.createObject({ id: "1:2", name: "page", _parent: `${root.id}-5` });
+    project.createObject({ id: "0:2", name: "page", _parent: `${root.id}-5` });
 
     const id = project.createNewId();
-    expect(id).toEqual("1:3");
+    expect(id).toEqual("0:3");
   });
 
   it("setRoot", () => {
-    const pA = new Project("a", 1);
+    const pA = new Project("a");
     let rA = pA.getRoot();
     const rootIdA = rA.id;
     const page1 = pA.createObject({
-      id: "1:2",
+      id: "0:2",
       name: "page",
       _parent: `${rootIdA}-5`,
     });
     rA = pA.getRoot();
     expect(rA._children).toEqual([page1]);
 
-    const pB = new Project("b", 2);
+    const pB = new Project("b");
     pB.setRoot(rA);
     const rB = pB.getRoot();
     expect(rB.id).toEqual(rootIdA);
     expect(rB._children).toEqual([page1]);
     expect(pB.getObject(page1.id).id).toEqual(page1.id);
+  });
+
+  it("setClientId", () => {
+    const project = new Project("abc");
+    project.setClientId(4);
+
+    const id = project.createNewId();
+    expect(id).toEqual("4:0");
+  });
+
+  it("setClientId twice => throw error", () => {
+    const project = new Project("abc");
+    project.setClientId(4);
+
+    expect(() => project.setClientId(5)).toThrow();
+  });
+
+  it("setClientId + createObject", () => {
+    const project = new Project("ABC");
+    project.setClientId(3);
+    const o = project.createObject({ id: "3:7", name: "test" });
+
+    const id = project.createNewId();
+    expect(id).toEqual("3:8");
   });
 });
