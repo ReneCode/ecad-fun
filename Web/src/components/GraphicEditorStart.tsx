@@ -18,7 +18,7 @@ const ProjectStart = () => {
 
   useEffect(() => {
     console.log("init");
-    const project = new Project(projectId);
+    const project = new Project(projectId, 1);
     setProject(project);
     setSocket(new Socket(project));
     window.addEventListener("resize", onResize);

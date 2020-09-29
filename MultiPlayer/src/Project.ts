@@ -1,3 +1,4 @@
+import { deepCopy } from "./deepCopy";
 import { Dispatcher } from "./Dispatcher";
 import { ObjectType } from "./types";
 import {
@@ -12,24 +13,54 @@ export class Project {
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
   private dispatcher = new Dispatcher();
+  private clientId: string = "";
+  private lastObjectIndex: number = -1;
 
-  constructor(id: string) {
+  constructor(id: string, clientId: number) {
     this.id = id;
+    this.clientId = `${clientId}`;
 
     const root = { id: "0:0", projectId: id, _type: "project" };
     this.addObject(root);
     this.root = root;
   }
 
+  public traverse(o: ObjectType, callback: (o: ObjectType) => void) {
+    callback(o);
+    if (o._children) {
+      for (const child of o._children) {
+        this.traverse(child, callback);
+      }
+    }
+  }
+
   public getRoot() {
     return this.root;
+  }
+
+  public setRoot(root: ObjectType) {
+    this.root = deepCopy(root);
+
+    // set objects-map
+    this.objects = {};
+    this.traverse(this.root, (o) => {
+      this.addObject(o);
+    });
+  }
+
+  public createNewId() {
+    return `${this.clientId}:${++this.lastObjectIndex}`;
   }
 
   public createObject(o: ObjectType) {
     if (!o.id) {
       throw new Error("id missing");
     }
+    if (!this.validateNewObjectId(o.id)) {
+      throw new Error(`bad objectId ${o.id}`);
+    }
     const obj = this.cloneObject(o);
+    delete obj._children;
     this.applyParentProperty(obj);
     this.addObject(obj);
 
@@ -161,5 +192,15 @@ export class Project {
       throw new Error(`object with id ${obj.id} allready exists`);
     }
     this.objects[obj.id] = obj;
+  }
+
+  private validateNewObjectId(id: string) {
+    const [clientId, index] = id.split(":");
+    const foundIndex = parseInt(index);
+    if (clientId !== this.clientId) {
+      return false;
+    }
+    this.lastObjectIndex = Math.max(this.lastObjectIndex, foundIndex);
+    return true;
   }
 }

@@ -13,7 +13,8 @@ export class Socket {
 
     // register callbacks
     this.socket.on("open-project", (data: any) => {
-      // project.setRoot(data);
+      console.log("got open-project >>", data);
+      project.setRoot(data);
       console.log("project:", data);
     });
 

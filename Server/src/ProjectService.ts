@@ -8,7 +8,7 @@ class ProjectService {
     await wait();
     let project = this.projects[projectId];
     if (!project) {
-      project = new Project(projectId);
+      project = new Project(projectId, 0);
       this.projects[projectId] = project;
     }
     return project;

@@ -4,11 +4,12 @@ import { randomId } from "../utils/randomId";
 export const actionLine: Action = {
   name: "line",
 
-  pointerDown: ({ state }) => {
+  pointerDown: ({ state, project }) => {
     const x = state.pointerX;
     const y = state.pointerY;
+    console.log(">>", project);
     const element: ECadLineElement = {
-      id: randomId(),
+      id: project.createNewId(),
       type: "line",
       x1: x,
       y1: y,
@@ -45,12 +46,13 @@ export const actionLine: Action = {
   pointerUp: ({ state, elements, project }) => {
     if (state.editingElement) {
       console.log(">>>>");
+      const root = project.getRoot();
       return {
         state: {
           editingElement: null,
         },
         elements: [...elements, state.editingElement],
-        createObject: { _parent: `0:0-5`, ...state.editingElement },
+        createObject: { _parent: `${root.id}-5`, ...state.editingElement },
         stopAction: true,
       };
     }

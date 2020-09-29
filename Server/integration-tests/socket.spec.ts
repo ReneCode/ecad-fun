@@ -1,7 +1,6 @@
 import { nanoid } from "nanoid";
 import io from "socket.io-client";
 import { SOCKET_URL, wait, waitUntilTrue } from "./utils";
-import {} from "nanoid";
 import { ObjectType } from "../old-src/multiplayer/types";
 
 const randomId = () => {

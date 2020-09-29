@@ -115,7 +115,6 @@ class GraphicEditor extends React.Component<Props, AppState> {
 
       let elements: ECadBaseElement[] = [];
       const children = this.props.project.getRoot()._children;
-      console.log(">>", children);
       if (children) {
         elements = [...(children as ECadBaseElement[])];
       }

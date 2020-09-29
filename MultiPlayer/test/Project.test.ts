@@ -2,7 +2,7 @@ import { Project } from "../src/Project";
 
 describe("Project", () => {
   it("create Project", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
 
     expect(project).toBeTruthy();
@@ -11,23 +11,27 @@ describe("Project", () => {
   });
 
   it("project.id", () => {
-    const project = new Project("new");
+    const project = new Project("new", 1);
     expect(project.id).toEqual("new");
   });
 
   it("createObject", () => {
-    const project = new Project("a");
-    const o = project.createObject({ id: "abc", name: "hello" });
-    expect(o).toEqual({ id: "abc", name: "hello" });
+    const project = new Project("a", 1);
+    const o = project.createObject({ id: "1:0", name: "hello" });
+    expect(o).toEqual({ id: "1:0", name: "hello" });
+  });
+
+  it("createObject - throw on wrong clientId", () => {
+    const project = new Project("a", 1);
+    expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
   });
 
   it("createObject - throw on bad id", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     expect(() => project.createObject({ id: "", name: "hello" })).toThrow();
   });
-
   it("append to root", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
 
     const fn = jest.fn();
@@ -44,7 +48,7 @@ describe("Project", () => {
   });
 
   it("update root-object", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
     const fn = jest.fn();
     project.subscribe("update-object", fn);
@@ -62,7 +66,7 @@ describe("Project", () => {
   });
 
   it("append children to root", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
 
     const c1 = { id: "1:1", _type: "p1", _parent: `${root.id}-5` };
@@ -82,7 +86,7 @@ describe("Project", () => {
   });
 
   it("append children with same fIndex to root", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
 
     const c1 = { id: "1:1", name: "p1", _parent: `${root.id}-4` };
@@ -97,7 +101,7 @@ describe("Project", () => {
   });
 
   it("update parent", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
 
     const page1 = { id: "1:1", name: "p1", _parent: `${root.id}-5` };
@@ -132,7 +136,7 @@ describe("Project", () => {
   });
 
   it("delete object", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
     const fn = jest.fn();
     project.subscribe("delete-object", fn);
@@ -150,7 +154,7 @@ describe("Project", () => {
   });
 
   it("delete object with childs", () => {
-    const project = new Project("a");
+    const project = new Project("a", 1);
     const root = project.getRoot();
 
     const page = { id: "1:1", name: "page", _parent: `${root.id}-5` };
@@ -169,31 +173,39 @@ describe("Project", () => {
     expect(project.getObject(element.id)).toBeUndefined();
   });
 
-  // it("change-objects", () => {
-  //   const project = new Project("a");
+  it("createNewId", () => {
+    const project = new Project("new", 4);
+    const id = project.createNewId();
+    expect(id).toEqual("4:0");
+  });
 
-  //   const fn = jest.fn();
-  //   project.subscribe("change-object", fn);
+  it("createNewId considers existing objectIds", () => {
+    const project = new Project("a", 1);
+    const root = project.getRoot();
 
-  //   const pageA = {
-  //     id: "1:0",
-  //     name: "pageA",
-  //     _parent: `${project.getRoot().id}-5`,
-  //   };
-  //   const pageB = {
-  //     id: "1:1",
-  //     name: "pageB",
-  //     _parent: `${project.getRoot().id}-5`,
-  //   };
-  //   project.changeObject([
-  //     {
-  //       c: pageA,
-  //     },
-  //     {
-  //       c: pageB,
-  //     },
-  //   ]);
-  //   expect(fn).toBeCalledTimes(1);
-  //   expect(fn).toBeCalledWith([{ c: pageA }, { c: pageB }]);
-  // });
+    project.createObject({ id: "1:2", name: "page", _parent: `${root.id}-5` });
+
+    const id = project.createNewId();
+    expect(id).toEqual("1:3");
+  });
+
+  it("setRoot", () => {
+    const pA = new Project("a", 1);
+    let rA = pA.getRoot();
+    const rootIdA = rA.id;
+    const page1 = pA.createObject({
+      id: "1:2",
+      name: "page",
+      _parent: `${rootIdA}-5`,
+    });
+    rA = pA.getRoot();
+    expect(rA._children).toEqual([page1]);
+
+    const pB = new Project("b", 2);
+    pB.setRoot(rA);
+    const rB = pB.getRoot();
+    expect(rB.id).toEqual(rootIdA);
+    expect(rB._children).toEqual([page1]);
+    expect(pB.getObject(page1.id).id).toEqual(page1.id);
+  });
 });
