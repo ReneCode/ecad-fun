@@ -1,5 +1,4 @@
-import { Project } from "./Project";
-import { ObjectType } from "./types";
+import { Project } from "../src/main";
 
 describe("Project", () => {
   it("create Project", () => {

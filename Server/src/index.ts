@@ -9,11 +9,12 @@ import debug from "debug";
 import { setupExpressRouting } from "./routing";
 import clientService from "./ObjectStore/ClientService";
 import { projectService } from "./ProjectService";
-import { ObjectType } from "./ObjectStore/types";
+import { ObjectType } from "multiplayer";
 
 const serverDebug = debug("server");
 const socketDebug = debug("socket");
 const errorDebug = debug("error");
+const projectDebug = debug("project");
 
 const app = express();
 
@@ -105,25 +106,37 @@ io.on("connection", (socket) => {
     const project = await projectService.open(projectId);
     if (project) {
       socket.join(projectId);
-      project.subscribe("create-object", (data) => {
-        io.to(socket.id).emit("create-object", data);
-      });
-      project.subscribe("update-object", (data) => {
-        io.to(socket.id).emit("update-object", data);
-      });
-      project.subscribe("delete-object", (data) => {
-        io.to(socket.id).emit("delete-object", data);
-      });
+      // project.subscribe("create-object", (data) => {
+      //   io.to(socket.id).emit("create-object", data);
+      // });
+      // project.subscribe("update-object", (data) => {
+      //   io.to(socket.id).emit("update-object", data);
+      // });
+      // project.subscribe("delete-object", (data) => {
+      //   io.to(socket.id).emit("delete-object", data);
+      // });
       io.to(socket.id).emit("open-project", project.getRoot());
     }
   });
 
   socket.on("create-object", async (obj: ObjectType) => {
+    socketDebug(`create-object ${socket.id}`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
+    const clientId = `${clientService.getClientIdBySocketId(socket.id)}`;
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
-        const result = project.createObject(obj);
+        // validate clientId of obj.id
+        // client is forced to use only its clienId
+        const [cId, index] = obj.id.split(":");
+        if (cId !== clientId) {
+          //
+          socket.emit("create-object", "err", obj);
+        } else {
+          const result = project.createObject(obj);
+          socket.emit("create-object", "ack", result);
+          socket.broadcast.emit("create-object", "ok", result);
+        }
       }
     } else {
       errorDebug(`no project for socket ${socket.id}`);
@@ -137,6 +150,8 @@ io.on("connection", (socket) => {
       const project = await projectService.open(projectId);
       if (project) {
         const result = project.updateObject(obj);
+        socket.emit("update-object", "ack", result);
+        socket.broadcast.emit("update-object", "ok", result);
       }
     }
   });
@@ -147,6 +162,8 @@ io.on("connection", (socket) => {
       const project = await projectService.open(projectId);
       if (project) {
         const result = project.deleteObject(id);
+        socket.emit("delete-object", "ack", result);
+        socket.broadcast.emit("delete-object", "ok", result);
       }
     }
   });

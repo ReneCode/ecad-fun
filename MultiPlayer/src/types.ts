@@ -1,5 +1,5 @@
 export type ObjectType = Record<string, unknown> & {
-  _id: string;
+  id: string;
   _parent?: string;
   _children?: readonly ObjectType[];
 };

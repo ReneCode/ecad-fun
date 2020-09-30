@@ -1,3 +1,4 @@
+import { deepCopy } from "./deepCopy";
 import { Dispatcher } from "./Dispatcher";
 import { ObjectType } from "./types";
 import {
@@ -6,45 +7,95 @@ import {
   splitParentProperty,
 } from "./utils";
 
+const DEFAULT_CLIENTID = "0";
+
 export class Project {
-  private id: string;
-  private name: string;
+  public readonly id: string;
+
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
-  private dispatcher = new Dispatcher<string>();
+  private dispatcher = new Dispatcher();
+  private clientId: string = DEFAULT_CLIENTID;
+  private lastObjectIndex: number = 0;
 
-  constructor(id: string, name: string) {
+  constructor(id: string) {
     this.id = id;
-    this.name = name;
 
-    const root = { _id: "0:0", _type: "project" };
+    const root = { id: "0:0", projectId: id, _type: "project" };
+    this.clientId = DEFAULT_CLIENTID;
+    this.lastObjectIndex = 0; // 0 is allready used
     this.addObject(root);
     this.root = root;
+  }
+
+  public setClientId(clientId: number) {
+    if (this.clientId !== DEFAULT_CLIENTID) {
+      throw new Error("clientId can only be set once");
+    }
+    this.clientId = `${clientId}`;
+    this.lastObjectIndex = -1;
+  }
+
+  public traverse(o: ObjectType, callback: (o: ObjectType) => void) {
+    callback(o);
+    if (o._children) {
+      for (const child of o._children) {
+        this.traverse(child, callback);
+      }
+    }
   }
 
   public getRoot() {
     return this.root;
   }
 
-  createObject(o: ObjectType) {
+  public setRoot(root: ObjectType) {
+    this.root = deepCopy(root);
+
+    // set objects-map
+    this.objects = {};
+    this.traverse(this.root, (o) => {
+      this.addObject(o);
+    });
+  }
+
+  public createNewId() {
+    return `${this.clientId}:${++this.lastObjectIndex}`;
+  }
+
+  public createObject(o: ObjectType) {
+    if (!o.id) {
+      throw new Error("id missing");
+    }
+    if (!this.validateCreateObjectId(o.id)) {
+      throw new Error(`bad objectId ${o.id}`);
+    }
+
     const obj = this.cloneObject(o);
+    delete obj._children;
     this.applyParentProperty(obj);
     this.addObject(obj);
 
-    const result = this.getObject(obj._id);
+    const result = this.getObject(obj.id);
     this.dispatcher.dispatch("create-object", result);
     return result;
   }
 
-  updateObject(o: ObjectType) {
-    const currentObject = this.getObject(o._id);
+  public updateObject(o: ObjectType) {
+    if (!o.id) {
+      throw new Error("id missing");
+    }
+
+    const currentObject = this.getObject(o.id);
     if (!currentObject) {
-      throw new Error(`object with id ${o._id} does not exist`);
+      throw new Error(`object with id ${o.id} does not exist`);
     }
 
     const obj = this.cloneObject(o);
+    // apply changes
     for (const key of Object.keys(obj)) {
-      if (key === "_id") {
+      if (key === "id") {
+        // id will stay unchanged
       } else if (key === "_parent") {
         this.removeFromCurrentParent(currentObject);
         (currentObject as any)[key] = (obj as any)[key];
@@ -54,28 +105,30 @@ export class Project {
       }
     }
 
-    const result = this.getObject(obj._id);
-    this.dispatcher.dispatch("update-object", result);
-    return result;
+    this.dispatcher.dispatch("update-object", obj);
+    return obj;
   }
 
   public deleteObject(id: string) {
-    const currentObject = this.getObject(id);
-    if (!currentObject) {
-      return;
+    if (!id) {
+      throw new Error("id missing");
     }
 
-    if (currentObject._parent) {
-      this.removeFromCurrentParent(currentObject);
-    }
-    // delete also the children
-    if (currentObject._children) {
-      for (const child of currentObject._children) {
-        this.deleteObject(child._id);
+    const currentObject = this.getObject(id);
+    if (currentObject) {
+      if (currentObject._parent) {
+        this.removeFromCurrentParent(currentObject);
       }
+      // delete also the children
+      if (currentObject._children) {
+        for (const child of currentObject._children) {
+          this.deleteObject(child.id);
+        }
+      }
+      delete this.objects[id];
+      this.dispatcher.dispatch("delete-object", id);
     }
-    delete this.objects[id];
-    this.dispatcher.dispatch("delete-object", id);
+    return id;
   }
 
   public getObject(id: string) {
@@ -105,6 +158,14 @@ export class Project {
     this.dispatcher.subscribe(type, handler);
   }
   // -----------------------------------------------------
+
+  validateCreateObjectId(id: string) {
+    const [clientId, index] = id.split(":");
+    if (this.clientId != DEFAULT_CLIENTID && this.clientId !== clientId) {
+      return false;
+    }
+    return true;
+  }
 
   private cloneObject(o: ObjectType): ObjectType {
     return { ...o };
@@ -143,14 +204,21 @@ export class Project {
     }
 
     currentParent._children = currentParent._children?.filter(
-      (c) => c._id !== obj._id
+      (c) => c.id !== obj.id
     );
   }
 
   private addObject(obj: ObjectType) {
-    if (this.objects[obj._id]) {
-      throw new Error(`object with id ${obj._id} allready exists`);
+    if (this.objects[obj.id]) {
+      throw new Error(`object with id ${obj.id} allready exists`);
     }
-    this.objects[obj._id] = obj;
+    // update lastObjectIndex on *my* clientId
+    const [clientId, index] = obj.id.split(":");
+    if (clientId === this.clientId) {
+      const foundIndex = parseInt(index);
+      this.lastObjectIndex = Math.max(this.lastObjectIndex, foundIndex);
+    }
+
+    this.objects[obj.id] = obj;
   }
 }

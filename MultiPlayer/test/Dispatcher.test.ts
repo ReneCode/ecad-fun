@@ -1,8 +1,8 @@
-import { Dispatcher } from "./Dispatcher";
+import { Dispatcher } from "../src/Dispatcher";
 
 describe("Dispatcher", () => {
   it("basic", () => {
-    const dispatcher = new Dispatcher<string>();
+    const dispatcher = new Dispatcher();
     const fn = jest.fn();
     const unsubscribe = dispatcher.subscribe("ping", fn);
     dispatcher.dispatch("ping");
@@ -14,7 +14,7 @@ describe("Dispatcher", () => {
   });
 
   it("multiple - with unsubscribe", () => {
-    const dispatcher = new Dispatcher<string>();
+    const dispatcher = new Dispatcher();
     const fnA = jest.fn();
     const fnB = jest.fn();
     const unsubscribeA = dispatcher.subscribe("A", fnA);

@@ -1,14 +1,15 @@
-// eslint-disable-next-line @typescript-eslint/no-namespace
+//
+
 export type EventHandler = (...params: any) => void;
 
-export class Dispatcher<T> {
+export class Dispatcher {
   private eventHandlers: {
-    type: T;
+    type: string;
     handler: EventHandler;
   }[] = [];
 
   // returns function to unsubscribe
-  subscribe(type: T, handler: EventHandler): () => void {
+  subscribe(type: string, handler: EventHandler): () => void {
     this.eventHandlers.push({ type, handler });
     return () => {
       this.eventHandlers = this.eventHandlers.filter((eh) => {
@@ -17,7 +18,7 @@ export class Dispatcher<T> {
     };
   }
 
-  dispatch(type: T, ...params: any) {
+  dispatch(type: string, ...params: any) {
     let handled = false;
     const eventHandlers = [...this.eventHandlers];
     for (let eh of eventHandlers) {

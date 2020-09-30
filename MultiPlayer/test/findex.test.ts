@@ -3,7 +3,7 @@ import {
   findexBetween,
   findexAfter,
   findexBefore,
-} from "./findex";
+} from "../src/findex";
 
 describe("findex", () => {
   it("start", () => {
