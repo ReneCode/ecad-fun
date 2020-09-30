@@ -30,11 +30,11 @@ describe("Project", () => {
     });
   });
 
-  it("createObject, project-clientId > 0 - different clientId throws error", () => {
-    const project = new Project("a");
-    project.setClientId(1);
-    expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
-  });
+  // it("createObject, project-clientId > 0 - different clientId throws error", () => {
+  //   const project = new Project("a");
+  //   project.setClientId(1);
+  //   expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
+  // });
 
   it("createObject - throw on bad id", () => {
     const project = new Project("a");
@@ -272,11 +272,11 @@ describe("Project", () => {
     expect(id).toEqual("3:8");
   });
 
-  it("setClientId + createObject with bad clienId", () => {
-    const project = new Project("ABC");
-    project.setClientId(3);
-    expect(() => project.createObject({ id: "5:0", name: "test" })).toThrow();
-  });
+  // it("setClientId + createObject with bad clienId", () => {
+  //   const project = new Project("ABC");
+  //   project.setClientId(3);
+  //   expect(() => project.createObject({ id: "5:0", name: "test" })).toThrow();
+  // });
 
   it("createObjects will increment id-counter", () => {
     const project = new Project("ABC");

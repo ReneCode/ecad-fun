@@ -67,9 +67,9 @@ export class Project {
     if (!o.id) {
       throw new Error("id missing");
     }
-    if (!this.validateCreateObjectId(o.id)) {
-      throw new Error(`bad objectId ${o.id}`);
-    }
+    // if (!this.validateCreateObjectId(o.id)) {
+    //   throw new Error(`bad objectId ${o.id}`);
+    // }
 
     const obj = this.cloneObject(o);
     delete obj._children;
