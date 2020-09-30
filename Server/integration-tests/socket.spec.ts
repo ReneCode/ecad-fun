@@ -1,7 +1,8 @@
 import { nanoid } from "nanoid";
 import io from "socket.io-client";
 import { SOCKET_URL, wait, waitUntilTrue } from "./utils";
-import { ObjectType } from "../old-src/multiplayer/types";
+
+type ObjectType = { id: string };
 
 const randomId = () => {
   return nanoid(6);
@@ -70,48 +71,92 @@ describe("socket-io", () => {
   });
 
   it("create-object single", async () => {
-    const socket = await openProject();
+    const { socket } = await openProject();
 
-    let gotData: ObjectType = undefined;
-    socket.on("create-object", (data: ObjectType) => {
-      gotData = data;
+    let gotData: any = undefined;
+    socket.on("create-object", (res: string, data: any) => {
+      gotData = [res, data];
     });
 
     socket.emit("create-object", { id: "1:0", name: "page" });
     await waitUntilTrue(() => gotData !== undefined);
     expect(gotData).toBeTruthy();
-    expect(gotData).toEqual({ id: "1:0", name: "page" });
+    expect(gotData).toEqual(["ack", { id: "1:0", name: "page" }]);
+
+    socket.close();
+  });
+
+  it("create-object with bad clientId", async () => {
+    const { socket, clientId } = await openProject();
+
+    socket.on("create-object", (res: string, data: any) => {
+      gotData = [res, data];
+    });
+
+    let gotData: any = undefined;
+    socket.on("create-object", (res: string, data: any) => {
+      gotData = [res, data];
+    });
+
+    socket.emit("create-object", { id: "35:0", name: "page" });
+    await waitUntilTrue(() => gotData !== undefined);
+    expect(gotData).toBeTruthy();
+    expect(gotData).toEqual(["err", { id: "35:0", name: "page" }]);
+
+    socket.close();
+  });
+
+  it("update-object single - get only changes", async () => {
+    const { socket } = await openProject();
+
+    let gotData: any = undefined;
+    socket.on("update-object", (res: string, data: any) => {
+      gotData = [res, data];
+    });
+
+    socket.emit("create-object", { id: "1:0", name: "p1", type: "page" });
+    await wait();
+    socket.emit("update-object", { id: "1:0", name: "p2" });
+    await waitUntilTrue(() => gotData !== undefined);
+    expect(gotData).toEqual(["ack", { id: "1:0", name: "p2" }]);
+
+    socket.close();
+  });
+
+  it("delete-object single", async () => {
+    const { socket } = await openProject();
+
+    let gotData: any = undefined;
+    socket.on("delete-object", (res: string, data: any) => {
+      gotData = [res, data];
+    });
+
+    socket.emit("create-object", { id: "1:0", name: "page" });
+    await wait();
+    socket.emit("delete-object", "1:0");
+    await waitUntilTrue(() => gotData !== undefined);
+    expect(gotData).toEqual(["ack", "1:0"]);
 
     socket.close();
   });
 });
 
-it("delete-object single", async () => {
-  const socket = await openProject();
-
-  let gotId: string = "";
-  socket.on("delete-object", (id: string) => {
-    gotId = id;
-  });
-
-  socket.emit("create-object", { id: "1:0", name: "page" });
-  await wait();
-  socket.emit("delete-object", "1:0");
-  await waitUntilTrue(() => gotId !== undefined);
-  expect(gotId).toEqual("1:0");
-
-  socket.close();
-});
+///////////////////////////////////////////////////
 
 const openProject = async (projectId: string = "") => {
   const socket = io(SOCKET_URL);
   await wait();
+
+  let clientId: number;
+  socket.on("send-clientid", (id: number) => {
+    clientId = id;
+  });
   socket.emit("open-project", projectId ? projectId : randomId());
   let gotData: any = undefined;
   socket.on("open-project", (data: any) => {
     gotData = data;
   });
 
-  await waitUntilTrue(() => gotData !== undefined);
-  return socket;
+  await waitUntilTrue(() => gotData !== undefined && !!clientId);
+  return { socket, clientId };
 };

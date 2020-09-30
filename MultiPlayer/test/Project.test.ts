@@ -21,15 +21,26 @@ describe("Project", () => {
     expect(o).toEqual({ id: "0:1", name: "hello" });
   });
 
-  // it("createObject - throw on wrong clientId", () => {
-  //   const project = new Project("a");
-  //   expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
-  // });
+  it("createObject, project-clientId 0 - different clientId is ok", () => {
+    const project = new Project("a");
+    project.setClientId(0);
+    expect(project.createObject({ id: "2:0", name: "hello" })).toEqual({
+      id: "2:0",
+      name: "hello",
+    });
+  });
+
+  it("createObject, project-clientId > 0 - different clientId throws error", () => {
+    const project = new Project("a");
+    project.setClientId(1);
+    expect(() => project.createObject({ id: "2:0", name: "hello" })).toThrow();
+  });
 
   it("createObject - throw on bad id", () => {
     const project = new Project("a");
     expect(() => project.createObject({ id: "", name: "hello" })).toThrow();
   });
+
   it("append to root", () => {
     const project = new Project("a");
     const root = project.getRoot();
@@ -100,6 +111,23 @@ describe("Project", () => {
     expect(r._children?.map((o) => o.name)).toEqual(["p2", "p1", "p3"]);
   });
 
+  it("update object - return only changes", () => {
+    const project = new Project("a");
+
+    const id = project.createNewId();
+    const p1 = { id, name: "p1", type: "page" };
+    project.createObject(p1);
+    const changes = project.updateObject({ id, name: "p2" });
+    // only changes
+    expect(changes).toEqual({ id, name: "p2" });
+    // complete object
+    expect(project.getObject(id)).toEqual({
+      id,
+      type: "page",
+      name: "p2",
+    });
+  });
+
   it("update parent", () => {
     const project = new Project("a");
     const root = project.getRoot();
@@ -121,8 +149,16 @@ describe("Project", () => {
     expect(p1).toHaveProperty("_children", [element]);
 
     const update = { id: element.id, _parent: `${page2.id}-5` };
-    expect(project.updateObject(update)).toHaveProperty("name", "line");
+    expect(project.updateObject(update)).toEqual({
+      id: element.id,
+      _parent: `${page2.id}-5`,
+    });
     const e = project.getObject(element.id);
+    expect(e).toEqual({
+      id: element.id,
+      _parent: `${page2.id}-5`,
+      name: "line",
+    });
 
     // removed from p1
     p1 = project.getObject(page1.id);
@@ -236,14 +272,20 @@ describe("Project", () => {
     expect(id).toEqual("3:8");
   });
 
-  it("createObjects only my clientId will increment id-counter", () => {
+  it("setClientId + createObject with bad clienId", () => {
+    const project = new Project("ABC");
+    project.setClientId(3);
+    expect(() => project.createObject({ id: "5:0", name: "test" })).toThrow();
+  });
+
+  it("createObjects will increment id-counter", () => {
     const project = new Project("ABC");
     project.setClientId(1);
     project.createObject({ id: "1:5", name: "p1" });
-    project.createObject({ id: "2:10", name: "p2" });
-    project.createObject({ id: "3:20", name: "p3" });
+    project.createObject({ id: "1:10", name: "p2" });
+    project.createObject({ id: "1:20", name: "p3" });
 
     const id = project.createNewId();
-    expect(id).toEqual("1:6");
+    expect(id).toEqual("1:21");
   });
 });

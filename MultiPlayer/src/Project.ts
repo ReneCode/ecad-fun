@@ -67,9 +67,10 @@ export class Project {
     if (!o.id) {
       throw new Error("id missing");
     }
-    // if (!this.validateNewObjectId(o.id)) {
-    //   throw new Error(`bad objectId ${o.id}`);
-    // }
+    if (!this.validateCreateObjectId(o.id)) {
+      throw new Error(`bad objectId ${o.id}`);
+    }
+
     const obj = this.cloneObject(o);
     delete obj._children;
     this.applyParentProperty(obj);
@@ -91,8 +92,10 @@ export class Project {
     }
 
     const obj = this.cloneObject(o);
+    // apply changes
     for (const key of Object.keys(obj)) {
-      if (key === "_id") {
+      if (key === "id") {
+        // id will stay unchanged
       } else if (key === "_parent") {
         this.removeFromCurrentParent(currentObject);
         (currentObject as any)[key] = (obj as any)[key];
@@ -102,9 +105,8 @@ export class Project {
       }
     }
 
-    const result = this.getObject(obj.id);
-    this.dispatcher.dispatch("update-object", result);
-    return result;
+    this.dispatcher.dispatch("update-object", obj);
+    return obj;
   }
 
   public deleteObject(id: string) {
@@ -156,6 +158,14 @@ export class Project {
     this.dispatcher.subscribe(type, handler);
   }
   // -----------------------------------------------------
+
+  validateCreateObjectId(id: string) {
+    const [clientId, index] = id.split(":");
+    if (this.clientId != DEFAULT_CLIENTID && this.clientId !== clientId) {
+      return false;
+    }
+    return true;
+  }
 
   private cloneObject(o: ObjectType): ObjectType {
     return { ...o };

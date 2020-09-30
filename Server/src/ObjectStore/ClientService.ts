@@ -18,6 +18,11 @@ class ClientService {
     return r?.projectId;
   }
 
+  getClientIdBySocketId(socketId: string) {
+    const r = clientRecordDb.find((r) => r.socketId === socketId);
+    return r?.clientId;
+  }
+
   /**
    * saves combination socketId + projectId and create a unique clientId
    * @return clientId
