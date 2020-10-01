@@ -100,6 +100,13 @@ export const moveElementByDelta = (element: ECadBaseElement, delta: Point) => {
   return elementWorkerManager.moveByDelta(element, delta);
 };
 
+export const updateMoveElementByDelta = (
+  element: ECadBaseElement,
+  delta: Point
+) => {
+  return elementWorkerManager.updateMoveByDelta(element, delta);
+};
+
 export const insideSelectionBox = (
   element: ECadBaseElement,
   selectionBox: Box

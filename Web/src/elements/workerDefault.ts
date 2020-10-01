@@ -30,4 +30,8 @@ export const workerDefault: ElementWorker = {
   moveHandle: (element, handleIdx, pt) => {
     return element;
   },
+
+  updateMoveByDeleta: (element, delta) => {
+    return { id: element.id };
+  },
 };

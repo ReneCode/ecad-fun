@@ -3,14 +3,15 @@ import {
   POINTER_BUTTONS,
   ECadRectangleElement,
   ActionResult,
+  ECadBaseElement,
 } from "../types";
 import {
   hitTestElement,
   getSelectedElements,
   replaceElements,
   moveHandleOfElement,
-  moveElementByDelta,
   insideSelectionBox,
+  updateMoveElementByDelta,
 } from "../elements";
 import { COLOR } from "../utils/color";
 
@@ -28,9 +29,14 @@ export const actionSelect: Action = {
     };
   },
 
-  pointerDown: ({ state, elements }): ActionResult | void => {
+  pointerDown: ({ state, project }): ActionResult | void => {
     const x = state.pointerX;
     const y = state.pointerY;
+
+    const elements = project.getRoot()._children as ECadBaseElement[];
+    if (!elements) {
+      return;
+    }
 
     //  check selection on the selected elements
     const selectedElements = elements.filter((e) =>
@@ -93,7 +99,12 @@ export const actionSelect: Action = {
     };
   },
 
-  pointerMove: ({ state, elements, actionState }): ActionResult | void => {
+  pointerMove: ({ state, project, actionState }): ActionResult | void => {
+    const elements = project.getRoot()._children as ECadBaseElement[];
+    if (!elements) {
+      return;
+    }
+
     const x = state.pointerX;
     const y = state.pointerY;
     if (
@@ -108,11 +119,12 @@ export const actionSelect: Action = {
       if (handleIdx < 0) {
         // move element
 
-        const replace = getSelectedElements(state, elements).map((e) => {
-          return moveElementByDelta(e, { x: dx, y: dy });
+        const update = getSelectedElements(state, elements).map((e) => {
+          return updateMoveElementByDelta(e, { x: dx, y: dy });
         });
         return {
-          elements: replaceElements(elements, replace),
+          updateObject: update[0],
+          // elements: replaceElements(elements, replace),
           actionState: {
             lastX: x,
             lastY: y,

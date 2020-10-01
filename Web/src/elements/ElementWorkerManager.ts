@@ -56,6 +56,10 @@ class ElementWorkerManager {
     return this.getWorker(element.type).moveHandle(element, handleIdx, pt);
   }
 
+  updateMoveByDelta(element: ECadBaseElement, delta: Point) {
+    return this.getWorker(element.type).updateMoveByDeleta?.(element, delta);
+  }
+
   // ----------------------------------------------------
 
   private getWorker(type: string) {

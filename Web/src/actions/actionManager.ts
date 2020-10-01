@@ -175,6 +175,10 @@ export class ActionManager {
           const obj = this.project.createObject(result.createObject);
           this.socket.emit("create-object", obj);
         }
+        if (result.updateObject) {
+          const obj = this.project.updateObject(result.updateObject);
+          this.socket.emit("update-object", obj);
+        }
 
         if (result.state) {
           this.setState(result.state);

@@ -19,15 +19,4 @@ class ProjectService {
   }
 }
 
-// let projectService: ProjectService;
-
-// export const createProjectService = () => {
-//   if (projectService) {
-//     throw new Error("projectService allready created");
-//   }
-//   projectService = new ProjectService();
-// };
-
-// export const getProjectService = () => projectService;
-
 export const projectService = new ProjectService();

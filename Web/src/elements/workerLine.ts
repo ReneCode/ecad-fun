@@ -74,6 +74,17 @@ export const workerLine: ElementWorker = {
     };
   },
 
+  updateMoveByDeleta: (element, { x: dx, y: dy }) => {
+    const line = element as ECadLineElement;
+    return {
+      id: line.id,
+      x1: line.x1 + dx,
+      y1: line.y1 + dy,
+      x2: line.x2 + dx,
+      y2: line.y2 + dy,
+    };
+  },
+
   moveHandle: (element, handleIdx, pt) => {
     const line = element as ECadLineElement;
     const newLine = { ...line };

@@ -210,6 +210,8 @@ export type ElementWorker = {
 
   moveByDelta: (element: ECadBaseElement, delta: Point) => ECadBaseElement;
 
+  updateMoveByDeleta?: (element: ObjectType, delta: Point) => ObjectType;
+
   moveHandle: (
     element: ECadBaseElement,
     handleIdx: number,

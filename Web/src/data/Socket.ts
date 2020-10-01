@@ -24,7 +24,6 @@ export class Socket {
     });
 
     this.socket.on("create-object", (response: string, data: ObjectType) => {
-      console.log(">>> createObject", response, data);
       if (response === "ack") {
         // done
       } else {
