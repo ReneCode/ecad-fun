@@ -44,14 +44,14 @@ export const workerSymbol: ElementWorker = {
     ];
   },
 
-  moveByDelta: (element, { x: dx, y: dy }) => {
-    const symbol = element as ECadSymbolElement;
-    return {
-      ...symbol,
-    };
-  },
+  // moveByDelta: (element, { x: dx, y: dy }) => {
+  //   const symbol = element as ECadSymbolElement;
+  //   return {
+  //     ...symbol,
+  //   };
+  // },
 
-  moveHandle: (element, handleIdx, pt) => {
-    return element;
-  },
+  // moveHandle: (element, handleIdx, pt) => {
+  //   return element;
+  // },
 }; // workerLine

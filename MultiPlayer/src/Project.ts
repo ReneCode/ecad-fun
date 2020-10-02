@@ -3,6 +3,7 @@ import { Dispatcher } from "./Dispatcher";
 import { ObjectType } from "./types";
 import {
   combineParentProperty,
+  makeArray,
   mergeIntoArray,
   splitParentProperty,
 } from "./utils";
@@ -63,69 +64,79 @@ export class Project {
     return `${this.clientId}:${++this.lastObjectIndex}`;
   }
 
-  public createObject(o: ObjectType) {
-    if (!o.id) {
-      throw new Error("id missing");
-    }
-
-    const obj = this.cloneObject(o);
-    delete obj._children;
-    this.applyParentProperty(obj);
-    this.addObject(obj);
-
-    const result = this.getObject(obj.id);
-    this.dispatcher.dispatch("create-object", result);
-    return result;
-  }
-
-  public updateObject(o: ObjectType) {
-    if (!o.id) {
-      throw new Error("id missing");
-    }
-
-    const currentObject = this.getObject(o.id);
-    if (!currentObject) {
-      throw new Error(`object with id ${o.id} does not exist`);
-    }
-
-    const obj = this.cloneObject(o);
-    // apply changes
-    for (const key of Object.keys(obj)) {
-      if (key === "id") {
-        // id will stay unchanged
-      } else if (key === "_parent") {
-        this.removeFromCurrentParent(currentObject);
-        (currentObject as any)[key] = (obj as any)[key];
-        this.applyParentProperty(currentObject);
-      } else {
-        (currentObject as any)[key] = (obj as any)[key];
+  public createObjects(os: ObjectType[]): ObjectType[] {
+    for (let o of os) {
+      if (!o.id) {
+        throw new Error("id missing");
       }
     }
 
-    this.dispatcher.dispatch("update-object", obj);
-    return obj;
-  }
-
-  public deleteObject(id: string) {
-    if (!id) {
-      throw new Error("id missing");
+    const results = [];
+    for (let o of os) {
+      const obj = this.cloneObject(o);
+      delete obj._children;
+      this.applyParentProperty(obj);
+      this.addObject(obj);
+      results.push(this.getObject(obj.id));
     }
 
-    const currentObject = this.getObject(id);
-    if (currentObject) {
-      if (currentObject._parent) {
-        this.removeFromCurrentParent(currentObject);
+    this.dispatcher.dispatch("create-object", results);
+    return results;
+  }
+
+  public updateObjects(os: ObjectType[]) {
+    const todos: { current: ObjectType; update: ObjectType }[] = [];
+    for (let o of os) {
+      if (!o.id) {
+        throw new Error("id missing");
       }
-      // delete also the children
-      if (currentObject._children) {
-        for (const child of currentObject._children) {
-          this.deleteObject(child.id);
+
+      const currentObject = this.getObject(o.id);
+      if (!currentObject) {
+        throw new Error(`object with id ${o.id} does not exist`);
+      }
+      todos.push({
+        current: currentObject,
+        update: o,
+      });
+    }
+
+    const results: ObjectType[] = [];
+    for (let { current, update } of todos) {
+      // apply changes
+      const copyUpdate = this.cloneObject(update);
+      for (const key of Object.keys(update)) {
+        if (key === "id") {
+          // id will stay unchanged
+        } else if (key === "_parent") {
+          this.removeFromCurrentParent(current);
+          (current as any)[key] = (update as any)[key];
+          this.applyParentProperty(current);
+        } else {
+          (current as any)[key] = (update as any)[key];
         }
       }
-      delete this.objects[id];
-      this.dispatcher.dispatch("delete-object", id);
+      results.push(copyUpdate);
     }
-    return id;
+
+    this.dispatcher.dispatch("update-object", results);
+    return results;
+  }
+
+  public deleteObjects(ids: string[]) {
+    for (let id of ids) {
+      const currentObject = this.getObject(id);
+      if (currentObject) {
+        this.traverse(currentObject, (o) => {
+          if (o._parent) {
+            this.removeFromCurrentParent(currentObject);
+          }
+          delete this.objects[o.id];
+        });
+      }
+    }
+    this.dispatcher.dispatch("delete-object", ids);
+    return ids;
   }
 
   public getObject(id: string) {

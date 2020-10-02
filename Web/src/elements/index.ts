@@ -14,6 +14,15 @@ import {
 } from "../utils/geometric";
 
 import elementWorkerManager from "../elements/ElementWorkerManager";
+import { Project } from "multiplayer";
+
+export const getElements = (project: Project): readonly ECadBaseElement[] => {
+  const elements = project.getRoot()._children;
+  if (!elements) {
+    return [];
+  }
+  return elements as ECadBaseElement[];
+};
 
 export const getSelectedElements = (
   state: AppState,
@@ -88,16 +97,12 @@ export const getHandlesElement = (element: ECadBaseElement) => {
   return elementWorkerManager.getHandles(element);
 };
 
-export const moveHandleOfElement = (
+export const updateMoveHandleOfElement = (
   element: ECadBaseElement,
   handleIdx: number,
   pt: Point
 ) => {
-  return elementWorkerManager.moveHandle(element, handleIdx, pt);
-};
-
-export const moveElementByDelta = (element: ECadBaseElement, delta: Point) => {
-  return elementWorkerManager.moveByDelta(element, delta);
+  return elementWorkerManager.updateMoveHandle(element, handleIdx, pt);
 };
 
 export const updateMoveElementByDelta = (

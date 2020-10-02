@@ -119,7 +119,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("create-object", async (obj: ObjectType) => {
+  socket.on("create-object", async (objects: ObjectType[]) => {
     socketDebug(`create-object ${socket.id}`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
     const clientId = `${clientService.getClientIdBySocketId(socket.id)}`;
@@ -128,12 +128,19 @@ io.on("connection", (socket) => {
       if (project) {
         // validate clientId of obj.id
         // client is forced to use only its clienId
-        const [cId, index] = obj.id.split(":");
-        if (cId !== clientId) {
+        let ok = true;
+        for (let obj of objects) {
+          const [cId, index] = obj.id.split(":");
+          if (cId !== clientId) {
+            ok = false;
+            break;
+          }
+        }
+        if (!ok) {
           //
-          socket.emit("create-object", "err", obj);
+          socket.emit("create-object", "err", objects);
         } else {
-          const result = project.createObject(obj);
+          const result = project.createObjects(objects);
           socket.emit("create-object", "ack", result);
           socket.broadcast.emit("create-object", "ok", result);
         }
@@ -143,25 +150,25 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("update-object", async (obj: ObjectType) => {
+  socket.on("update-object", async (objects: ObjectType[]) => {
     socketDebug(`update-object ${socket.id}`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
-        const result = project.updateObject(obj);
+        const result = project.updateObjects(objects);
         socket.emit("update-object", "ack", result);
         socket.broadcast.emit("update-object", "ok", result);
       }
     }
   });
-  socket.on("delete-object", async (id: string) => {
+  socket.on("delete-object", async (ids: string[]) => {
     socketDebug(`delete-object ${socket.id}`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
-        const result = project.deleteObject(id);
+        const result = project.deleteObjects(ids);
         socket.emit("delete-object", "ack", result);
         socket.broadcast.emit("delete-object", "ok", result);
       }

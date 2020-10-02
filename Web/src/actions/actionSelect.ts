@@ -8,12 +8,13 @@ import {
 import {
   hitTestElement,
   getSelectedElements,
-  replaceElements,
-  moveHandleOfElement,
   insideSelectionBox,
   updateMoveElementByDelta,
+  updateMoveHandleOfElement,
+  getElements,
 } from "../elements";
 import { COLOR } from "../utils/color";
+import { ObjectType } from "multiplayer";
 
 export const actionSelect: Action = {
   name: "select",
@@ -33,11 +34,7 @@ export const actionSelect: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
 
-    const elements = project.getRoot()._children as ECadBaseElement[];
-    if (!elements) {
-      return;
-    }
-
+    const elements = getElements(project);
     //  check selection on the selected elements
     const selectedElements = elements.filter((e) =>
       state.selectedElementIds.includes(e.id)
@@ -119,11 +116,13 @@ export const actionSelect: Action = {
       if (handleIdx < 0) {
         // move element
 
-        const update = getSelectedElements(state, elements).map((e) => {
-          return updateMoveElementByDelta(e, { x: dx, y: dy });
-        });
+        const update = getSelectedElements(state, elements)
+          .map((e) => {
+            return updateMoveElementByDelta(e, { x: dx, y: dy });
+          })
+          .filter((o) => !!o) as ObjectType[];
         return {
-          updateObject: update[0],
+          updateObjects: update,
           // elements: replaceElements(elements, replace),
           actionState: {
             lastX: x,
@@ -132,11 +131,13 @@ export const actionSelect: Action = {
         };
       } else {
         // move handle
-        const replace = getSelectedElements(state, elements).map((e) => {
-          return moveHandleOfElement(e, handleIdx, { x, y });
-        });
+        const update = getSelectedElements(state, elements)
+          .map((e) => {
+            return updateMoveHandleOfElement(e, handleIdx, { x, y });
+          })
+          .filter((o) => !!o) as ObjectType[];
         return {
-          elements: replaceElements(elements, replace),
+          updateObjects: update,
           actionState: {
             lastX: x,
             lastY: y,

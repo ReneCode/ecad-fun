@@ -19,12 +19,12 @@ const Socket: React.FC<Props> = ({ projectId, project }) => {
       console.log("project:", data);
     });
 
-    socket.on("create-object", (response: string, data: ObjectType) => {
+    socket.on("create-object", (response: string, data: ObjectType[]) => {
       console.log(">>> createObject", response, data);
       if (response === "ack") {
         // done
       } else {
-        project.createObject(data);
+        project.createObjects(data);
       }
     });
 

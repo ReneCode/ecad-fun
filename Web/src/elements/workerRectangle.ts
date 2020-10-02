@@ -6,6 +6,7 @@ import {
   transformPoint,
 } from "../utils/geometric";
 import { COLOR } from "../utils/color";
+import { ObjectType } from "multiplayer";
 
 export const workerRectangle: ElementWorker = {
   type: "rectangle",
@@ -70,19 +71,14 @@ export const workerRectangle: ElementWorker = {
     ];
   },
 
-  moveByDelta: (element, { x: dx, y: dy }): ECadRectangleElement => {
+  updateMoveByDelta: (element, { x: dx, y: dy }): ObjectType => {
     const rectangle = element as ECadRectangleElement;
     return {
-      ...rectangle,
+      id: rectangle.id,
       x1: rectangle.x1 + dx,
       y1: rectangle.y1 + dy,
       x2: rectangle.x2 + dx,
       y2: rectangle.y2 + dy,
     };
-  },
-
-  moveHandle: (element, handleIdx, pt) => {
-    const rectangle = element as ECadRectangleElement;
-    return { ...rectangle };
   },
 };

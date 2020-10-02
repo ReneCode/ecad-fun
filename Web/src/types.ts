@@ -140,9 +140,9 @@ export type ActionResult = {
   state?: Partial<AppState>;
   elements?: readonly ECadBaseElement[];
 
-  createObject?: ObjectType;
-  updateObject?: ObjectType;
-  deleteObject?: string;
+  createObjects?: ObjectType[];
+  updateObjects?: ObjectType[];
+  deleteObjects?: string[];
 
   actionState?: Partial<ActionState> | any;
   stopAction?: boolean;
@@ -208,15 +208,13 @@ export type ElementWorker = {
 
   getHandles: (element: ECadBaseElement) => ElementHandle[];
 
-  moveByDelta: (element: ECadBaseElement, delta: Point) => ECadBaseElement;
+  updateMoveByDelta?: (element: ObjectType, delta: Point) => ObjectType;
 
-  updateMoveByDeleta?: (element: ObjectType, delta: Point) => ObjectType;
-
-  moveHandle: (
-    element: ECadBaseElement,
+  updateMoveHandle?: (
+    element: ObjectType,
     handleIdx: number,
     pt: Point
-  ) => ECadBaseElement;
+  ) => ObjectType;
 };
 
 export type ElementRenderParams = {

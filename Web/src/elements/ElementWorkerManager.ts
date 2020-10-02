@@ -48,16 +48,16 @@ class ElementWorkerManager {
     return this.getWorker(element.type).getHandles(element);
   }
 
-  moveByDelta(element: ECadBaseElement, delta: Point) {
-    return this.getWorker(element.type).moveByDelta(element, delta);
-  }
-
-  moveHandle(element: ECadBaseElement, handleIdx: number, pt: Point) {
-    return this.getWorker(element.type).moveHandle(element, handleIdx, pt);
+  updateMoveHandle(element: ECadBaseElement, handleIdx: number, pt: Point) {
+    return this.getWorker(element.type).updateMoveHandle?.(
+      element,
+      handleIdx,
+      pt
+    );
   }
 
   updateMoveByDelta(element: ECadBaseElement, delta: Point) {
-    return this.getWorker(element.type).updateMoveByDeleta?.(element, delta);
+    return this.getWorker(element.type).updateMoveByDelta?.(element, delta);
   }
 
   // ----------------------------------------------------

@@ -7,6 +7,7 @@ import {
   transformLength,
 } from "../utils/geometric";
 import { COLOR } from "../utils/color";
+import { ObjectType } from "multiplayer";
 
 export const workerCircle: ElementWorker = {
   type: "circle",
@@ -57,19 +58,19 @@ export const workerCircle: ElementWorker = {
     ];
   },
 
-  moveByDelta: (element, { x: dx, y: dy }): ECadCircleElement => {
+  updateMoveByDelta: (element, { x: dx, y: dy }): ObjectType => {
     const circle = element as ECadCircleElement;
     return {
-      ...circle,
+      id: circle.id,
       x: circle.x + dx,
       y: circle.y + dy,
     };
   },
 
-  moveHandle: (element, handleIdx, pt) => {
+  updateMoveHandle: (element, handleIdx, pt): ObjectType => {
     const circle = element as ECadCircleElement;
     return {
-      ...circle,
+      id: circle.id,
       radius: distancePointToPoint(pt.x, pt.y, circle.x, circle.y),
     };
   },

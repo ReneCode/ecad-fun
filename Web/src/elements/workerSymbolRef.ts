@@ -57,16 +57,16 @@ export const workerSymbolRef: ElementWorker = {
     ];
   },
 
-  moveByDelta: (element, { x: dx, y: dy }) => {
-    const symbolRef = element as ECadSymbolRefElement;
-    return {
-      ...symbolRef,
-      x: symbolRef.x + dx,
-      y: symbolRef.y + dy,
-    };
-  },
+  // moveByDelta: (element, { x: dx, y: dy }) => {
+  //   const symbolRef = element as ECadSymbolRefElement;
+  //   return {
+  //     ...symbolRef,
+  //     x: symbolRef.x + dx,
+  //     y: symbolRef.y + dy,
+  //   };
+  // },
 
-  moveHandle: (element, handleIdx, pt) => {
-    return element;
-  },
+  // moveHandle: (element, handleIdx, pt) => {
+  //   return element;
+  // },
 }; // workerLine

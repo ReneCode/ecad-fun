@@ -69,3 +69,14 @@ export const mergeIntoArray = (
     };
   }
 };
+
+export const makeArray = (o: any): any[] => {
+  if (!Array.isArray(o)) {
+    if (!o) {
+      return [];
+    }
+    return [o];
+  } else {
+    return o;
+  }
+};

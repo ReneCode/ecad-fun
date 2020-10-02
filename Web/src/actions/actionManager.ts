@@ -171,12 +171,16 @@ export class ActionManager {
           }
         }
 
-        if (result.createObject) {
-          const obj = this.project.createObject(result.createObject);
+        if (result.createObjects) {
+          const obj = this.project.createObjects(result.createObjects);
           this.socket.emit("create-object", obj);
         }
-        if (result.updateObject) {
-          const obj = this.project.updateObject(result.updateObject);
+        if (result.updateObjects) {
+          const obj = this.project.updateObjects(result.updateObjects);
+          this.socket.emit("update-object", obj);
+        }
+        if (result.deleteObjects) {
+          const obj = this.project.deleteObjects(result.deleteObjects);
           this.socket.emit("update-object", obj);
         }
 

@@ -7,7 +7,6 @@ export const actionLine: Action = {
   pointerDown: ({ state, project }) => {
     const x = state.pointerX;
     const y = state.pointerY;
-    console.log(">>", project);
     const element: ECadLineElement = {
       id: project.createNewId(),
       type: "line",
@@ -45,14 +44,12 @@ export const actionLine: Action = {
 
   pointerUp: ({ state, elements, project }) => {
     if (state.editingElement) {
-      console.log(">>>>");
       const root = project.getRoot();
       return {
         state: {
           editingElement: null,
         },
-        elements: [...elements, state.editingElement],
-        createObject: { _parent: `${root.id}-5`, ...state.editingElement },
+        createObjects: [{ _parent: `${root.id}-5`, ...state.editingElement }],
         stopAction: true,
       };
     }

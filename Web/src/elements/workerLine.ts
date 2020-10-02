@@ -6,6 +6,7 @@ import {
   transformPoint,
 } from "../utils/geometric";
 import { COLOR } from "../utils/color";
+import { ObjectType } from "multiplayer";
 
 export const workerLine: ElementWorker = {
   type: "line",
@@ -63,18 +64,7 @@ export const workerLine: ElementWorker = {
     ];
   },
 
-  moveByDelta: (element, { x: dx, y: dy }) => {
-    const line = element as ECadLineElement;
-    return {
-      ...line,
-      x1: line.x1 + dx,
-      y1: line.y1 + dy,
-      x2: line.x2 + dx,
-      y2: line.y2 + dy,
-    };
-  },
-
-  updateMoveByDeleta: (element, { x: dx, y: dy }) => {
+  updateMoveByDelta: (element, { x: dx, y: dy }): ObjectType => {
     const line = element as ECadLineElement;
     return {
       id: line.id,
@@ -85,17 +75,17 @@ export const workerLine: ElementWorker = {
     };
   },
 
-  moveHandle: (element, handleIdx, pt) => {
+  updateMoveHandle: (element, handleIdx, pt): ObjectType => {
     const line = element as ECadLineElement;
-    const newLine = { ...line };
+    const update: ObjectType = { id: element.id };
     if (handleIdx === 0) {
-      newLine.x1 = pt.x;
-      newLine.y1 = pt.y;
+      update.x1 = pt.x;
+      update.y1 = pt.y;
     }
     if (handleIdx === 1) {
-      newLine.x2 = pt.x;
-      newLine.y2 = pt.y;
+      update.x2 = pt.x;
+      update.y2 = pt.y;
     }
-    return newLine;
+    return update;
   },
 }; // workerLine

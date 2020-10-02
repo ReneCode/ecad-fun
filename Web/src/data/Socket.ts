@@ -13,9 +13,8 @@ export class Socket {
 
     // register callbacks
     this.socket.on("open-project", (data: any) => {
-      console.log("got open-project >>", data);
+      console.log("got open-project:", data);
       project.setRoot(data);
-      console.log("project:", data);
     });
 
     this.socket.on("send-clientid", (clientId: string) => {
@@ -23,11 +22,11 @@ export class Socket {
       project.setClientId(parseInt(clientId));
     });
 
-    this.socket.on("create-object", (response: string, data: ObjectType) => {
+    this.socket.on("create-object", (response: string, data: ObjectType[]) => {
       if (response === "ack") {
         // done
       } else {
-        project.createObject(data);
+        project.createObjects(data);
       }
     });
 

@@ -1,4 +1,4 @@
-import { ElementWorker, ECadBaseElement } from "../types";
+import { ElementWorker } from "../types";
 
 import { normalizeBox } from "../utils/geometric";
 
@@ -23,15 +23,11 @@ export const workerDefault: ElementWorker = {
     return [];
   },
 
-  moveByDelta: (element, { x: dx, y: dy }): ECadBaseElement => {
-    return element;
+  updateMoveHandle: (element, handleIdx, pt) => {
+    return { id: element.id };
   },
 
-  moveHandle: (element, handleIdx, pt) => {
-    return element;
-  },
-
-  updateMoveByDeleta: (element, delta) => {
+  updateMoveByDelta: (element, delta) => {
     return { id: element.id };
   },
 };
