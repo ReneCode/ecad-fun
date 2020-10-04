@@ -3,7 +3,7 @@ import { ObjectType } from "./types";
 
 export const splitParentProperty = (propValue: string) => {
   const [parentId, fIndex] = propValue.split("-");
-  if (!parentId || !fIndex) {
+  if (!parentId) {
     throw new Error(`splitParentProperty: bad propValue: ${propValue}`);
   }
   return [parentId, fIndex];
@@ -17,6 +17,21 @@ export const combineParentProperty = (parentId: string, fIndex: string) => {
   }
   const propValue = `${parentId}-${fIndex}`;
   return propValue;
+};
+
+export const appendToArray = (
+  children: readonly ObjectType[] | undefined,
+  obj: ObjectType
+): { arr: readonly ObjectType[]; fIndex: string } => {
+  if (!children) {
+    const nextFIndex = findexAfter("");
+    return { arr: [obj], fIndex: nextFIndex };
+  }
+
+  const lastChild = children[children.length - 1];
+  const [_, fidx] = splitParentProperty(lastChild._parent as string);
+  const nextFIndex = findexAfter(fidx);
+  return { arr: [...children, obj], fIndex: nextFIndex };
 };
 
 export const mergeIntoArray = (

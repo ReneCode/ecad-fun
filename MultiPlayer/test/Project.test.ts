@@ -61,6 +61,23 @@ describe("Project", () => {
     expect(fn).toHaveBeenCalledWith([child]);
   });
 
+  it("append without fIndex", () => {
+    const project = new Project("a");
+
+    const page1 = { id: project.createNewId(), _parent: "0:0", name: "p1" };
+    const page2 = { id: project.createNewId(), _parent: "0:0", name: "p2" };
+    const page3 = { id: project.createNewId(), _parent: "0:0", name: "p3" };
+    project.createObjects([page1, page2, page3]);
+
+    const root = project.getRoot();
+    expect(root._children).toHaveLength(3);
+    if (root._children) {
+      expect(root._children[0]._parent).toEqual("0:0-1");
+      expect(root._children[1]._parent).toEqual("0:0-2");
+      expect(root._children[2]._parent).toEqual("0:0-3");
+    }
+  });
+
   it("update root-object", () => {
     const project = new Project("a");
     const root = project.getRoot();

@@ -2,6 +2,7 @@ import { deepCopy } from "./deepCopy";
 import { Dispatcher } from "./Dispatcher";
 import { ObjectType } from "./types";
 import {
+  appendToArray,
   combineParentProperty,
   makeArray,
   mergeIntoArray,
@@ -144,25 +145,6 @@ export class Project {
     return this.objects[id];
   }
 
-  // public changeObject(changeObjects: ChangeObjectType[]) {
-  //   // collect dispatch
-  //   // apply each changeObject
-  //   // dispatch collectedDispatch
-
-  //   const results = [];
-  //   for (const change of changeObjects) {
-  //     if (change.c) {
-  //       results.push({ c: this.createObject(change.c) });
-  //     } else if (change.d) {
-  //       results.push({ d: this.deleteObject(change.d) });
-  //     } else if (change.u) {
-  //       results.push({ u: this.updateObject(change.u) });
-  //     }
-  //   }
-
-  //   this.dispatcher.dispatch("change-object", results);
-  // }
-
   public subscribe(type: string, handler: (...params: any) => void) {
     this.dispatcher.subscribe(type, handler);
   }
@@ -213,14 +195,22 @@ export class Project {
     if (!parent) {
       throw new Error(`parent with id:${parentId} does not exist`);
     }
-    const { arr, fIndex: changedFIndex } = mergeIntoArray(
-      parent._children,
-      obj,
-      fIndex
-    );
-    parent._children = arr;
-    if (changedFIndex !== fIndex) {
-      obj._parent = combineParentProperty(parentId, changedFIndex);
+
+    if (!fIndex) {
+      // without fIndex append add the end of parent._children
+      const { arr, fIndex: newFIndex } = appendToArray(parent._children, obj);
+      parent._children = arr;
+      obj._parent = combineParentProperty(parentId, newFIndex);
+    } else {
+      const { arr, fIndex: changedFIndex } = mergeIntoArray(
+        parent._children,
+        obj,
+        fIndex
+      );
+      parent._children = arr;
+      if (changedFIndex !== fIndex) {
+        obj._parent = combineParentProperty(parentId, changedFIndex);
+      }
     }
   }
 
