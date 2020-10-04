@@ -1,4 +1,5 @@
 import { Project } from "../src/Project";
+import { ObjectType } from "../src/types";
 
 describe("Project", () => {
   it("create Project", () => {
@@ -363,5 +364,95 @@ describe("Project", () => {
         type: "page",
       },
     ]);
+  });
+
+  describe("save/load", () => {
+    it("basic", () => {
+      const projectA = new Project("A");
+      projectA.createObjects([
+        { id: "1:0", type: "pageA" },
+        { id: "1:1", type: "pageB" },
+      ]);
+      const rootA = projectA.getRoot();
+      const content = projectA.save();
+      expect(content).toHaveLength(3);
+
+      const projectB = new Project("B");
+      projectB.load(content);
+
+      const rootB = projectB.getRoot();
+      expect(rootA).toEqual(rootB);
+    });
+
+    it("with hierarchie", () => {
+      const projectA = new Project("A");
+
+      projectA.createObjects([
+        { id: "1:0", type: "pageA", _parent: "0:0-5" },
+        { id: "1:1", type: "pageB", _parent: "0:0-4" },
+        { id: "1:2", type: "element", _parent: "1:0-5" },
+      ]);
+      const rootA = projectA.getRoot();
+      const content = projectA.save();
+      expect(content).toHaveLength(4);
+
+      const projectB = new Project("B");
+      projectB.load(content);
+      const rootB = projectB.getRoot();
+      expect(rootA).toEqual(rootB);
+    });
+
+    it("without _children property", () => {
+      const projectA = new Project("A");
+
+      projectA.createObjects([
+        { id: "1:0", type: "pageA", _parent: "0:0-5" },
+        { id: "1:1", type: "pageB", _parent: "0:0-4" },
+        { id: "1:2", type: "element", _parent: "1:0-5" },
+      ]);
+      const rootA = projectA.getRoot();
+      const content = projectA.save();
+
+      for (let o of content) {
+        expect(o._children).toBeUndefined();
+      }
+    });
+
+    describe("performance", () => {
+      let project: Project;
+      const COUNT = 20_000;
+      let content: readonly ObjectType[] = [];
+
+      it("createObject-single", () => {
+        project = new Project("A");
+        for (let i = 0; i < COUNT; i++) {
+          project.createObjects([
+            { id: project.createNewId(), name: `name-${i}`, _parent: "0:0-5" },
+          ]);
+        }
+      });
+      it("createObject-multiple", () => {
+        project = new Project("B");
+        const objects = [];
+        for (let i = 0; i < COUNT; i++) {
+          objects.push({
+            id: project.createNewId(),
+            name: `name-${i}`,
+            _parent: "0:0-5",
+          });
+        }
+        project.createObjects(objects);
+      });
+
+      it("save manny", () => {
+        content = project.save();
+        expect(content).toHaveLength(COUNT + 1);
+      });
+
+      it("load many", () => {
+        const projectB = new Project("B");
+        projectB.load(content);
+      });
+    });
   });
 });

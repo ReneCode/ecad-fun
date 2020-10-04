@@ -7,29 +7,24 @@ import {
 } from "../types";
 import { debounce } from "../utils";
 import { getNotFoundSymbol } from "../elements/notFoundSymbol";
+import { Project } from "multiplayer";
 
 const DELAY_SAVE = 1000;
 const LOCAL_STORAGE_STATE_KEY = "ecad-state";
-const LOCAL_STORAGE_ELEMENTS_KEY = "ecad-elements";
+const LOCAL_STORAGE_PROJECT_KEY = "ecad-project";
 
-export const saveDebounced = debounce(
-  (state: AppState, elements: readonly ECadBaseElement[]) => {
-    saveToLocalStorage(state, elements);
-  },
-  DELAY_SAVE
-);
+export const saveDebounced = debounce((state: AppState, project: Project) => {
+  saveToLocalStorage(state, project);
+}, DELAY_SAVE);
 
-const saveToLocalStorage = (
-  state: AppState,
-  elements: readonly ECadBaseElement[]
-) => {
+const saveToLocalStorage = (state: AppState, project: Project) => {
   try {
-    const cleanedElements = cleanupElementsForExport(elements);
+    // const cleanedElements = cleanupElementsForExport(project);
 
     localStorage.setItem(LOCAL_STORAGE_STATE_KEY, JSON.stringify(state));
     localStorage.setItem(
-      LOCAL_STORAGE_ELEMENTS_KEY,
-      JSON.stringify(cleanedElements)
+      LOCAL_STORAGE_PROJECT_KEY,
+      JSON.stringify(project.save())
     );
   } catch (err) {
     console.error(err);
@@ -39,15 +34,15 @@ const saveToLocalStorage = (
 export const loadFromLocalStorage = () => {
   try {
     const jsonState = localStorage.getItem(LOCAL_STORAGE_STATE_KEY);
-    const jsonElements = localStorage.getItem(LOCAL_STORAGE_ELEMENTS_KEY);
+    const jsonObjects = localStorage.getItem(LOCAL_STORAGE_PROJECT_KEY);
 
     let state: AppState = getDefaultAppState();
     if (jsonState) {
       state = JSON.parse(jsonState);
     }
     let elements = [];
-    if (jsonElements) {
-      elements = JSON.parse(jsonElements);
+    if (jsonObjects) {
+      elements = JSON.parse(jsonObjects);
     }
     return {
       state,

@@ -9,6 +9,7 @@ import {
 } from "./utils";
 
 const DEFAULT_CLIENTID = "0";
+const ROOT_ID = "0:0";
 
 export class Project {
   public readonly id: string;
@@ -22,7 +23,7 @@ export class Project {
   constructor(id: string) {
     this.id = id;
 
-    const root = { id: "0:0", projectId: id, _type: "project" };
+    const root = { id: ROOT_ID, projectId: id, _type: "project" };
     this.clientId = DEFAULT_CLIENTID;
     this.lastObjectIndex = 0; // 0 is allready used
     this.addObject(root);
@@ -165,6 +166,30 @@ export class Project {
   public subscribe(type: string, handler: (...params: any) => void) {
     this.dispatcher.subscribe(type, handler);
   }
+
+  public save(): readonly ObjectType[] {
+    const result: ObjectType[] = [];
+    for (let o of Object.values(this.objects)) {
+      const clone = { ...o };
+      delete clone._children;
+      result.push(clone);
+    }
+    return result;
+  }
+
+  public load(objects: readonly ObjectType[]) {
+    this.objects = {};
+    for (let obj of objects) {
+      if (obj.id === ROOT_ID) {
+        this.root = obj;
+      }
+      this.objects[obj.id] = obj;
+      if (obj._parent) {
+        this.applyParentProperty(obj);
+      }
+    }
+  }
+
   // -----------------------------------------------------
 
   validateCreateObjectId(id: string) {

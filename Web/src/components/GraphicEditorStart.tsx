@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import GraphicEditor from "./GraphicEditor";
-import { AppState, ECadBaseElement } from "../types";
+import { AppState } from "../types";
 import { saveDebounced } from "../state";
 import { Socket } from "../data/Socket";
 import { Project } from "multiplayer";
@@ -32,11 +32,8 @@ const ProjectStart = () => {
     setSize({ width: window.innerWidth, height: window.innerHeight });
   };
 
-  const onChange = (
-    appState: AppState,
-    elements: readonly ECadBaseElement[]
-  ) => {
-    saveDebounced(appState, elements);
+  const onChange = (appState: AppState, project: Project) => {
+    saveDebounced(appState, project);
   };
 
   if (project && socket) {

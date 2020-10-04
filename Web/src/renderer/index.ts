@@ -18,7 +18,8 @@ type RenderOptions = {
 
 export const renderScene = (
   canvas: HTMLCanvasElement,
-  elements: ECadBaseElement[],
+  elements: readonly ECadBaseElement[],
+  dynamicElements: readonly ECadBaseElement[],
   state: AppState
 ) => {
   const context = canvas.getContext("2d");
@@ -52,6 +53,10 @@ export const renderScene = (
     if (element) {
       renderElement(context, element, renderParamsSelected);
     }
+  }
+
+  for (let dynamicElement of dynamicElements) {
+    renderElement(context, dynamicElement, renderParams);
   }
 };
 

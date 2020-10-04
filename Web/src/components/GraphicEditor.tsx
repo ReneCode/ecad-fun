@@ -9,11 +9,12 @@ import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 import { Project } from "multiplayer";
 import { Socket } from "../data/Socket";
+import { getElements } from "../elements";
 
 type Props = {
   width: number;
   height: number;
-  onChange: (appState: AppState, elements: readonly ECadBaseElement[]) => void;
+  onChange: (appState: AppState, project: Project) => void;
   project: Project;
   socket: Socket;
 };
@@ -113,21 +114,17 @@ class GraphicEditor extends React.Component<Props, AppState> {
     if (this.canvas) {
       this.canvas.style.cursor = this.state.cursor;
 
-      let elements: ECadBaseElement[] = [];
-      const children = this.props.project.getRoot()._children;
-      if (children) {
-        elements = [...(children as ECadBaseElement[])];
-      }
-      // let elements = [...this.project.getElements()];
+      const elements = getElements(this.props.project);
 
+      let dynamicElements: ECadBaseElement[] = [];
       if (this.state.editingElement) {
-        elements.push(this.state.editingElement);
+        dynamicElements.push(this.state.editingElement);
       }
       if (this.state.selectionBox) {
-        elements.push(this.state.selectionBox);
+        dynamicElements.push(this.state.selectionBox);
       }
-      renderScene(this.canvas, elements, this.state);
-      this.props.onChange(this.state, elements);
+      renderScene(this.canvas, elements, dynamicElements, this.state);
+      this.props.onChange(this.state, this.props.project);
     }
   }
 
