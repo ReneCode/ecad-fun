@@ -78,6 +78,28 @@ describe("Project", () => {
     }
   });
 
+  it("append without fIndex and parent._children is []", () => {
+    const project = new Project("a");
+    const [page1] = project.createObjects([
+      { id: project.createNewId(), _parent: "0:0", name: "p1" },
+    ]);
+    expect(project.getRoot()._children).toHaveLength(1);
+    project.deleteObjects([page1.id]);
+    expect(project.getRoot()._children).toHaveLength(0);
+
+    const root = project.getRoot();
+    expect(root._children).toEqual([]);
+
+    const page2 = { id: project.createNewId(), _parent: "0:0", name: "p2" };
+    project.createObjects([page2]);
+
+    const r = project.getRoot();
+    expect(r._children).toHaveLength(1);
+    if (root._children) {
+      expect(root._children[0]._parent).toEqual("0:0-1");
+    }
+  });
+
   it("update root-object", () => {
     const project = new Project("a");
     const root = project.getRoot();
@@ -437,7 +459,7 @@ describe("Project", () => {
 
     describe("performance", () => {
       let project: Project;
-      const COUNT = 20_000;
+      const COUNT = 200;
       let content: readonly ObjectType[] = [];
 
       it("createObject-single", () => {

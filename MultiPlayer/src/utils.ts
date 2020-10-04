@@ -23,7 +23,7 @@ export const appendToArray = (
   children: readonly ObjectType[] | undefined,
   obj: ObjectType
 ): { arr: readonly ObjectType[]; fIndex: string } => {
-  if (!children) {
+  if (!children || children.length === 0) {
     const nextFIndex = findexAfter("");
     return { arr: [obj], fIndex: nextFIndex };
   }

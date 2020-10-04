@@ -171,9 +171,9 @@ export class ActionManager {
           }
         }
 
-        if (result.createObjects) {
-          const obj = this.project.createObjects(result.createObjects);
-          this.socket.emit("create-object", obj);
+        if (result.deleteObjects) {
+          const obj = this.project.deleteObjects(result.deleteObjects);
+          this.socket.emit("delete-object", obj);
           this.setState({});
         }
         if (result.updateObjects) {
@@ -181,9 +181,9 @@ export class ActionManager {
           this.socket.emit("update-object", obj);
           this.setState({});
         }
-        if (result.deleteObjects) {
-          const obj = this.project.deleteObjects(result.deleteObjects);
-          this.socket.emit("delete-object", obj);
+        if (result.createObjects) {
+          const obj = this.project.createObjects(result.createObjects);
+          this.socket.emit("create-object", obj);
           this.setState({});
         }
 

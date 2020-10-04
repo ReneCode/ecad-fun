@@ -1,15 +1,17 @@
 import { Action, ECadSymbolElement } from "../types";
 import { randomId } from "../utils/randomId";
 import elementWorkerManager from "../elements/ElementWorkerManager";
+import { getElements } from "../elements";
 
 export const actionCreateSymbol: Action = {
   name: "createSymbol",
 
-  execute: ({ state, elements }) => {
+  execute: ({ state, project }) => {
     if (state.selectedElementIds.length === 0) {
       return;
     }
 
+    const elements = getElements(project);
     const cntSymbols = elements.reduce((acc, e) => {
       if (e.type === "symbol") {
         acc++;
@@ -21,9 +23,10 @@ export const actionCreateSymbol: Action = {
       state.selectedElementIds.includes(element.id)
     );
 
-    const lastChildId = children[children.length - 1].id;
+    const lastChild = children[children.length - 1];
     const symbol: ECadSymbolElement = {
-      id: randomId(),
+      id: project.createNewId(),
+      _parent: lastChild._parent, // set symbol at same position as last child
       type: "symbol",
       name: `Symbol-${cntSymbols + 1}`,
       color: "black",
@@ -49,19 +52,8 @@ export const actionCreateSymbol: Action = {
       state: {
         selectedElementIds: [symbol.id],
       },
-      elements: elements
-        .filter(
-          (element) =>
-            !state.selectedElementIds.includes(element.id) ||
-            lastChildId === element.id
-        )
-        .map((element) => {
-          if (element.id === lastChildId) {
-            return symbol;
-          } else {
-            return element;
-          }
-        }),
+      createObjects: [symbol],
+      deleteObjects: children.map((e) => e.id),
     };
   },
 };
