@@ -174,14 +174,17 @@ export class ActionManager {
         if (result.createObjects) {
           const obj = this.project.createObjects(result.createObjects);
           this.socket.emit("create-object", obj);
+          this.setState({});
         }
         if (result.updateObjects) {
           const obj = this.project.updateObjects(result.updateObjects);
           this.socket.emit("update-object", obj);
+          this.setState({});
         }
         if (result.deleteObjects) {
           const obj = this.project.deleteObjects(result.deleteObjects);
-          this.socket.emit("update-object", obj);
+          this.socket.emit("delete-object", obj);
+          this.setState({});
         }
 
         if (result.state) {

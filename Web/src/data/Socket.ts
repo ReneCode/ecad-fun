@@ -40,6 +40,15 @@ export class Socket {
       }
     });
 
+    this.socket.on("delete-object", (response: string, data: string[]) => {
+      if (response === "ack") {
+        // done
+      } else {
+        project.deleteObjects(data);
+        callbackRedraw();
+      }
+    });
+
     // open that project
     this.socket.emit("open-project", project.id);
   }

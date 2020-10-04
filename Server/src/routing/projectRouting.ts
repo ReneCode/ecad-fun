@@ -1,14 +1,23 @@
 import express = require("express");
 import HttpStatus = require("http-status-codes");
+import { projectService } from "../ProjectService";
 
 const router = express.Router();
-import { projectService } from "../ProjectService";
+
+router.use((req, res, next) => {
+  console.log("check project");
+  next();
+});
+
+router.get("/", (req, res) => {
+  res.json({ name: "projectRouting" });
+});
 
 router.get("/:projectId", async (req, res) => {
   const projectId = req.params.projectId;
 
-  const project = projectService.open(projectId);
-  res.json(project);
+  const project = await projectService.open(projectId);
+  res.json(project.getRoot());
 });
 
 /*

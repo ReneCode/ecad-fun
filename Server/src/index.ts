@@ -6,15 +6,14 @@ import http from "http";
 const bodyParser = require("body-parser");
 
 import debug from "debug";
-import { setupExpressRouting } from "./routing";
 import clientService from "./ObjectStore/ClientService";
 import { projectService } from "./ProjectService";
 import { ObjectType } from "multiplayer";
+import projectRouting from "./routing/projectRouting";
 
 const serverDebug = debug("server");
 const socketDebug = debug("socket");
 const errorDebug = debug("error");
-const projectDebug = debug("project");
 
 const app = express();
 
@@ -25,7 +24,7 @@ app.use(bodyParser.json());
 
 app.use(morgan("common"));
 
-setupExpressRouting(app);
+app.use("/project", projectRouting);
 
 app.use("/", (req, res) => {
   res.send("hi cad.fun Server");
