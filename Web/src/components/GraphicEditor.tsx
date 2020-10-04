@@ -15,45 +15,46 @@ type Props = {
   width: number;
   height: number;
   onChange: (appState: AppState, project: Project) => void;
-  project: Project;
-  socket: Socket;
+  projectId: string;
 };
 
 class GraphicEditor extends React.Component<Props, AppState> {
   canvas: HTMLCanvasElement | null = null;
-  actionMananger: ActionManager;
+  actionMananger: ActionManager | undefined;
+  project: Project | undefined;
+  socket: Socket = new Socket();
 
   state: AppState = getDefaultAppState();
 
-  constructor(props: Props) {
-    super(props);
-    console.log("new ActionManager", this.props);
+  // init() {
+  //   console.log("init ActionManager);
+
+  // const symbolLibManager = new SymbolLibManager(this.projects);
+  // this.actionMananger.registerAddin(
+  //   "symbollib",
+  //   symbolLibManager.applyResult
+  // );
+  // }
+
+  componentDidMount() {
+    this.project = new Project(this.props.projectId);
+    this.socket.init(this.project, () => {
+      // redraw
+      this.setState({});
+    });
+
     this.actionMananger = new ActionManager(
       () => this.getState(),
       this.setStateValues,
       () => [],
       () => {},
-      this.props.project,
-      this.props.socket
+      this.project,
+      this.socket
       // () => this.project.getElements(),
       // (elements) => this.project.setElements(elements)
     );
 
     this.actionMananger.registerAll();
-
-    // const symbolLibManager = new SymbolLibManager(this.projects);
-    // this.actionMananger.registerAddin(
-    //   "symbollib",
-    //   symbolLibManager.applyResult
-    // );
-  }
-
-  // getMainProject(): Project {
-  //   return this.projects["main"];
-  // }
-
-  componentDidMount() {
-    console.log("did mount");
 
     const { state, elements } = loadFromLocalStorage();
     const matrix = calcTransformationMatrix(
@@ -67,6 +68,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
   }
 
   componentWillUnmount() {
+    this.socket.exit();
     this.removeEventListeners();
   }
 
@@ -116,7 +118,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
     if (this.canvas) {
       this.canvas.style.cursor = this.state.cursor;
 
-      const elements = getElements(this.props.project);
+      const elements = this.project ? getElements(this.project) : [];
 
       let dynamicElements: ECadBaseElement[] = [];
       if (this.state.editingElement) {
@@ -126,7 +128,9 @@ class GraphicEditor extends React.Component<Props, AppState> {
         dynamicElements.push(this.state.selectionBox);
       }
       renderScene(this.canvas, elements, dynamicElements, this.state);
-      this.props.onChange(this.state, this.props.project);
+      if (this.project) {
+        this.props.onChange(this.state, this.project);
+      }
     }
   }
 
@@ -170,25 +174,25 @@ class GraphicEditor extends React.Component<Props, AppState> {
     this.dispatchPointerEvent("pointerDown", event);
   };
   private onDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
-    this.actionMananger.execute("importDocument", { params: event });
+    this.actionMananger?.execute("importDocument", { params: event });
   };
   private onWheel = (event: WheelEvent) => {
     event.preventDefault();
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
-      this.actionMananger.execute("zoomPinch", {
+      this.actionMananger?.execute("zoomPinch", {
         params: event,
       });
     } else {
-      this.actionMananger.execute("panning", {
+      this.actionMananger?.execute("panning", {
         params: event,
       });
     }
   };
 
   private onToolboxClick = (action: string) => {
-    this.actionMananger.execute(action, { params: null });
+    this.actionMananger?.execute(action, { params: null });
   };
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
@@ -218,7 +222,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
       pointerY: y,
       pointerButtons: event.buttons,
     });
-    this.actionMananger.dispatch(eventType, {});
+    this.actionMananger?.dispatch(eventType, {});
   }
 }
 

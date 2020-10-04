@@ -4,17 +4,17 @@ import { Project, ObjectType } from "multiplayer";
 const WS_SERVER = process.env.REACT_APP_WEBSOCKET_SERVER as string;
 
 export class Socket {
-  private socket: SocketIOClient.Socket;
-  private project: Project;
+  private socket: SocketIOClient.Socket | undefined;
 
-  constructor(project: Project) {
-    this.project = project;
+  init(project: Project, callbackRedraw: () => void) {
+    console.log("socket init");
     this.socket = io(WS_SERVER);
 
     // register callbacks
     this.socket.on("open-project", (data: any) => {
       console.log("got open-project:", data);
       project.setRoot(data);
+      callbackRedraw();
     });
 
     this.socket.on("send-clientid", (clientId: string) => {
@@ -27,6 +27,16 @@ export class Socket {
         // done
       } else {
         project.createObjects(data);
+        callbackRedraw();
+      }
+    });
+
+    this.socket.on("update-object", (response: string, data: ObjectType[]) => {
+      if (response === "ack") {
+        // done
+      } else {
+        project.updateObjects(data);
+        callbackRedraw();
       }
     });
 
@@ -35,21 +45,10 @@ export class Socket {
   }
 
   public exit() {
-    this.socket.disconnect();
+    this.socket?.disconnect();
   }
 
   public emit(event: string, ...args: any[]) {
-    this.socket.emit(event, ...args);
+    this.socket?.emit(event, ...args);
   }
-
-  // project.subscribe("create-object", (data: ObjectType) => {
-  //   console.log("createObject", data);
-  //   socket.emit("create-object", data);
-  // });
-  // project.subscribe("update-object", (data: any) => {
-  //   socket.emit("update-object", data);
-  // });
-  // project.subscribe("delete-object", (data: any) => {
-  //   socket.emit("delete-object", data);
-  // });
 }
