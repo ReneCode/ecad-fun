@@ -27,7 +27,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
 
   constructor(props: Props) {
     super(props);
-    console.log("new ActionManager");
+    console.log("new ActionManager", this.props);
     this.actionMananger = new ActionManager(
       () => this.getState(),
       this.setStateValues,
@@ -53,6 +53,8 @@ class GraphicEditor extends React.Component<Props, AppState> {
   // }
 
   componentDidMount() {
+    console.log("did mount");
+
     const { state, elements } = loadFromLocalStorage();
     const matrix = calcTransformationMatrix(
       state.screenOriginX,

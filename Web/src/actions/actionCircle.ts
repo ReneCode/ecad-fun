@@ -5,11 +5,12 @@ import { randomId } from "../utils/randomId";
 export const actionCircle: Action = {
   name: "circle",
 
-  pointerDown: ({ state }) => {
+  pointerDown: ({ state, project }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadCircleElement = {
-      id: randomId(),
+      id: project.createNewId(),
+      _parent: project.getRoot().id,
       type: "circle",
       x,
       y,
@@ -44,13 +45,13 @@ export const actionCircle: Action = {
     }
   },
 
-  pointerUp: ({ state, elements }) => {
+  pointerUp: ({ state }) => {
     if (state.editingElement) {
       return {
         state: {
           editingElement: null,
         },
-        elements: [...elements, state.editingElement],
+        createObjects: [state.editingElement],
         stopAction: true,
       };
     }

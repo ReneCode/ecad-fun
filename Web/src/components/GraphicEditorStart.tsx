@@ -38,15 +38,13 @@ const ProjectStart = () => {
 
   if (project && socket) {
     return (
-      <div>
-        <GraphicEditor
-          width={size.width}
-          height={size.height}
-          onChange={onChange}
-          project={project}
-          socket={socket}
-        />
-      </div>
+      <GraphicEditor
+        width={size.width}
+        height={size.height}
+        onChange={onChange}
+        project={project}
+        socket={socket}
+      />
     );
   } else {
     return null;

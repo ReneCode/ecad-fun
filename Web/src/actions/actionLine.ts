@@ -9,6 +9,7 @@ export const actionLine: Action = {
     const y = state.pointerY;
     const element: ECadLineElement = {
       id: project.createNewId(),
+      _parent: project.getRoot().id,
       type: "line",
       x1: x,
       y1: y,
@@ -42,14 +43,13 @@ export const actionLine: Action = {
     }
   },
 
-  pointerUp: ({ state, elements, project }) => {
+  pointerUp: ({ state }) => {
     if (state.editingElement) {
-      const root = project.getRoot();
       return {
         state: {
           editingElement: null,
         },
-        createObjects: [{ _parent: `${root.id}-5`, ...state.editingElement }],
+        createObjects: [state.editingElement],
         stopAction: true,
       };
     }

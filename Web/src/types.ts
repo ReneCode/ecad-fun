@@ -10,8 +10,7 @@ export const POINTER_BUTTONS = {
 
 type ECadElementType = "line" | "rectangle" | "circle" | "symbol" | "symbolRef";
 
-export type ECadBaseElement = {
-  id: string;
+export type ECadBaseElement = ObjectType & {
   type: ECadElementType;
   color?: string;
   fill?: string;

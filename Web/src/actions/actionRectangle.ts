@@ -4,11 +4,12 @@ import { randomId } from "../utils/randomId";
 export const actionRectangle: Action = {
   name: "rectangle",
 
-  pointerDown: ({ state }) => {
+  pointerDown: ({ state, project }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadRectangleElement = {
-      id: randomId(),
+      id: project.createNewId(),
+      _parent: project.getRoot().id,
       type: "rectangle",
       x1: x,
       y1: y,
@@ -42,13 +43,13 @@ export const actionRectangle: Action = {
     }
   },
 
-  pointerUp: ({ state, elements }) => {
+  pointerUp: ({ state }) => {
     if (state.editingElement) {
       return {
         state: {
           editingElement: null,
         },
-        elements: [...elements, state.editingElement],
+        createObjects: [state.editingElement],
         stopAction: true,
       };
     }
