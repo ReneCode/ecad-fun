@@ -67,11 +67,11 @@ export const workerCircle: ElementWorker = {
     };
   },
 
-  updateMoveHandle: (element, handleIdx, pt): ObjectType => {
+  updateMoveHandle: ({ element, handleIdx, x, y, shiftKey }): ObjectType => {
     const circle = element as ECadCircleElement;
     return {
       id: circle.id,
-      radius: distancePointToPoint(pt.x, pt.y, circle.x, circle.y),
+      radius: distancePointToPoint(x, y, circle.x, circle.y),
     };
   },
 };

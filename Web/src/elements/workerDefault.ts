@@ -23,7 +23,7 @@ export const workerDefault: ElementWorker = {
     return [];
   },
 
-  updateMoveHandle: (element, handleIdx, pt) => {
+  updateMoveHandle: ({ element }) => {
     return { id: element.id };
   },
 

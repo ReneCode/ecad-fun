@@ -3,6 +3,7 @@ import {
   ECadBaseElement,
   ElementRenderFn,
   Point,
+  ElementChangeArgs,
 } from "../types";
 
 import { workerDefault } from "./workerDefault";
@@ -48,12 +49,8 @@ class ElementWorkerManager {
     return this.getWorker(element.type).getHandles(element);
   }
 
-  updateMoveHandle(element: ECadBaseElement, handleIdx: number, pt: Point) {
-    return this.getWorker(element.type).updateMoveHandle?.(
-      element,
-      handleIdx,
-      pt
-    );
+  updateMoveHandle(args: ElementChangeArgs) {
+    return this.getWorker(args.element.type).updateMoveHandle?.(args);
   }
 
   updateMoveByDelta(element: ECadBaseElement, delta: Point) {

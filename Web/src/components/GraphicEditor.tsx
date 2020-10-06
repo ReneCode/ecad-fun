@@ -174,25 +174,21 @@ class GraphicEditor extends React.Component<Props, AppState> {
     this.dispatchPointerEvent("pointerDown", event);
   };
   private onDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
-    this.actionMananger?.execute("importDocument", { params: event });
+    this.actionMananger?.execute("importDocument", event);
   };
   private onWheel = (event: WheelEvent) => {
     event.preventDefault();
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
-      this.actionMananger?.execute("zoomPinch", {
-        params: event,
-      });
+      this.actionMananger?.execute("zoomPinch", event);
     } else {
-      this.actionMananger?.execute("panning", {
-        params: event,
-      });
+      this.actionMananger?.execute("panning", event);
     }
   };
 
   private onToolboxClick = (action: string) => {
-    this.actionMananger?.execute(action, { params: null });
+    this.actionMananger?.execute(action, null);
   };
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
@@ -222,7 +218,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
       pointerY: y,
       pointerButtons: event.buttons,
     });
-    this.actionMananger?.dispatch(eventType, {});
+    this.actionMananger?.dispatch(eventType, { shiftKey: event.shiftKey });
   }
 }
 

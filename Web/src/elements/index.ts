@@ -5,6 +5,7 @@ import {
   ECadCircleElement,
   Point,
   Box,
+  ElementChangeArgs,
 } from "../types";
 import {
   enlargeBoxByDelta,
@@ -97,12 +98,8 @@ export const getHandlesElement = (element: ECadBaseElement) => {
   return elementWorkerManager.getHandles(element);
 };
 
-export const updateMoveHandleOfElement = (
-  element: ECadBaseElement,
-  handleIdx: number,
-  pt: Point
-) => {
-  return elementWorkerManager.updateMoveHandle(element, handleIdx, pt);
+export const updateMoveHandleOfElement = (args: ElementChangeArgs) => {
+  return elementWorkerManager.updateMoveHandle(args);
 };
 
 export const updateMoveElementByDelta = (

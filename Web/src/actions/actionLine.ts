@@ -1,10 +1,11 @@
 import { ECadLineElement, Action } from "../types";
+import { distancePointToPoint } from "../utils/geometric";
 import { randomId } from "../utils/randomId";
 
 export const actionLine: Action = {
   name: "line",
 
-  pointerDown: ({ state, project }) => {
+  pointerDown: ({ state, project, params }) => {
     const x = state.pointerX;
     const y = state.pointerY;
     const element: ECadLineElement = {
@@ -24,12 +25,24 @@ export const actionLine: Action = {
     };
   },
 
-  pointerMove: ({ state }) => {
+  pointerMove: ({ state, params }) => {
     if (state.editingElement) {
-      const x = state.pointerX;
-      const y = state.pointerY;
+      let x = state.pointerX;
+      let y = state.pointerY;
+
+      const { shiftKey } = params;
 
       const oldLine = state.editingElement as ECadLineElement;
+      if (shiftKey) {
+        const dx = Math.abs(x - oldLine.x1);
+        const dy = Math.abs(y - oldLine.y1);
+        if (dx > dy) {
+          y = oldLine.y1;
+        } else {
+          x = oldLine.x1;
+        }
+      }
+
       const element: ECadLineElement = {
         ...oldLine,
         x2: x,

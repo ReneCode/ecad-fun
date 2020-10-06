@@ -75,16 +75,44 @@ export const workerLine: ElementWorker = {
     };
   },
 
-  updateMoveHandle: (element, handleIdx, pt): ObjectType => {
+  updateMoveHandle: ({ element, handleIdx, x, y, shiftKey }): ObjectType => {
     const line = element as ECadLineElement;
     const update: ObjectType = { id: element.id };
-    if (handleIdx === 0) {
-      update.x1 = pt.x;
-      update.y1 = pt.y;
-    }
-    if (handleIdx === 1) {
-      update.x2 = pt.x;
-      update.y2 = pt.y;
+
+    if (shiftKey) {
+      // keep the line-angle
+      const ratio = (line.y2 - line.y1) / (line.x2 - line.x1);
+      if (Math.abs(ratio) < 1) {
+        // take X, recalc Y
+        if (handleIdx === 1) {
+          const newY = ratio * (x - line.x1) + line.y1;
+          update.x2 = x;
+          update.y2 = newY;
+        } else if (handleIdx === 0) {
+          const newY = ratio * (x - line.x2) + line.y2;
+          update.x1 = x;
+          update.y1 = newY;
+        }
+      } else {
+        // take Y, recalc X
+        if (handleIdx === 1) {
+          const newX = (y - line.y1) / ratio + line.x1;
+          update.x2 = newX;
+          update.y2 = y;
+        } else if (handleIdx === 0) {
+          const newX = (y - line.y2) / ratio + line.x2;
+          update.x1 = newX;
+          update.y1 = y;
+        }
+      }
+    } else {
+      if (handleIdx === 0) {
+        update.x1 = x;
+        update.y1 = y;
+      } else if (handleIdx === 1) {
+        update.x2 = x;
+        update.y2 = y;
+      }
     }
     return update;
   },

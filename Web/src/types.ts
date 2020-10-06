@@ -125,6 +125,7 @@ export type ActionState = {
   lastX: number;
   lastY: number;
   selectedHandleIdx: number;
+  shiftKey: boolean;
   selectionMode: "selectionbox" | "element";
 };
 
@@ -132,6 +133,7 @@ export const defaultActionState: ActionState = {
   lastX: 0,
   lastY: 0,
   selectedHandleIdx: -1,
+  shiftKey: false,
   selectionMode: "element",
 };
 
@@ -194,6 +196,14 @@ export type Box = {
   y2: number;
 };
 
+export type ElementChangeArgs = {
+  element: ECadBaseElement;
+  handleIdx: number;
+  x: number;
+  y: number;
+  shiftKey: boolean;
+};
+
 export type ElementHandle = { x: number; y: number; idx: number };
 
 export type ElementWorker = {
@@ -209,11 +219,7 @@ export type ElementWorker = {
 
   updateMoveByDelta?: (element: ObjectType, delta: Point) => ObjectType;
 
-  updateMoveHandle?: (
-    element: ObjectType,
-    handleIdx: number,
-    pt: Point
-  ) => ObjectType;
+  updateMoveHandle?: (args: ElementChangeArgs) => ObjectType;
 };
 
 export type ElementRenderParams = {

@@ -96,12 +96,18 @@ export const actionSelect: Action = {
     };
   },
 
-  pointerMove: ({ state, project, actionState }): ActionResult | void => {
+  pointerMove: ({
+    state,
+    project,
+    actionState,
+    params,
+  }): ActionResult | void => {
     const elements = project.getRoot()._children as ECadBaseElement[];
     if (!elements) {
       return;
     }
 
+    const { shiftKey } = params;
     const x = state.pointerX;
     const y = state.pointerY;
     if (
@@ -133,7 +139,13 @@ export const actionSelect: Action = {
         // move handle
         const update = getSelectedElements(state, elements)
           .map((e) => {
-            return updateMoveHandleOfElement(e, handleIdx, { x, y });
+            return updateMoveHandleOfElement({
+              element: e,
+              handleIdx,
+              x,
+              y,
+              shiftKey,
+            });
           })
           .filter((o) => !!o) as ObjectType[];
         return {

@@ -14,7 +14,6 @@ const ProjectStart = () => {
   });
 
   useEffect(() => {
-    console.log("init");
     window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("resize", onResize);

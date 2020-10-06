@@ -81,4 +81,21 @@ export const workerRectangle: ElementWorker = {
       y2: rectangle.y2 + dy,
     };
   },
+
+  updateMoveHandle: ({ element, handleIdx, x, y, shiftKey }): ObjectType => {
+    const rectangle = element as ECadRectangleElement;
+    switch (handleIdx) {
+      case 0:
+        return { id: rectangle.id, x1: x, y1: y };
+      case 1:
+        return { id: rectangle.id, x1: x, y2: y };
+      case 2:
+        return { id: rectangle.id, x2: x, y2: y };
+      case 3:
+        return { id: rectangle.id, x2: x, y1: y };
+
+      default:
+        return rectangle;
+    }
+  },
 };

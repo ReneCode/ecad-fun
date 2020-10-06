@@ -95,7 +95,7 @@ export class ActionManager {
     this.addins[name] = fn;
   }
 
-  public async dispatch(type: EventType, { params }: { params?: any }) {
+  public async dispatch(type: EventType, params: any) {
     const action = this.getAction(this.runningActionName);
     if (action) {
       await this.applyActionMethode(action, type, {
@@ -105,7 +105,7 @@ export class ActionManager {
     }
   }
 
-  public async execute(actionName: string, { params }: { params: any }) {
+  public async execute(actionName: string, params: any) {
     const action = this.getAction(actionName);
     if (!action) {
       console.error(`action ${actionName} not found`);
@@ -122,13 +122,13 @@ export class ActionManager {
       // otherwise this is a long running action
 
       // stop the current long-running action
-      this.dispatch("stop", {});
+      this.dispatch("stop", null);
       this.actionState = defaultActionState;
 
       // and make actionName to the new long-running actino
       // and start it
       this.runningActionName = actionName;
-      this.dispatch("start", { params });
+      this.dispatch("start", params);
     }
   }
 
