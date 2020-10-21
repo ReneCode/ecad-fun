@@ -494,4 +494,36 @@ describe("Project", () => {
       });
     });
   });
+
+  describe("query", () => {
+    it("get without children", () => {
+      const project = new Project("A");
+
+      project.createObjects([
+        { id: "1:0", name: "p1" },
+        { id: "1:1", name: "p2" },
+        { id: "2:0", name: "e1", _parent: "1:0-5" },
+      ]);
+
+      const [result] = project.query([{ prop: "id", value: "1:0" }]);
+      expect(result.id).toBe("1:0");
+      expect(result.name).toBe("p1");
+      expect(result._children).toBeUndefined();
+    });
+
+    it("get by type", () => {
+      const project = new Project("A");
+
+      project.createObjects([
+        { id: "1:0", type: "page", name: "p1" },
+        { id: "1:1", type: "page", name: "p2" },
+        { id: "2:0", name: "e1", _parent: "1:0-5" },
+      ]);
+
+      const result = project.query([{ prop: "type", value: "page" }]);
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe("1:0");
+      expect(result[1].id).toBe("1:1");
+    });
+  });
 });

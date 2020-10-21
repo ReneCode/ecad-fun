@@ -48,6 +48,25 @@ export class Project {
     }
   }
 
+  public query(q: { prop: string; value: any }[]) {
+    return Object.values(this.objects)
+      .filter((o: ObjectType) => {
+        let ok = true;
+        for (let qe of q) {
+          if (o[qe.prop] !== qe.value) {
+            ok = false;
+            break;
+          }
+        }
+        return ok;
+      })
+      .map((o: ObjectType) => {
+        const cp = { ...o };
+        delete cp._children;
+        return cp;
+      });
+  }
+
   public getRoot() {
     return this.root;
   }
