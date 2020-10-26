@@ -4,32 +4,65 @@ import { Project } from "multiplayer";
 import { wait } from "./utils";
 import { IntervalCallback } from "./IntervalCallback";
 
+const projectPath: string = path.join(
+  __dirname,
+  "..",
+  process.env.PROJECT_PATH || "./"
+);
+
 class ProjectService {
-  projects: Record<string, Project> = {};
-  intervalCallback = new IntervalCallback();
+  projects: Map<string, Project> = new Map();
+  saveInterval = new IntervalCallback();
+  closeInterval = new IntervalCallback();
 
-  async open(projectId: string) {
+  public async open(projectId: string) {
     await wait();
-    let project = this.projects[projectId];
+    this.closeInterval.init(
+      projectId,
+      () => this.close(projectId),
+      60_000,
+      true
+    );
+    let project = this.projects.get(projectId);
     if (!project) {
-      project = new Project(projectId);
-      this.projects[projectId] = project;
-      this.intervalCallback.init(projectId, () => this.save(project), 10_000);
+      const newProject = new Project(projectId);
+      this.load(newProject);
+      this.projects.set(projectId, newProject);
+      this.saveInterval.init(projectId, () => this.save(newProject), 10_000);
+      return newProject;
+    } else {
+      this.saveInterval.enableCallback(projectId);
+      return project;
     }
-
-    this.intervalCallback.enableCallback(projectId);
-    return project;
   }
 
-  async save(project: Project) {
-    console.log("> save Project", project.id);
+  private load(project: Project) {
+    try {
+      const p = path.join(projectPath, `${project.id}.json`);
+      console.log(`load project: ${p}`);
+      const content = fs.readFileSync(p, "utf8");
+      if (content) {
+        const json = JSON.parse(content);
+        project.load(json);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  private save(project: Project) {
     const content = project.save();
-    const p = path.join("./", `${project.id}.json`);
+    if (!fs.existsSync(projectPath)) {
+      fs.mkdirSync(projectPath);
+    }
+    const p = path.join(projectPath, `${project.id}.json`);
+    console.log(`save project: ${p}`);
     fs.writeFileSync(p, JSON.stringify(content, null, 1));
   }
 
-  async close(projectId: string) {
-    this.intervalCallback.exit(projectId);
+  private async close(projectId: string) {
+    this.projects.delete(projectId);
+    console.log(`close project: ${projectId}`);
     await wait();
   }
 }

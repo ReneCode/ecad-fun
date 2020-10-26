@@ -4,7 +4,12 @@ export class IntervalCallback {
     { handle: NodeJS.Timeout; enable: boolean }
   > = new Map();
 
-  init(key: string, callback: (id: string) => void, ms: number) {
+  init(
+    key: string,
+    callback: (id: string) => void,
+    ms: number,
+    enable: boolean = false
+  ) {
     const value = this.intervalHandle.get(key);
     if (value && value.handle) {
       clearInterval(value.handle);
@@ -19,7 +24,7 @@ export class IntervalCallback {
         }
       }
     }, ms);
-    this.intervalHandle.set(key, { handle: newHandle, enable: false });
+    this.intervalHandle.set(key, { handle: newHandle, enable: enable });
   }
 
   exit(key: string) {

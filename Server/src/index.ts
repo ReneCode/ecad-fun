@@ -115,7 +115,6 @@ io.on("connection", (socket) => {
       //   io.to(socket.id).emit("delete-object", data);
       // });
       const content = project.save();
-      console.log(">>", content);
       io.to(socket.id).emit("open-project", content);
     }
   });
