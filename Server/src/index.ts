@@ -105,6 +105,7 @@ io.on("connection", (socket) => {
     const project = await projectService.open(projectId);
     if (project) {
       socket.join(projectId);
+      socketDebug(`join projectId:${projectId} socket:${socket.id}`);
       // project.subscribe("create-object", (data) => {
       //   io.to(socket.id).emit("create-object", data);
       // });
@@ -120,9 +121,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("create-object", async (objects: ObjectType[]) => {
-    socketDebug(`create-object ${socket.id}`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
     const clientId = `${clientService.getClientIdBySocketId(socket.id)}`;
+    socketDebug(`create-object projectId:${projectId} socket:${socket.id}`);
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
@@ -142,7 +143,7 @@ io.on("connection", (socket) => {
         } else {
           const result = project.createObjects(objects);
           socket.emit("create-object", "ack", result);
-          socket.broadcast.emit("create-object", "ok", result);
+          socket.broadcast.to(projectId).emit("create-object", "ok", result);
         }
       }
     } else {
@@ -151,26 +152,26 @@ io.on("connection", (socket) => {
   });
 
   socket.on("update-object", async (objects: ObjectType[]) => {
-    socketDebug(`update-object ${socket.id}`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
+    socketDebug(`update-object projectId:${projectId} socket:${socket.id}`);
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
         const result = project.updateObjects(objects);
         socket.emit("update-object", "ack", result);
-        socket.broadcast.emit("update-object", "ok", result);
+        socket.broadcast.to(projectId).emit("update-object", "ok", result);
       }
     }
   });
   socket.on("delete-object", async (ids: string[]) => {
-    socketDebug(`delete-object ${socket.id}`);
     const projectId = clientService.getProjectIdBySocketId(socket.id);
+    socketDebug(`delete-object projectId:${projectId} socket:${socket.id}`);
     if (projectId) {
       const project = await projectService.open(projectId);
       if (project) {
         const result = project.deleteObjects(ids);
         socket.emit("delete-object", "ack", result);
-        socket.broadcast.emit("delete-object", "ok", result);
+        socket.broadcast.to(projectId).emit("delete-object", "ok", result);
       }
     }
   });
