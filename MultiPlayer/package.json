@@ -1,6 +1,6 @@
 {
   "name": "multiplayer",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "multiplayer for ecad.fun",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "jest --config=jest.config.json",
+    "test": "jest --config=jest.config.json --verbose",
     "test:w": "jest --verbose --watchAll --config=jest.config.json"
   },
   "keywords": [],

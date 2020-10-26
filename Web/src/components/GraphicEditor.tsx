@@ -64,6 +64,9 @@ class GraphicEditor extends React.Component<Props, AppState> {
     );
     this.setState({ ...state, ...matrix });
     // this.project.setElements(elements);
+
+    this.setDebugging();
+
     this.addEventListeners();
   }
 
@@ -132,6 +135,12 @@ class GraphicEditor extends React.Component<Props, AppState> {
         this.props.onChange(this.state, this.project);
       }
     }
+  }
+
+  private setDebugging() {
+    (window as any).h = {
+      project: this.project,
+    };
   }
 
   public render() {

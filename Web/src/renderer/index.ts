@@ -111,6 +111,7 @@ const renderHandle = (
   const { x: sx, y: sy } = transformPoint(x, y, worldToScreenMatrix);
 
   context.beginPath();
+  context.lineWidth = 1;
   context.strokeStyle = COLOR.GRIPHANDLE_STROKE;
   context.fillStyle = COLOR.GRIPHANDLE_FILL;
   context.fillRect(

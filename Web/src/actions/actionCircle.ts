@@ -1,6 +1,5 @@
 import { ECadCircleElement, Action } from "../types";
 import { distancePointToPoint } from "../utils/geometric";
-import { randomId } from "../utils/randomId";
 
 export const actionCircle: Action = {
   name: "circle",
@@ -15,6 +14,8 @@ export const actionCircle: Action = {
       x,
       y,
       radius: 0,
+      lineWidth: 1,
+      color: "#33ee4488",
     };
     return {
       state: {

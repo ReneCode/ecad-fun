@@ -27,6 +27,7 @@ export type ECadCircleElement = ECadBaseElement & {
   x: number;
   y: number;
   radius: number;
+  lineWidth?: number;
 };
 
 export type ECadRectangleElement = ECadBaseElement & {

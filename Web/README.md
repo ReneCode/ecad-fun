@@ -9,6 +9,14 @@ haskell, clojoure
 https://www.youtube.com/watch?v=6arkndScw7A&t=649s
 https://www.youtube.com/watch?v=IcfhcJrtJqI
 
+dockerize
+
+https://medium.com/@tiangolo/react-in-docker-with-nginx-built-with-multi-stage-docker-builds-including-testing-8cc49d6ec305
+
+typescript local package
+
+https://medium.com/cameron-nokes/the-30-second-guide-to-publishing-a-typescript-package-to-npm-89d93ff7bccd
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

@@ -23,6 +23,12 @@ export const workerCircle: ElementWorker = {
     const radius = transformLength(circle.radius, worldToScreenMatrix);
     context.arc(x, y, radius, 0, Math.PI * 2);
 
+    if (circle.lineWidth) {
+      context.lineWidth = transformLength(
+        circle.lineWidth,
+        worldToScreenMatrix
+      );
+    }
     context.strokeStyle = selected
       ? COLOR.SELECTED
       : element.color
@@ -35,7 +41,14 @@ export const workerCircle: ElementWorker = {
   hitTest: (element, pt, epsilon) => {
     const circle = element as ECadCircleElement;
     const dist = distancePointToPoint(pt.x, pt.y, circle.x, circle.y);
-    return dist >= circle.radius - epsilon && dist <= circle.radius + epsilon;
+    if (circle.lineWidth) {
+      return (
+        dist >= circle.radius - circle.lineWidth / 2 - epsilon &&
+        dist <= circle.radius + circle.lineWidth / 2 + epsilon
+      );
+    } else {
+      return dist >= circle.radius - epsilon && dist <= circle.radius + epsilon;
+    }
   },
 
   getBoundingBox: (element: ECadBaseElement) => {

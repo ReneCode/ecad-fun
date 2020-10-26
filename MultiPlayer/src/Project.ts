@@ -180,11 +180,12 @@ export class Project {
 
   public load(objects: readonly ObjectType[]) {
     this.objects = {};
-    for (let obj of objects) {
+    for (let src of objects) {
+      const obj = deepCopy(src);
       if (obj.id === ROOT_ID) {
         this.root = obj;
       }
-      this.objects[obj.id] = obj;
+      this.addObject(obj);
       if (obj._parent) {
         this.applyParentProperty(obj);
       }

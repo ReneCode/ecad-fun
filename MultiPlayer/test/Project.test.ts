@@ -423,6 +423,19 @@ describe("Project", () => {
       expect(rootA).toEqual(rootB);
     });
 
+    it("update lastId after load", () => {
+      const project = new Project("A");
+      project.setClientId(1);
+      const content = [
+        { id: "0:0", projectId: "A", _type: "project" },
+        { id: "1:0", type: "pageA", _parent: "0:0-5" },
+        { id: "1:1", type: "pageB", _parent: "0:0-6" },
+      ];
+      project.load(content);
+      const id = project.createNewId();
+      expect(id).toBe("1:2");
+    });
+
     it("with hierarchie", () => {
       const projectA = new Project("A");
 
@@ -451,7 +464,7 @@ describe("Project", () => {
       ]);
       const rootA = projectA.getRoot();
       const content = projectA.save();
-
+      console.log(content);
       for (let o of content) {
         expect(o._children).toBeUndefined();
       }
@@ -459,7 +472,7 @@ describe("Project", () => {
 
     describe("performance", () => {
       let project: Project;
-      const COUNT = 200;
+      const COUNT = 10_000;
       let content: readonly ObjectType[] = [];
 
       it("createObject-single", () => {

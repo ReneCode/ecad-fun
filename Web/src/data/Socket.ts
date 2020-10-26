@@ -7,13 +7,13 @@ export class Socket {
   private socket: SocketIOClient.Socket | undefined;
 
   init(project: Project, callbackRedraw: () => void) {
-    console.log("socket init");
+    console.log("socket init:", WS_SERVER);
     this.socket = io(WS_SERVER);
 
     // register callbacks
     this.socket.on("open-project", (data: any) => {
       console.log("got open-project:", data);
-      project.setRoot(data);
+      project.load(data);
       callbackRedraw();
     });
 

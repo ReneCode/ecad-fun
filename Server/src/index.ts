@@ -114,7 +114,9 @@ io.on("connection", (socket) => {
       // project.subscribe("delete-object", (data) => {
       //   io.to(socket.id).emit("delete-object", data);
       // });
-      io.to(socket.id).emit("open-project", project.getRoot());
+      const content = project.save();
+      console.log(">>", content);
+      io.to(socket.id).emit("open-project", content);
     }
   });
 
