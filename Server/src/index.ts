@@ -9,7 +9,7 @@ import debug from "debug";
 import clientService from "./ObjectStore/ClientService";
 import { projectService } from "./ProjectService";
 import { ObjectType } from "multiplayer";
-import projectRouting from "./routing/projectRouting";
+import routing from "./routing/index";
 
 const serverDebug = debug("server");
 const socketDebug = debug("socket");
@@ -24,25 +24,21 @@ app.use(bodyParser.json());
 
 app.use(morgan("common"));
 
-app.use("/project", projectRouting);
+app.use(routing);
 
-app.use("/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("hi cad.fun Server");
 });
 
-app.use((req, res, next) => {
-  res.status(404).send("Not found");
+// not found handler
+app.use((req, res) => {
+  res.status(404).send("sorry, not found");
 });
 
-// error handling - should be the last use
+// error handler
 app.use((error: any, req: any, res: any, next: any) => {
-  // catches all errors of the app
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: "sorry - some error happens",
-    },
-  });
+  console.error(error.stack);
+  res.status(500).send(error.message);
 });
 
 const port = process.env.PORT || 8080; // default port to listen
