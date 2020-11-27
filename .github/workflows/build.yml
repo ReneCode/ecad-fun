@@ -39,8 +39,8 @@ jobs:
         working-directory: ./Web
         run: |
           ls
-          ls node_modules
           npm install
+          ls node_modules
           npm run build
         env:
           CI: true
