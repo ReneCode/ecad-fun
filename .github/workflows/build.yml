@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: ecad-fun
+name: build
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Change to frontend directory
         working-directory: ./Web
-        run: ls -R
+        run: ls
 
       - name: install package
         working-directory: ./Web

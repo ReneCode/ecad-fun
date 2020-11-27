@@ -39,14 +39,18 @@ class ProjectService {
   private load(project: Project) {
     try {
       const p = path.join(projectPath, `${project.id}.json`);
-      console.log(`load project: ${p}`);
+      if (!fs.existsSync(p)) {
+        console.error(`project path does not exists: ${p}`);
+      }
       const content = fs.readFileSync(p, "utf8");
       if (content) {
         const json = JSON.parse(content);
         project.load(json);
       }
+      return true;
     } catch (err) {
       console.error(err);
+      return false;
     }
   }
 

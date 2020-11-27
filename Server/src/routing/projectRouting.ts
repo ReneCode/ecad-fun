@@ -1,24 +1,23 @@
+import express from "express";
+
 import { Request, Response } from "express";
 import HttpStatus = require("http-status-codes");
 import { projectService } from "../ProjectService";
 
-export function list(req: Request, res: Response) {
-  res.json([{ name: "projectRouting" }]);
-}
+const router = express.Router();
 
-export async function read(req: Request, res: Response) {
+router.get("/", (req: Request, res: Response) => {
+  res.json([{ name: "projectRouting" }]);
+});
+
+router.get("/:id", async (req: Request, res: Response) => {
   const projectId = req.params.id;
 
   const project = await projectService.open(projectId);
   res.json(project.getRoot());
-}
+});
 
-/*
-body: {
-  name: string
-} 
-*/
-export async function create(req: Request, res: Response) {
+router.post("/", async (req: Request, res: Response) => {
   const name = req.body?.name;
   if (name) {
     const project = projectService.open(name);
@@ -26,12 +25,14 @@ export async function create(req: Request, res: Response) {
   } else {
     res.status(HttpStatus.BAD_REQUEST);
   }
-}
+});
 
-export function update(req: Request, res: Response) {
-  res.send("ok");
-}
+router.put("/:id", (req: Request, res: Response) => {
+  res.send("update ok");
+});
 
-export function deleteProject(req: Request, res: Response) {
-  res.send("ok");
-}
+router.delete("/:id", (req: Request, res: Response) => {
+  res.send("delete ok");
+});
+
+export default router;

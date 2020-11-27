@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "start:w": "nodemon src/index.ts",
-    "integrationtest": "jest integration-tests/ --runInBand",
+    "integrationtest": "jest integration-tests/ --runInBand --detectOpenHandles",
     "integrationtest:w": "jest integration-tests/ --watchAll --runInBand",
     "test": "jest src/ --runInBand",
     "test:w": "jest src/ --watchAll --runInBand --detectOpenHandles"

@@ -1,3 +1,13 @@
+# rules
+
+## client
+
+discard incomming changes from the server that conflict with unacknowledged property changes
+
+- delete: store props of deleted object in client UndoList
+
+- id : client-Id + Counter
+
 # Client-Server Communication
 
 sync
