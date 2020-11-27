@@ -28,17 +28,20 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Change to frontend directory
-        working-directory: ./Web
-        run: ls
 
-      - name: install package
-        working-directory: ./Web
-        run: npm install
+      - name: build MultiPlayer
+          working-directory: ./MultiPlayer
+          run: |
+            npm install
+            npm build
 
-      - name: build app
+      - name: build Web Frontend
         working-directory: ./Web
-        run: npm run build
+        run: |
+          ls
+          ls node_modules
+          npm install
+          npm run build
         env:
           CI: true
 
