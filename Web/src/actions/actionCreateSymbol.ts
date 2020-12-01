@@ -1,5 +1,4 @@
 import { Action, ECadSymbolElement } from "../types";
-import { randomId } from "../utils/randomId";
 import elementWorkerManager from "../elements/ElementWorkerManager";
 import { getElements } from "../elements";
 

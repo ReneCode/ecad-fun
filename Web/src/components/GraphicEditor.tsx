@@ -1,7 +1,6 @@
 import React from "react";
 import Toolbox from "./Toobox";
 import Status from "./Status";
-import SymbolList from "./SymbolList";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/actionManager";
 import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
@@ -56,7 +55,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
 
     this.actionMananger.registerAll();
 
-    const { state, elements } = loadFromLocalStorage();
+    const { state } = loadFromLocalStorage();
     const matrix = calcTransformationMatrix(
       state.screenOriginX,
       state.screenOriginY,

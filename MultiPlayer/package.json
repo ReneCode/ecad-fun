@@ -2,10 +2,10 @@
   "name": "multiplayer",
   "version": "0.0.24",
   "description": "multiplayer for ecad.fun",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "lib/**/*"
+    "dist/**/*"
   ],
   "scripts": {
     "prepare": "npm run build",

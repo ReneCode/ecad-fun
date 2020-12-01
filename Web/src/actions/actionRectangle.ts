@@ -1,5 +1,4 @@
 import { ECadRectangleElement, Action } from "../types";
-import { randomId } from "../utils/randomId";
 
 export const actionRectangle: Action = {
   name: "rectangle",
