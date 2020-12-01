@@ -63,14 +63,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Login to azure container registry
-        working-directory: ./Server
-
         uses: azure/docker-login@v1
         with:
           login-server: relang.azurecr.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Docker build
+        working-directory: ./Server
         run: |
           docker build . -t ${{ secrets.DOCKER_REGISTRY }}:MultiPlayer
           docker build . -t ${{ secrets.DOCKER_REGISTRY }}:MultiPlayer
