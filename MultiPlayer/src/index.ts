@@ -3,6 +3,8 @@ import { ObjectType } from "./types";
 
 export { ObjectType, Project };
 
+export const Greeter = (name: string) => `Hello ${name}`;
+
 /*
 import { findexAfter, findexBetween } from "./findex";
 
