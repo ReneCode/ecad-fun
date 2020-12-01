@@ -1,4 +1,4 @@
-import { findexAfter, findexBetween } from "./findex";
+import { FractionIndex } from "./FractionIndex";
 import { ObjectType } from "./types";
 
 export const splitParentProperty = (propValue: string) => {
@@ -24,13 +24,13 @@ export const appendToArray = (
   obj: ObjectType
 ): { arr: readonly ObjectType[]; fIndex: string } => {
   if (!children || children.length === 0) {
-    const nextFIndex = findexAfter("");
+    const nextFIndex = FractionIndex.after("");
     return { arr: [obj], fIndex: nextFIndex };
   }
 
   const lastChild = children[children.length - 1];
   const [_, fidx] = splitParentProperty(lastChild._parent as string);
-  const nextFIndex = findexAfter(fidx);
+  const nextFIndex = FractionIndex.after(fidx);
   return { arr: [...children, obj], fIndex: nextFIndex };
 };
 
@@ -62,7 +62,7 @@ export const mergeIntoArray = (
     let newfIndex = "";
     if (idx + 1 === children.length) {
       // append to the end
-      newfIndex = findexAfter(childfIndex);
+      newfIndex = FractionIndex.after(childfIndex);
       return { arr: [...children, obj], fIndex: newfIndex };
     } else {
       // in the middle
@@ -71,7 +71,7 @@ export const mergeIntoArray = (
       const [__, nextChildfIndex] = splitParentProperty(
         nextChild._parent as string
       );
-      newfIndex = findexBetween(fIndex, nextChildfIndex);
+      newfIndex = FractionIndex.between(fIndex, nextChildfIndex);
       return {
         arr: [...children.slice(0, idx + 1), obj, ...children.slice(idx + 1)],
         fIndex: newfIndex,

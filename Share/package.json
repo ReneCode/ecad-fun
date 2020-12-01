@@ -8,9 +8,9 @@
     "dist/**/*"
   ],
   "scripts": {
-    "prepare": "npm run build",
+    "prepare": "npm run copy",
     "build": "tsc",
-    "copy": "cp src/* ../Web/src/multiplayer",
+    "copy": "./copy-files.sh",
     "test": "jest --config=jest.config.json --verbose",
     "test:w": "jest --verbose --watchAll --config=jest.config.json"
   },
