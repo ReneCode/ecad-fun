@@ -464,7 +464,6 @@ describe("Project", () => {
       ]);
       const rootA = projectA.getRoot();
       const content = projectA.save();
-      console.log(content);
       for (let o of content) {
         expect(o._children).toBeUndefined();
       }
