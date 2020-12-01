@@ -30,17 +30,17 @@ jobs:
 
 
       - name: build MultiPlayer
-          working-directory: ./MultiPlayer
-          run: |
-            npm install
-            npm build
+        working-directory: ./MultiPlayer
+        run: |
+          npm install
+          npm build
 
       - name: build Web Frontend
         working-directory: ./Web
         run: |
           ls
-          ls node_modules
           npm install
+          ls node_modules
           npm run build
         env:
           CI: true
