@@ -18,7 +18,6 @@
     "express": "4.17.1",
     "http-status-code": "^2.1.0",
     "morgan": "^1.10.0",
-    "multiplayer": "file:../MultiPlayer",
     "nanoid": "^3.1.10",
     "socket.io": "2.3.0"
   },

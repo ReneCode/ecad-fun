@@ -1,5 +1,4 @@
-import { Project } from "multiplayer";
-import { ObjectType } from "multiplayer";
+import { ObjectType, Project } from "./share";
 
 export type ActionName = string;
 

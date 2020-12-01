@@ -15,7 +15,7 @@ import {
 } from "../utils/geometric";
 
 import elementWorkerManager from "../elements/ElementWorkerManager";
-import { Project } from "multiplayer";
+import { Project } from "../share";
 
 export const getElements = (project: Project): readonly ECadBaseElement[] => {
   const elements = project.getRoot()._children;

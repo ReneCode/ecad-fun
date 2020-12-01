@@ -14,7 +14,7 @@ import {
   getElements,
 } from "../elements";
 import { COLOR } from "../utils/color";
-import { ObjectType } from "multiplayer";
+import { ObjectType } from "../share";
 
 export const actionSelect: Action = {
   name: "select",

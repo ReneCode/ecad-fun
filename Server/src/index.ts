@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 import debug from "debug";
 import clientService from "./ObjectStore/ClientService";
 import { projectService } from "./ProjectService";
-import { ObjectType } from "multiplayer";
+import { ObjectType } from "./share";
 import routing from "./routing/index";
 
 const serverDebug = debug("server");

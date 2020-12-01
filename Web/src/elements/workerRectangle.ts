@@ -6,7 +6,7 @@ import {
   transformPoint,
 } from "../utils/geometric";
 import { COLOR } from "../utils/color";
-import { ObjectType } from "multiplayer";
+import { ObjectType } from "../share";
 
 export const workerRectangle: ElementWorker = {
   type: "rectangle",

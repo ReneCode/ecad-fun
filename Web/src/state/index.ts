@@ -7,7 +7,7 @@ import {
 } from "../types";
 import { debounce } from "../utils";
 import { getNotFoundSymbol } from "../elements/notFoundSymbol";
-import { Project } from "multiplayer";
+import { Project } from "../share";
 
 const DELAY_SAVE = 1000;
 const LOCAL_STORAGE_STATE_KEY = "ecad-state";

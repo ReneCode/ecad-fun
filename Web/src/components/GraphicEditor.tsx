@@ -6,7 +6,7 @@ import { ActionManager, EventType } from "../actions/actionManager";
 import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
 import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
-import { Project } from "multiplayer";
+import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { getElements } from "../elements";
 

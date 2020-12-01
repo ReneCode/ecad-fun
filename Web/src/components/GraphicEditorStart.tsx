@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import GraphicEditor from "./GraphicEditor";
 import { AppState } from "../types";
 import { saveDebounced } from "../state";
-import { Project } from "multiplayer";
+import { Project } from "../share";
 
 const ProjectStart = () => {
   const { id: projectId } = useParams();

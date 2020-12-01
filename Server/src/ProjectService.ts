@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { Project } from "multiplayer";
+import { Project } from "./share";
 import { wait } from "./utils";
 import { IntervalCallback } from "./IntervalCallback";
 

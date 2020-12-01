@@ -1,7 +1,10 @@
-import { Project } from "./Project";
-import { ObjectType } from "./types";
+// import { Project } from "./Project";
+// import { ObjectType } from "./types";
 
-export { ObjectType, Project };
+// export { ObjectType, Project };
+
+export * from "./Project";
+export * from "./types";
 
 export const Greeter = (name: string) => `Hello ${name}`;
 

@@ -18,7 +18,7 @@ import { actionCreateSymbol } from "./actionCreateSymbol";
 import { actionPlaceSymbol } from "./actionPlaceSymbol";
 import { actionExportDocument } from "./actionExportDocument";
 import { actionImportDocument } from "./actionImportDocument";
-import { Project } from "multiplayer";
+import { Project } from "../share";
 import { Socket } from "../data/Socket";
 
 export type EventType =

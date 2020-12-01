@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import { Project, ObjectType } from "multiplayer";
+import { Project, ObjectType } from "../share";
 
 const WS_SERVER = process.env.REACT_APP_WEBSOCKET_SERVER as string;
 

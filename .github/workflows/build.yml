@@ -28,6 +28,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Login to azure container registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: build MultiPlayer
         working-directory: ./MultiPlayer
         run: |
@@ -41,6 +48,11 @@ jobs:
           npm run build
         env:
           CI: true
+
+      - name: Docker build
+        working-directory: ./Web
+        run: |
+          docker build . -t ${{ secrets.DOCKER_REGISTRY }}:mp-web
 
       - name: build Server Backend
         working-directory: ./Server
@@ -62,15 +74,3 @@ jobs:
   dockerize:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to azure container registry
-        uses: azure/docker-login@v1
-        with:
-          login-server: relang.azurecr.io
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Docker build
-        working-directory: ./Server
-        run: |
-          docker build . -t ${{ secrets.DOCKER_REGISTRY }}:MultiPlayer
-          docker build . -t ${{ secrets.DOCKER_REGISTRY }}:MultiPlayer

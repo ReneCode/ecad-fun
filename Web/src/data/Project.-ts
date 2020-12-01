@@ -1,6 +1,6 @@
 import { ECadBaseElement, ECadSymbolElement } from "../types";
 
-import { Project as MPProject, ObjectType } from "multiplayer";
+import { Project as MPProject, ObjectType } from "../share";
 
 export class Project {
   // id: number = -1;
