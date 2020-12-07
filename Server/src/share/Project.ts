@@ -4,7 +4,6 @@ import { ObjectType } from "./types";
 import {
   appendToArray,
   combineParentProperty,
-  makeArray,
   mergeIntoArray,
   splitParentProperty,
 } from "./utils";
@@ -196,7 +195,7 @@ export class Project {
 
   validateCreateObjectId(id: string) {
     const [clientId, index] = id.split(":");
-    if (this.clientId != DEFAULT_CLIENTID && this.clientId !== clientId) {
+    if (this.clientId !== DEFAULT_CLIENTID && this.clientId !== clientId) {
       return false;
     }
     return true;

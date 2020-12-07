@@ -10,6 +10,7 @@
   "scripts": {
     "_prepare": "npm run copy",
     "build": "tsc",
+    "build:prod": "CI=true && tsc",
     "copy": "./copy-files.sh",
     "test": "jest --config=jest.config.json --verbose",
     "test:w": "jest --verbose --watchAll --config=jest.config.json"

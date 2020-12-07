@@ -28,7 +28,7 @@
     "docker:build": "docker build . -t relang.azurecr.io/ecad-fun-web",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:prod": "GENERATE_SOURCEMAP=false && npm run build",
+    "build:prod": "CI=true GENERATE_SOURCEMAP=false && npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
