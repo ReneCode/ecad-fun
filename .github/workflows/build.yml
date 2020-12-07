@@ -20,47 +20,46 @@ jobs:
         node-version: [12.x]
 
     steps:
-    - name: Checkout sources
-      uses: actions/checkout@v2
+      - name: Checkout sources
+        uses: actions/checkout@v2
 
-    - name: User npm ${{matrix.node-version}}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: User npm ${{matrix.node-version}}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Login to azure container registry
-      uses: azure/docker-login@v1
-      with:
-        login-server: ${{ secrets.DOCKER_REGISTRY }}
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to azure container registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: build Share
-      working-directory: ./Share
-      run: |
-        npm install
-        npm test
+      - name: build Share
+        working-directory: ./Share
+        run: |
+          npm install
+          npm test
 
-    - name: build Web Frontend
-      working-directory: ./Web
-      run: |
-        npm install
-        npm run build:prod
-      env:
-        CI: true
+      - name: build Web Frontend
+        working-directory: ./Web
+        run: |
+          npm install
+        env:
+          CI: true
 
-    - name: Docker build
-      working-directory: ./Web
-      run: |
-        docker build . -t ${{ secrets.DOCKER_REGISTRY }}:ecad-fun-web
+      - name: Docker build
+        working-directory: ./Web
+        run: |
+          docker build . -t ${{ secrets.DOCKER_REGISTRY }}:ecad-fun-web
 
-    - name: build Server Backend
-      working-directory: ./Server
-      run: |
-        npm install
-        npm run build
-      env:
-        CI: true
+      - name: build Server Backend
+        working-directory: ./Server
+        run: |
+          npm install
+          npm run build
+        env:
+          CI: true
 
     # - uses: amondnet/vercel-action@v19
     #   with:
@@ -70,4 +69,3 @@ jobs:
     #     vercel-org-id: ${{ secrets.ORG_ID}}  #Required
     #     vercel-project-id: ${{ secrets.PROJECT_ID}} #Required
     #     working-directory: ./Web
-
