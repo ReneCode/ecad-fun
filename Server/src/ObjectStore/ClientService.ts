@@ -79,6 +79,4 @@ class ClientService {
   }
 }
 
-const clientService = new ClientService();
-
-export default clientService;
+export const clientService = new ClientService();
