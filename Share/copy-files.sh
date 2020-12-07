@@ -1,4 +1,4 @@
-
+echo copy share files to ./Server and ./Web
 
 rm -rf ../Server/src/share
 rm -rf ../Web/src/share

@@ -25,6 +25,7 @@
     "typescript": "3.9.6"
   },
   "scripts": {
+    "docker:build": "docker build . -t relang.azurecr.io/ecad-fun-web",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "build:prod": "GENERATE_SOURCEMAP=false && npm run build",

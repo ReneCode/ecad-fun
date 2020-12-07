@@ -35,24 +35,24 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: build MultiPlayer
-        working-directory: ./MultiPlayer
+      - name: build Share
+        working-directory: ./Share
         run: |
           npm install
-          npm build
+          npm test
 
       - name: build Web Frontend
         working-directory: ./Web
         run: |
           npm install
-          npm run build
+          npm run build:prod
         env:
           CI: true
 
       - name: Docker build
         working-directory: ./Web
         run: |
-          docker build . -t ${{ secrets.DOCKER_REGISTRY }}:mp-web
+          docker build . -t ${{ secrets.DOCKER_REGISTRY }}:ecad-fun-web
 
       - name: build Server Backend
         working-directory: ./Server
