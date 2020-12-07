@@ -71,6 +71,3 @@ jobs:
       #     vercel-project-id: ${{ secrets.PROJECT_ID}} #Required
       #     working-directory: ./Web
 
-  dockerize:
-    runs-on: ubuntu-latest
-    steps:
