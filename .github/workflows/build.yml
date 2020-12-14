@@ -51,8 +51,8 @@ jobs:
       - name: Docker build
         working-directory: ./Web
         run: |
-          docker build . -t ${{ secrets.DOCKER_REGISTRY }}:ecad-fun-web
-          docker image push ${{ secrets.DOCKER_REGISTRY }}:ecad-fun-web
+          docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
+          docker image push ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
 
       - name: build Server Backend
         working-directory: ./Server
