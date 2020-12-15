@@ -23,6 +23,13 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
+      - name: Get Date
+        env:
+          cur_date: ${{ echo `date +"%F"` }}
+        run: |
+          echo `date +"%F"`
+          echo env: ${{ cur_date }}
+
       - name: User npm ${{matrix.node-version}}
         uses: actions/setup-node@v1
         with:
@@ -45,10 +52,10 @@ jobs:
         working-directory: ./Web
         run: |
           docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
-          docker tag ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web:${{ github.run_number }}
+          docker tag ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web:${{ cur_date }}-${{ github.run_number }}
           docker image push ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
 
-      - name: build Server Backend
+      - name: Docker build Server Backend
         working-directory: ./Server
         run: |
           docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-server
