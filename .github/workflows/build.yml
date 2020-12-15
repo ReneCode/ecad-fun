@@ -24,8 +24,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get Date
-        env:
-          cur_date: ${{ date +"%F" }}
         run: |
           echo `date +"%F"`
           echo env: ${{ cur_date }}
