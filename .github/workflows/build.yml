@@ -25,9 +25,11 @@ jobs:
 
       - name: Get Date
         run: |
+          echo "CUR_DATE::$(date +'%F')" >> $GITHUB_ENV
           echo `date +"%F"`
-          echo env: ${{ cur_date }}
-
+          echo $CUR_DATE
+          echo ${{ CUR_DATE }}
+          
       - name: User npm ${{matrix.node-version}}
         uses: actions/setup-node@v1
         with:
