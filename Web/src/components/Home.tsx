@@ -10,7 +10,7 @@ const App = () => {
       <header className="App-header">
         {/* <p onClick={handleClick}>{state.canvas.name} </p> */}
         <p>ECAD.fun</p>
-        <a href="/p/abc">Project</a>
+        <a href="/p/abc">project</a>
       </header>
     </div>
   );
