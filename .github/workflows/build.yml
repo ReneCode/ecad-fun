@@ -27,7 +27,7 @@ jobs:
         run: echo "NOW::$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
         
       - name: Show Date
-          echo $NOW
+        run: echo $NOW
 #          run: echo "CUR_DATE::$(date +'%F')" >> $GITHUB_ENV
           
       - name: User npm ${{matrix.node-version}}
