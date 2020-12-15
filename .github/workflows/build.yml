@@ -27,7 +27,6 @@ jobs:
         run: |
           echo "CUR_DATE::$(date +'%F')" >> $GITHUB_ENV
           echo $CUR_DATE
-          echo ${{ CUR_DATE }}
           
       - name: User npm ${{matrix.node-version}}
         uses: actions/setup-node@v1
@@ -51,7 +50,7 @@ jobs:
         working-directory: ./Web
         run: |
           docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
-          docker tag ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web:${{ cur_date }}-${{ github.run_number }}
+          docker tag ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web:$CUR_DATE-${{ github.run_number }}
           docker image push ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
 
       - name: Docker build Server Backend
