@@ -41,14 +41,7 @@ jobs:
           npm install
           npm test
 
-      - name: build Web Frontend
-        working-directory: ./Web
-        run: |
-          npm install
-        env:
-          CI: true
-
-      - name: Docker build
+      - name: Docker build Web Frontend
         working-directory: ./Web
         run: |
           docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web:${{ github.run_number }}
