@@ -25,7 +25,7 @@ jobs:
 
       - name: Get Date
         env:
-          cur_date: ${{ echo `date +"%F"` }}
+          cur_date: ${{ date +"%F" }}
         run: |
           echo `date +"%F"`
           echo env: ${{ cur_date }}
