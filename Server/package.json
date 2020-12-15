@@ -11,8 +11,8 @@
     "integrationtest:w": "jest integration-tests/ --watchAll --runInBand",
     "test": "jest src/ --runInBand",
     "test:w": "jest src/ --watchAll --runInBand --detectOpenHandles",
-    "docker:build": "docker build -t mp-server-test .",
-    "docker:run": "docker run -p 4000:8080 mp-server-test"
+    "docker:build": "docker build -t ecad-fun-server .",
+    "docker:run": "docker run -p 4000:8080 ecad-fun-server"
   },
   "dependencies": {
     "express": "4.17.1",

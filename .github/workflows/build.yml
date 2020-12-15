@@ -51,8 +51,9 @@ jobs:
       - name: build Server Backend
         working-directory: ./Server
         run: |
-          npm install
-          npm run build
+          docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-server
+          docker tag ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-server ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-server:${{ github.run_number }}
+          docker image push ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-server
         env:
           CI: true
 
