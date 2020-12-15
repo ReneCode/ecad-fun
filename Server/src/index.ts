@@ -23,7 +23,7 @@ app.use(morgan("common"));
 app.use(routing);
 
 app.get("/", (req, res) => {
-  res.send("hi cad.fun Server");
+  res.send("cad.fun server");
 });
 
 // not found handler
