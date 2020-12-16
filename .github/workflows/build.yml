@@ -5,11 +5,7 @@
 
 name: build
 
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -45,12 +41,12 @@ jobs:
           npm install
           npm test
 
-      - name: Docker build Web Frontend
-        working-directory: ./Web
-        run: |
-          docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
-          docker tag ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web:$NOW
-          docker image push ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
+      # - name: Docker build Web Frontend
+      #   working-directory: ./Web
+      #   run: |
+      #     docker build . -t ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
+      #     docker tag ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web:$NOW
+      #     docker image push ${{ secrets.DOCKER_REGISTRY }}/ecad-fun-web
 
       - name: Docker build Server Backend
         working-directory: ./Server
