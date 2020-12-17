@@ -1,5 +1,14 @@
 # ecad.fun
 
+# setup
+
+create an `.env` file containing environment variables for local useage:
+
+REACT_APP_SERVER=http://localhost:8080
+REACT_APP_WEBSOCKET_SERVER=ws://localhost:8080
+
+# ideas
+
 easy is realative. (easy for whom)
 
 simple is an objective
