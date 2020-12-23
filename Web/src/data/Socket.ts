@@ -24,8 +24,11 @@ export class Socket {
 
     this.socket.on("create-object", (response: string, data: ObjectType[]) => {
       if (response === "ack") {
-        // done
+        // it's the answer of my own creating.
+        // so I have nothing to do done
       } else {
+        // it's the answer of some other client creating
+        // so I have to follow that creating
         project.createObjects(data);
         callbackRedraw();
       }

@@ -405,6 +405,34 @@ describe("Project", () => {
     ]);
   });
 
+  describe("dirty", () => {
+    it("create", () => {
+      const project = new Project("D");
+      expect(project.getAndClearDirty()).toBe(false);
+      project.createObjects([{ id: "1:0", type: "page", name: "p1" }]);
+      expect(project.getAndClearDirty()).toBe(true);
+      expect(project.getAndClearDirty()).toBe(false);
+    });
+
+    it("update", () => {
+      const project = new Project("D");
+      project.createObjects([{ id: "1:0", type: "page", name: "p1" }]);
+      project.getAndClearDirty();
+      project.updateObjects([{ id: "1:0", name: "p2" }]);
+      expect(project.getAndClearDirty()).toBe(true);
+      expect(project.getAndClearDirty()).toBe(false);
+    });
+
+    it("delete", () => {
+      const project = new Project("D");
+      project.createObjects([{ id: "1:0", type: "page", name: "p1" }]);
+      project.getAndClearDirty();
+      project.deleteObjects(["1:0"]);
+      expect(project.getAndClearDirty()).toBe(true);
+      expect(project.getAndClearDirty()).toBe(false);
+    });
+  });
+
   describe("save/load", () => {
     it("basic", () => {
       const projectA = new Project("A");
@@ -471,7 +499,7 @@ describe("Project", () => {
 
     describe("performance", () => {
       let project: Project;
-      const COUNT = 10_000;
+      const COUNT = 1_000;
       let content: readonly ObjectType[] = [];
 
       it("createObject-single", () => {

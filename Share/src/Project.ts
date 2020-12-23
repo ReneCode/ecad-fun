@@ -14,6 +14,7 @@ const ROOT_ID = "0:0";
 export class Project {
   public readonly id: string;
 
+  private dirty: boolean = false;
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
   private dispatcher = new Dispatcher();
@@ -28,6 +29,12 @@ export class Project {
     this.lastObjectIndex = 0; // 0 is allready used
     this.addObject(root);
     this.root = root;
+  }
+
+  public getAndClearDirty() {
+    const dirty = this.dirty;
+    this.dirty = false;
+    return dirty;
   }
 
   public setClientId(clientId: number) {
@@ -91,6 +98,8 @@ export class Project {
       }
     }
 
+    this.dirty = true;
+
     const results = [];
     for (let o of os) {
       const obj = this.cloneObject(o);
@@ -121,6 +130,8 @@ export class Project {
       });
     }
 
+    this.dirty = true;
+
     const results: ObjectType[] = [];
     for (let { current, update } of todos) {
       // apply changes
@@ -144,6 +155,8 @@ export class Project {
   }
 
   public deleteObjects(ids: string[]) {
+    this.dirty = true;
+
     for (let id of ids) {
       const currentObject = this.getObject(id);
       if (currentObject) {

@@ -3,6 +3,7 @@ import path from "path";
 import { Project } from "./share";
 import { wait } from "./utils";
 import { IntervalCallback } from "./IntervalCallback";
+import { Scheduler } from "./Scheduler";
 
 const projectPath: string = path.join(
   __dirname,
@@ -12,26 +13,30 @@ const projectPath: string = path.join(
 
 class ProjectService {
   projects: Map<string, Project> = new Map();
-  saveInterval = new IntervalCallback();
-  closeInterval = new IntervalCallback();
 
   public async open(projectId: string) {
     await wait();
-    this.closeInterval.init(
-      projectId,
-      () => this.close(projectId),
-      60_000,
-      true
-    );
     let project = this.projects.get(projectId);
     if (!project) {
       const newProject = new Project(projectId);
       this.load(newProject);
       this.projects.set(projectId, newProject);
-      this.saveInterval.init(projectId, () => this.save(newProject), 10_000);
+
+      let saveScheduler: Scheduler | undefined = undefined;
+      const closeScheduler = new Scheduler(() => {
+        this.close(projectId);
+        closeScheduler.exit();
+        saveScheduler?.exit();
+      }, 60_000);
+
+      saveScheduler = new Scheduler(() => {
+        if (newProject.getAndClearDirty()) {
+          this.save(newProject);
+          closeScheduler.reset();
+        }
+      }, 10_000);
       return newProject;
     } else {
-      this.saveInterval.enableCallback(projectId);
       return project;
     }
   }
@@ -64,10 +69,9 @@ class ProjectService {
     fs.writeFileSync(p, JSON.stringify(content, null, 1));
   }
 
-  private async close(projectId: string) {
+  private close(projectId: string) {
     this.projects.delete(projectId);
     console.log(`close project: ${projectId}`);
-    await wait();
   }
 }
 
