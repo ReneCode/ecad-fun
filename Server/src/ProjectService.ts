@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { Project } from "./share";
 import { wait } from "./utils";
-import { IntervalCallback } from "./IntervalCallback";
 import { Scheduler } from "./Scheduler";
 
 const projectPath: string = path.join(

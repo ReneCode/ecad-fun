@@ -12,7 +12,7 @@ export class Socket {
 
     // register callbacks
     this.socket.on("open-project", (data: any) => {
-      console.log("got open-project:", data);
+      // console.log("got open-project:", data);
       project.load(data);
       callbackRedraw();
     });
@@ -50,6 +50,10 @@ export class Socket {
         project.deleteObjects(data);
         callbackRedraw();
       }
+    });
+
+    this.socket.on("connect_failed", (a: any, b: any) => {
+      console.log(">> connect_failed", a, b);
     });
 
     // open that project
