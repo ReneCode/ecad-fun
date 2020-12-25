@@ -7,6 +7,8 @@ const bodyParser = require("body-parser");
 import debug from "debug";
 import routing from "./routing/index";
 import { initSocketIO } from "./io";
+import { Scheduler } from "./Scheduler";
+import { drawDashboard } from "./dashboard/dashboard";
 
 const serverDebug = debug("server");
 
@@ -47,4 +49,9 @@ initSocketIO(server);
 
 server.listen(port, () => {
   serverDebug(`listening on port: ${port}`);
+  if (process.env.NODE_ENV === "development") {
+    new Scheduler(() => {
+      drawDashboard();
+    }, 1_000);
+  }
 });

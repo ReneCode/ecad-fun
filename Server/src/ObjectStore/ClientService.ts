@@ -23,6 +23,14 @@ class ClientService {
     return r?.clientId;
   }
 
+  getDataByProjectId(projectId: string) {
+    return clientRecordDb
+      .filter((r) => r.projectId === projectId)
+      .map((r) => {
+        return { socketId: r.socketId, clientId: r.clientId };
+      });
+  }
+
   /**
    * saves combination socketId + projectId and create a unique clientId
    * @return clientId
