@@ -3,6 +3,8 @@ import express from "express";
 const morgan = require("morgan");
 import http from "http";
 const bodyParser = require("body-parser");
+const jwt = require("express-jwt");
+const jwks = require("jwks-rsa");
 
 import debug from "debug";
 import routing from "./routing/index";
@@ -13,6 +15,18 @@ import { drawDashboard } from "./dashboard/dashboard";
 const serverDebug = debug("server");
 
 const app = express();
+
+var jwtCheck = jwt({
+  secret: jwks.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: "https://relang.eu.auth0.com/.well-known/jwks.json",
+  }),
+  audience: "https://ecad-server.azurewebsites.net",
+  issuer: "https://relang.eu.auth0.com/",
+  algorithms: ["RS256"],
+});
 
 // parse application/x-www-form-urlencoded
 // app.use(bodyParser.urlencoded({ extended: false }));
@@ -26,6 +40,16 @@ app.use(routing);
 
 app.get("/", (req, res) => {
   res.send("cad.fun server");
+});
+
+app.get("/api/public", (req, res) => {
+  res.send("cad.fun public api");
+});
+
+app.use(jwtCheck);
+
+app.get("/api/private", (req, res) => {
+  res.send("cad.fun private api");
 });
 
 // not found handler
@@ -48,10 +72,10 @@ const server = http.createServer(app);
 initSocketIO(server);
 
 server.listen(port, () => {
-  serverDebug(`listening on port: ${port}`);
+  serverDebug(`listening on port:${port}.`);
   if (process.env.NODE_ENV === "development") {
-    new Scheduler(() => {
-      drawDashboard();
-    }, 1_000);
+    // new Scheduler(() => {
+    //   drawDashboard();
+    // }, 5_000);
   }
 });

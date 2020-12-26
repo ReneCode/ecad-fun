@@ -18,7 +18,7 @@ export class Socket {
     });
 
     this.socket.on("send-clientid", (clientId: string) => {
-      console.log("set clientId", clientId);
+      console.debug("set clientId", clientId);
       project.setClientId(parseInt(clientId));
     });
 

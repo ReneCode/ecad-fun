@@ -8,6 +8,12 @@ discard incomming changes from the server that conflict with unacknowledged prop
 
 - id : client-Id + Counter
 
+# Authentication
+
+https://www.youtube.com/watch?v=NuCZgR09csE&list=PLZ14qQz3cfJL6aoKZ_Ly7jiYrwi9ihviW&index=2
+
+https://github.com/auth0-blog/auth0-react-sdk-video/blob/starter/src/server/api-server.js
+
 # Client-Server Communication
 
 sync
