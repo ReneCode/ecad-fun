@@ -14,7 +14,6 @@ ReactDOM.render(
       <Auth0ProviderWithHistory>
         <Routing />
       </Auth0ProviderWithHistory>
-      ,
     </Router>
   </React.StrictMode>,
   document.getElementById("root")

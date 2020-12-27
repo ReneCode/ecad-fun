@@ -1,13 +1,22 @@
 import React from "react";
+import { useHistory } from "react-router";
 import ToolButton from "./ToolButton";
 
 type Props = {
   onClick: (actionName: string) => void;
 };
 const Toolbox: React.FC<Props> = ({ onClick }) => {
+  const history = useHistory();
+
   return (
     <div className="toolbox">
-      <ToolButton onClick={() => onClick("navigateHome")}>Home</ToolButton>
+      <ToolButton
+        onClick={() => {
+          history.push("/");
+        }}
+      >
+        Home
+      </ToolButton>
       {/* <ToolButton onClick={() => onClick("select")}>select</ToolButton> */}
       <ToolButton onClick={() => onClick("line")}>line</ToolButton>
       <ToolButton onClick={() => onClick("circle")}>circle</ToolButton>

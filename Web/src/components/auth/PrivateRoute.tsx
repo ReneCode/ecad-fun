@@ -11,6 +11,7 @@ const PrivateRoute: React.FC<Props> = ({ component, ...args }) => {
       component={withAuthenticationRequired(component, {
         onRedirecting: () => <Loading />,
       })}
+      {...args}
     ></Route>
   );
 };

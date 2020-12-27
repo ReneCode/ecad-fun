@@ -18,7 +18,6 @@ import { actionCreateSymbol } from "./actionCreateSymbol";
 import { actionPlaceSymbol } from "./actionPlaceSymbol";
 import { actionExportDocument } from "./actionExportDocument";
 import { actionImportDocument } from "./actionImportDocument";
-import { actionNavigateHome } from "./actionNavigateHome";
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
 
@@ -87,8 +86,6 @@ export class ActionManager {
 
     this.register(actionExportDocument);
     this.register(actionImportDocument);
-
-    this.register(actionNavigateHome);
 
     // default action
     this.runningActionName = "select";

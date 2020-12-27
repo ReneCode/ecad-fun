@@ -11,10 +11,14 @@ const App = () => {
   return (
     <div className="home">
       <Header></Header>
-      <div className="home-content">
-        <p>ECAD.fun</p>
-        <a href="/p/abc">Project</a>
-      </div>
+      {!isLoading ? (
+        <div className="home-content">
+          <p>ECAD.fun</p>
+          <a href="/p/abc">Project</a>
+        </div>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 };
