@@ -4,8 +4,19 @@
 
 create an `.env` file containing environment variables for local useage:
 
-REACT_APP_SERVER=http://localhost:8080
-REACT_APP_WEBSOCKET_SERVER=ws://localhost:8080
+- REACT_APP_SERVER=http://localhost:8080
+- REACT_APP_WEBSOCKET_SERVER=ws://localhost:8080
+
+## auth
+
+add from auth0.com
+
+- REACT_APP_AUTH0_DOMAIN=
+- REACT_APP_AUTH0_CLIENT_ID=
+
+for API calls:
+
+- REACT_APP_AUTH0_AUDIENCE=
 
 # ideas
 
