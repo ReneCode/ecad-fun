@@ -11,6 +11,14 @@ create an `.env` file containing environment variables for local useage:
 
 https://auth0.com/blog/complete-guide-to-react-user-authentication/#Retrieving-User-Information
 
+https://www.youtube.com/watch?v=1rgeO_EbSGg
+
+https://www.youtube.com/watch?v=pSOXSUmcYvo&list=PLZ14qQz3cfJL6aoKZ_Ly7jiYrwi9ihviW&index=3
+
+multiple environments
+
+https://auth0.com/docs/dev-lifecycle/set-up-multiple-environments?_ga=2.133442438.928364951.1609088841-1632117338.1609088841
+
 add from auth0.com
 
 - REACT_APP_AUTH0_DOMAIN=

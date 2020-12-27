@@ -10,6 +10,7 @@ const Auth0ProviderWithHistory: React.FC<Props> = ({ children }) => {
   const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || "";
   const audience = process.env.REACT_APP_AUTH0_AUDIENCE || "";
 
+  console.log({ domain, clientId, audience });
   const onRedirectCallback = (appState: any) => {
     history.push(appState?.returnTo || window.location.pathname);
   };
@@ -18,7 +19,7 @@ const Auth0ProviderWithHistory: React.FC<Props> = ({ children }) => {
     <Auth0Provider
       domain={domain}
       clientId={clientId}
-      redirectUrl={window.location.origin}
+      redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
       audience={audience}
     >
