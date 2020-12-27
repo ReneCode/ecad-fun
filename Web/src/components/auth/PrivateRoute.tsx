@@ -5,7 +5,7 @@ import { withAuthenticationRequired } from "@auth0/auth0-react";
 import Loading from "../Loading";
 
 type Props = { component: React.ComponentType };
-const PrivateRoute = ({ component, ...args }) => {
+const PrivateRoute: React.FC<Props> = ({ component, ...args }) => {
   return (
     <Route
       component={withAuthenticationRequired(component, {
