@@ -1,0 +1,33 @@
+.home {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 50px auto;
+}
+
+.home-header {
+  background-color: #ddd;
+  border-bottom: 1px solid #444;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 4px;
+
+  .home-user-name {
+    font-size: 0.7rem;
+    width: 80px;
+  }
+  .home-user-image {
+    width: 35px;
+    border: 1px solid #444;
+    border-radius: 50%;
+  }
+
+  .home-gap {
+    width: 5px;
+  }
+}
+
+.home-content {
+  background-color: #ddd;
+}

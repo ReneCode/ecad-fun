@@ -9,6 +9,8 @@ create an `.env` file containing environment variables for local useage:
 
 ## auth
 
+https://auth0.com/blog/complete-guide-to-react-user-authentication/#Retrieving-User-Information
+
 add from auth0.com
 
 - REACT_APP_AUTH0_DOMAIN=
@@ -17,6 +19,10 @@ add from auth0.com
 for API calls:
 
 - REACT_APP_AUTH0_AUDIENCE=
+
+## userId
+
+take the user object from auth0 an there the unique property: `user.sub`
 
 # ideas
 
