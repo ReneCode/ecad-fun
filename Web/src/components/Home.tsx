@@ -3,13 +3,16 @@ import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./Home.scss";
 
+import ProjectList from "./ProjectList";
+import { useUserId } from "./useUserId";
+
 import Header from "./Header";
-import Loading from "./Loading";
 
 const App = () => {
-  const { isLoading } = useAuth0();
+  const { isLoading, user } = useAuth0();
+  const userHash = useUserId();
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
       <div className="home">
         <Header></Header>
@@ -22,6 +25,8 @@ const App = () => {
       <Header></Header>
       <div>
         <p>ECAD.fun</p>
+        <pre>{userHash}</pre>
+        <ProjectList />
         <nav>
           <ul>
             <li>

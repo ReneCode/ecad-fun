@@ -2,6 +2,7 @@ require("dotenv").config();
 import express from "express";
 const morgan = require("morgan");
 import http from "http";
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
@@ -16,15 +17,29 @@ const serverDebug = debug("server");
 
 const app = express();
 
+const appOrigin = process.env.APP_ORIGIN;
+const authAudience = process.env.AUTH0_AUDIENCE;
+const authIssuer = process.env.AUTH0_ISSUER;
+
+if (!appOrigin || !authAudience || !authIssuer) {
+  throw new Error("make sure that .env is filled");
+}
+
+console.log({
+  appOrigin,
+  authAudience,
+  authIssuer,
+});
+
 var jwtCheck = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: process.env.AUTH0_JWKS_URI,
+    jwksUri: `${authIssuer}.well-known/jwks.json`,
   }),
-  audience: process.env.AUTH0_AUDIENCE,
-  issuer: process.env.AUTH0_ISSUER,
+  audience: authAudience,
+  issuer: authIssuer,
   algorithms: ["RS256"],
 });
 
@@ -36,7 +51,7 @@ app.use(bodyParser.json());
 
 app.use(morgan("common"));
 
-app.use(routing);
+app.use(cors({ origin: appOrigin, optionsSuccessStatus: 200 }));
 
 app.get("/", (req, res) => {
   res.send("cad.fun server");
@@ -46,7 +61,10 @@ app.get("/api/public", (req, res) => {
   res.send("cad.fun public api");
 });
 
+// =========== auth API ================
 app.use(jwtCheck);
+
+app.use(routing);
 
 app.get("/api/private", (req, res) => {
   res.send("cad.fun private api");
