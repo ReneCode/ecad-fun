@@ -17,7 +17,11 @@ const serverDebug = debug("server");
 
 const app = express();
 
-const appOrigin = process.env.APP_ORIGIN;
+let appOrigin = process.env.APP_ORIGIN;
+if (process.env.NODE_ENV === "production") {
+  appOrigin = "https://ecad-fun.vercel.app";
+}
+
 const authAudience = process.env.AUTH0_AUDIENCE;
 const authIssuer = process.env.AUTH0_ISSUER;
 
@@ -51,6 +55,18 @@ app.use(bodyParser.json());
 
 app.use(morgan("common"));
 
+// const corsOptions = {
+//   origin: function (origin: any, callback: any) {
+//     // console.log(origin, appOrigin, origin === appOrigin);
+//     if (origin === appOrigin || origin === "https://ecad-fun.vercel.app") {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+// };
+
+// app.use(cors(corsOptions));
 app.use(cors({ origin: appOrigin, optionsSuccessStatus: 200 }));
 
 app.get("/", (req, res) => {
