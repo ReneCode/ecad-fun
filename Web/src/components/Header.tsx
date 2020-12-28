@@ -6,7 +6,6 @@ import "./Header.scss";
 
 export const Header = () => {
   const { isAuthenticated, logout, loginWithRedirect, user } = useAuth0();
-  console.log(user);
   return (
     <header className="home-header">
       <div className="home-user-name">{user?.name}</div>
