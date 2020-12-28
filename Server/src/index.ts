@@ -18,9 +18,9 @@ const serverDebug = debug("server");
 const app = express();
 
 let appOrigin = process.env.APP_ORIGIN;
-if (process.env.NODE_ENV === "production") {
-  appOrigin = "https://ecad-fun.vercel.app";
-}
+// if (process.env.NODE_ENV === "production") {
+//   appOrigin = "https://ecad-fun.vercel.app";
+// }
 
 const authAudience = process.env.AUTH0_AUDIENCE;
 const authIssuer = process.env.AUTH0_ISSUER;
