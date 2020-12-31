@@ -8,6 +8,15 @@ discard incomming changes from the server that conflict with unacknowledged prop
 
 - id : client-Id + Counter
 
+# inspiration
+
+Bret Victor - inventing on principle
+https://www.youtube.com/watch?v=PUv66718DII
+
+give room to ideas
+imediate connection (reaction)
+no delay in feedback loop
+
 # Authentication
 
 https://www.youtube.com/watch?v=NuCZgR09csE&list=PLZ14qQz3cfJL6aoKZ_Ly7jiYrwi9ihviW&index=2
@@ -15,6 +24,9 @@ https://www.youtube.com/watch?v=NuCZgR09csE&list=PLZ14qQz3cfJL6aoKZ_Ly7jiYrwi9ih
 https://auth0.com/docs/quickstart/spa/react/02-calling-an-api
 
 https://github.com/auth0-blog/auth0-react-sdk-video/blob/starter/src/server/api-server.js
+
+Error handling on server auth
+https://github.com/auth0/express-jwt
 
 # Client-Server Communication
 
