@@ -5,7 +5,7 @@ import http from "http";
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const jwt = require("express-jwt");
-const jwks = require("jwks-rsa");
+const jwksRsa = require("jwks-rsa");
 
 import debug from "debug";
 import routing from "./routing/index";
@@ -36,7 +36,7 @@ console.log({
 });
 
 var jwtCheck = jwt({
-  secret: jwks.expressJwtSecret({
+  secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
@@ -73,16 +73,22 @@ app.get("/", (req, res) => {
   res.send("cad.fun server");
 });
 
+// =========== authorization for /api routes ================
+app.use("/api", jwtCheck, (err: any, req: any, res: any, next: any) => {
+  console.log(" app use /api ==================");
+  if (err) {
+    // if (err.name === "UnauthorizedError") {
+    return res.status(401).send();
+  }
+});
+
 app.get("/api/public", (req, res) => {
   res.send("cad.fun public api");
 });
 
-// =========== auth API ================
-// app.use(jwtCheck);
-
 app.use(routing);
 
-app.get("/api/private", (req, res) => {
+app.get("/api/private", (req: any, res: any) => {
   res.send("cad.fun private api");
 });
 
