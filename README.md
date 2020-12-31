@@ -12,6 +12,8 @@ discard incomming changes from the server that conflict with unacknowledged prop
 
 https://www.youtube.com/watch?v=NuCZgR09csE&list=PLZ14qQz3cfJL6aoKZ_Ly7jiYrwi9ihviW&index=2
 
+https://auth0.com/docs/quickstart/spa/react/02-calling-an-api
+
 https://github.com/auth0-blog/auth0-react-sdk-video/blob/starter/src/server/api-server.js
 
 # Client-Server Communication

@@ -78,7 +78,7 @@ app.get("/api/public", (req, res) => {
 });
 
 // =========== auth API ================
-app.use(jwtCheck);
+// app.use(jwtCheck);
 
 app.use(routing);
 
