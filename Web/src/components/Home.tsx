@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./Home.scss";
@@ -9,8 +9,22 @@ import { useUserId } from "./useUserId";
 import Header from "./Header";
 
 const App = () => {
-  const { isLoading, user } = useAuth0();
+  const { isLoading, user, getAccessTokenSilently } = useAuth0();
   const userHash = useUserId();
+
+  useEffect(() => {
+    // try re-login after refreshing the page
+    const callAPI = async () => {
+      try {
+        const _token = await getAccessTokenSilently();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (!isLoading) {
+      callAPI();
+    }
+  }, [isLoading, getAccessTokenSilently]);
 
   if (isLoading || !user) {
     return (

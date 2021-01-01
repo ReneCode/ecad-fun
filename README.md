@@ -14,8 +14,10 @@ Bret Victor - inventing on principle
 https://www.youtube.com/watch?v=PUv66718DII
 
 give room to ideas
-imediate connection (reaction)
+**imediate connection** (reaction)
+
 no delay in feedback loop
+show data, show comparison
 
 # Authentication
 
