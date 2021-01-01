@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./Home.scss";
 
-import ProjectList from "./ProjectList";
 import { useUserId } from "./useUserId";
 
 import Header from "./Header";
@@ -40,9 +39,11 @@ const App = () => {
       <div>
         <p>ECAD.fun</p>
         <pre>{userHash}</pre>
-        <ProjectList />
         <nav>
           <ul>
+            <li>
+              <Link to="/projects">Projects</Link>
+            </li>
             <li>
               <Link to="/profile">Profile</Link>
             </li>

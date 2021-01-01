@@ -55,18 +55,6 @@ app.use(bodyParser.json());
 
 app.use(morgan("common"));
 
-// const corsOptions = {
-//   origin: function (origin: any, callback: any) {
-//     // console.log(origin, appOrigin, origin === appOrigin);
-//     if (origin === appOrigin || origin === "https://ecad-fun.vercel.app") {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-// };
-
-// app.use(cors(corsOptions));
 app.use(cors({ origin: appOrigin, optionsSuccessStatus: 200 }));
 
 app.get("/", (req, res) => {
@@ -82,15 +70,7 @@ app.use("/api", jwtCheck, (err: any, req: any, res: any, next: any) => {
   }
 });
 
-app.get("/api/public", (req, res) => {
-  res.send("cad.fun public api");
-});
-
-app.use(routing);
-
-app.get("/api/private", (req: any, res: any) => {
-  res.send("cad.fun private api");
-});
+app.use("/api", routing);
 
 // not found handler
 app.use((req, res) => {
