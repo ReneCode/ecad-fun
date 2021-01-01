@@ -46,10 +46,12 @@ export const replaceElements = (
   });
 };
 
+export type HitTestElementOption = { gripSize: number };
+
 export const hitTestElement = (
   element: ECadBaseElement,
   pt: Point,
-  { gripSize }: { gripSize: number }
+  { gripSize }: HitTestElementOption
 ): HitTestResult | undefined => {
   const epsilon = gripSize / 2;
 

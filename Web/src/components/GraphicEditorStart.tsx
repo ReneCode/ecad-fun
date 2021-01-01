@@ -6,7 +6,7 @@ import { saveDebounced } from "../state";
 import { Project } from "../share";
 
 const ProjectStart = () => {
-  const { id: projectId } = useParams();
+  const { id: projectId } = useParams<{ id: string }>();
 
   const [size, setSize] = useState({
     width: window.innerWidth,
