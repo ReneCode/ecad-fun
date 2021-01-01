@@ -15,9 +15,13 @@ const App = () => {
     // try re-login after refreshing the page
     const callAPI = async () => {
       try {
+        console.log("refresh page - before getAccessTokenSilently");
         const _token = await getAccessTokenSilently();
       } catch (error) {
-        console.log(error);
+        console.log(
+          "refresh page - exception in getAccessTokenSilently",
+          error
+        );
       }
     };
     if (!isLoading) {

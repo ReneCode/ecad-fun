@@ -24,6 +24,12 @@ class ProjectService {
     return projects;
   }
 
+  public async create({ name }: { name: string }): Promise<string> {
+    await wait();
+
+    return "";
+  }
+
   public async open(projectId: string) {
     await wait();
     const data = this.projects.get(projectId);
