@@ -3,6 +3,7 @@ import path from "path";
 import { Project } from "./share";
 import { wait } from "./utils";
 import { Scheduler } from "./Scheduler";
+import { loadJson, saveJson } from "./utils/json";
 
 const projectPath: string = path.join(
   __dirname,
@@ -66,31 +67,17 @@ class ProjectService {
   }
 
   private load(project: Project) {
-    try {
-      const p = path.join(projectPath, `${project.id}.json`);
-      if (!fs.existsSync(p)) {
-        console.error(`project path does not exists: ${p}`);
-      }
-      const content = fs.readFileSync(p, "utf8");
-      if (content) {
-        const json = JSON.parse(content);
-        project.load(json);
-      }
+    const json = loadJson(`${project.id}.json`);
+    if (json) {
+      project.load(json);
       return true;
-    } catch (err) {
-      console.error(err);
-      return false;
     }
+    return false;
   }
 
   private save(project: Project) {
     const content = project.save();
-    if (!fs.existsSync(projectPath)) {
-      fs.mkdirSync(projectPath);
-    }
-    const p = path.join(projectPath, `${project.id}.json`);
-    console.log(`save project: ${p}`);
-    fs.writeFileSync(p, JSON.stringify(content, null, 1));
+    saveJson(`${project.id}.json`, content);
   }
 }
 
