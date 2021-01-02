@@ -1,5 +1,18 @@
 .project-list {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.projects-header {
+  margin: 5px;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+}
+
+.project-card {
+  padding: 10px;
+  cursor: default;
 }
