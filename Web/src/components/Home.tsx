@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./Home.scss";
 
@@ -37,28 +37,30 @@ const App = () => {
     );
   }
 
-  return (
-    <div className="home">
-      <Header></Header>
-      <div>
-        <p>ECAD.fun</p>
-        <pre>{userHash}</pre>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/projects">Projects</Link>
-            </li>
-            <li>
-              <Link to="/profile">Profile</Link>
-            </li>
-            <li>
-              <Link to="/p/abc">Project abc</Link>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-  );
+  return <Redirect to="/projects"></Redirect>;
+
+  // return (
+  //   <div className="home">
+  //     <Header></Header>
+  //     <div>
+  //       <p>ECAD.fun</p>
+  //       <pre>{userHash}</pre>
+  //       <nav>
+  //         <ul>
+  //           <li>
+  //             <Link to="/projects">Projects</Link>
+  //           </li>
+  //           <li>
+  //             <Link to="/profile">Profile</Link>
+  //           </li>
+  //           <li>
+  //             <Link to="/p/abc">Project abc</Link>
+  //           </li>
+  //         </ul>
+  //       </nav>
+  //     </div>
+  //   </div>
+  // );
 };
 
 export default App;
