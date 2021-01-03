@@ -31,6 +31,26 @@ export const dbAddProject = async (userId: string, projectName: string) => {
   return dbProject;
 };
 
+export const dbUpdateProject = async (
+  userId: string,
+  projectId: string,
+  { name }: { name: string }
+) => {
+  await wait(50);
+  const projects = loadProjects();
+  let updateProject: DbProject | undefined;
+  const newProjects = projects.map((p) => {
+    if (p.userId === userId && p.id === projectId) {
+      updateProject = { ...p, name: name };
+      return updateProject;
+    } else {
+      return p;
+    }
+  });
+  saveProjects(newProjects);
+  return updateProject;
+};
+
 export const dbGetProjectById = async (userId: string, projectId: string) => {
   await wait(50);
   const projects = loadProjects();

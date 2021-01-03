@@ -38,29 +38,6 @@ const App = () => {
   }
 
   return <Redirect to="/projects"></Redirect>;
-
-  // return (
-  //   <div className="home">
-  //     <Header></Header>
-  //     <div>
-  //       <p>ECAD.fun</p>
-  //       <pre>{userHash}</pre>
-  //       <nav>
-  //         <ul>
-  //           <li>
-  //             <Link to="/projects">Projects</Link>
-  //           </li>
-  //           <li>
-  //             <Link to="/profile">Profile</Link>
-  //           </li>
-  //           <li>
-  //             <Link to="/p/abc">Project abc</Link>
-  //           </li>
-  //         </ul>
-  //       </nav>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default App;

@@ -1,15 +1,8 @@
-import fs from "fs";
 import path from "path";
 import { Project } from "./share";
 import { wait } from "./utils";
 import { Scheduler } from "./Scheduler";
 import { loadJson, saveJson } from "./utils/json";
-
-const projectPath: string = path.join(
-  __dirname,
-  "..",
-  process.env.PROJECT_PATH || "./"
-);
 
 class ProjectService {
   projects: Map<

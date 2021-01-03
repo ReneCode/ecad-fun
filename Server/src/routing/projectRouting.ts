@@ -5,7 +5,12 @@ import { Request, Response } from "express";
 const jwt = require("jsonwebtoken");
 
 import HttpStatus = require("http-status-codes");
-import { dbAddProject, dbGetProjectById, dbGetProjects } from "../Database";
+import {
+  dbAddProject,
+  dbGetProjectById,
+  dbGetProjects,
+  dbUpdateProject,
+} from "../Database";
 import { projectService } from "../ProjectService";
 import { getUserIdFromRequest } from "../utils";
 
@@ -25,23 +30,31 @@ router.get("/:id", async (req: Request, res: Response) => {
   if (project) {
     res.json(project);
   } else {
-    res.status(HttpStatus.NOT_FOUND);
+    res.status(HttpStatus.NOT_FOUND).send();
   }
 });
 
 router.post("/", async (req: Request, res: Response) => {
   const userId = getUserIdFromRequest(req);
-  const name = req.body?.name;
+  const name: string = req.body?.name;
   if (name) {
     const project = await dbAddProject(userId, name);
     res.json(project);
   } else {
-    res.status(HttpStatus.BAD_REQUEST);
+    res.status(HttpStatus.BAD_REQUEST).send();
   }
 });
 
-router.put("/:id", (req: Request, res: Response) => {
-  res.send("update ok");
+router.put("/:id", async (req: Request, res: Response) => {
+  const userId = getUserIdFromRequest(req);
+  const projectId = req.params.id;
+  const name: string = req.body?.name;
+  if (name) {
+    const project = await dbUpdateProject(userId, projectId, { name });
+    res.json(project);
+  } else {
+    res.status(HttpStatus.BAD_REQUEST).send();
+  }
 });
 
 router.delete("/:id", (req: Request, res: Response) => {

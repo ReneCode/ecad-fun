@@ -1,32 +1,36 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import React, { useEffect, useState } from "react";
-
-import Card from "./Card";
-import { useUserId } from "../useUserId";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useHistory } from "react-router";
 
 import "./Projects.scss";
+import Card from "./Card";
 import Header from "../Header";
 import Button from "../Button";
-import { useHistory } from "react-router";
+import { useUserId } from "../useUserId";
+
+import {
+  apiCreateProject,
+  apiGetAllProjects,
+  apiUpdateProject,
+} from "./ApiProject";
+
+type DbProject = {
+  id: string;
+  name: string;
+  editable: boolean;
+};
 
 const Projects = () => {
   const userId = useUserId();
   const { getAccessTokenSilently } = useAuth0();
-  const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
+  const [projects, setProjects] = useState<DbProject[]>([]);
   const history = useHistory();
 
   useEffect(() => {
     const getData = async () => {
       const token = await getAccessTokenSilently({});
-
-      const url = `${process.env.REACT_APP_SERVER}/api/projects`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const projects = await response.json();
+      const projects = await apiGetAllProjects(token);
+      if (projects) {
         setProjects(projects);
       }
     };
@@ -36,24 +40,49 @@ const Projects = () => {
 
   const addProject = async () => {
     const token = await getAccessTokenSilently();
-    const url = `${process.env.REACT_APP_SERVER}/api/projects`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: "Untitled" }),
-    });
-    if (response.ok) {
-      const project = await response.json();
-      setProjects([project].concat(projects));
+    const project = await apiCreateProject(token, "Untitled");
+    if (project) {
+      setProjects(projects.concat(project));
     }
   };
 
   const openProject = async (projectId: string) => {
-    console.log("open project", projectId);
     history.push(`/p/${projectId}`);
+  };
+
+  const editProjectName = (ev: React.MouseEvent, projectId: string) => {
+    ev.stopPropagation();
+    setProjects(
+      projects.map((p) => {
+        if (p.id === projectId) {
+          return { ...p, editable: true };
+        }
+        return p;
+      })
+    );
+  };
+
+  const finishEditProjectName = async (
+    ev: React.FocusEvent,
+    projectId: string
+  ) => {
+    ev.stopPropagation();
+    const newName = ev.target.innerHTML;
+    const project = await apiUpdateProject(
+      await getAccessTokenSilently(),
+      projectId,
+      newName
+    );
+    if (project) {
+      setProjects(
+        projects.map((p) => {
+          if (p.id === projectId) {
+            return { ...p, editable: false, name: project.name };
+          }
+          return p;
+        })
+      );
+    }
   };
 
   return (
@@ -67,7 +96,15 @@ const Projects = () => {
         {projects.map((project) => {
           return (
             <Card key={project.id} onClick={() => openProject(project.id)}>
-              <div className="project-card">{project.name}</div>
+              <div
+                className="project-card"
+                contentEditable={project.editable}
+                suppressContentEditableWarning={true}
+                onClick={(ev) => editProjectName(ev, project.id)}
+                onBlur={(ev) => finishEditProjectName(ev, project.id)}
+              >
+                {project.name}
+              </div>
             </Card>
           );
         })}
