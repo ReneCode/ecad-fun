@@ -9,6 +9,7 @@ import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { getElements } from "../elements";
+import GitHubLink from "./GitHubLink";
 
 type Props = {
   width: number;

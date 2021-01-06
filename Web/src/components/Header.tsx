@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import Button from "./Button";
+import GitHubLink from "./GitHubLink";
 
 import "./Header.scss";
 
@@ -24,6 +25,7 @@ export const Header = () => {
           <Button onClick={() => loginWithRedirect()}>Log In </Button>
         )}
       </div>
+      <GitHubLink />
     </header>
   );
 };
