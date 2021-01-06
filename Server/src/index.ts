@@ -18,6 +18,8 @@ const serverDebug = debug("server");
 const app = express();
 
 let appOrigin = process.env.APP_ORIGIN;
+const allowedOrigins = [appOrigin];
+
 // if (process.env.NODE_ENV === "production") {
 //   appOrigin = "https://ecad-fun.vercel.app";
 // }
@@ -56,6 +58,23 @@ app.use(bodyParser.json());
 app.use(morgan("common"));
 
 app.use(cors({ origin: appOrigin, optionsSuccessStatus: 200 }));
+app.use(
+  cors({
+    origin: function (
+      origin: string,
+      callback: (data: any, ok: boolean) => void
+    ) {
+      if (!origin) {
+        return callback(null, true);
+      }
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `The CORS policy for this site doese not allow access from ${origin}`;
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("cad.fun server");

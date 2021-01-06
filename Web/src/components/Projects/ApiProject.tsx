@@ -4,6 +4,7 @@ export const apiGetAllProjects = async (token: string) => {
   }
   const url = `${process.env.REACT_APP_SERVER}/api/projects`;
   const response = await fetch(url, {
+    method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
     },

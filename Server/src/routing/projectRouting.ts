@@ -1,8 +1,5 @@
 import express from "express";
-
 import { Request, Response } from "express";
-
-const jwt = require("jsonwebtoken");
 
 import HttpStatus = require("http-status-codes");
 import {
@@ -11,7 +8,6 @@ import {
   dbGetProjects,
   dbUpdateProject,
 } from "../Database";
-import { projectService } from "../ProjectService";
 import { getUserIdFromRequest } from "../utils";
 
 const router = express.Router();
