@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 
@@ -16,17 +16,6 @@ const Auth0ProviderWithHistory: React.FC<Props> = ({ children }) => {
     history.push(appState?.returnTo || window.location.pathname);
   };
 
-  // useEffect(() => {
-  //   const doit = async () => {
-  //     const auth0 = await createAuth0Client({
-  //       domain: { domain },
-  //       client_id: { clientId },
-  //       cacheLocation = "localstorage",
-  //     });
-  //   };
-  //   doit();
-  // }, []);
-
   return (
     <Auth0Provider
       domain={domain}
@@ -34,6 +23,7 @@ const Auth0ProviderWithHistory: React.FC<Props> = ({ children }) => {
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
       audience={audience}
+      cacheLocation="localstorage"
     >
       {children}
     </Auth0Provider>
