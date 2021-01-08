@@ -11,6 +11,13 @@ import {
 const DEFAULT_CLIENTID = "0";
 const ROOT_ID = "0:0";
 
+type QueryParams = {
+  depth?: number;
+  rootId?: string;
+  rootObj?: ObjectType;
+  q: { prop: string; value: any }[];
+};
+
 export class Project {
   public readonly id: string;
 
@@ -54,23 +61,62 @@ export class Project {
     }
   }
 
-  public query(q: { prop: string; value: any }[]) {
-    return Object.values(this.objects)
-      .filter((o: ObjectType) => {
-        let ok = true;
-        for (let qe of q) {
-          if (o[qe.prop] !== qe.value) {
-            ok = false;
-            break;
-          }
-        }
-        return ok;
-      })
-      .map((o: ObjectType) => {
-        const cp = { ...o };
-        delete cp._children;
-        return cp;
-      });
+  public query(params: QueryParams) {
+    let qObj = params.rootObj;
+    if (!qObj) {
+      const rootId = params.rootId ? params.rootId : ROOT_ID;
+      qObj = this.getObject(rootId);
+    }
+
+    if (!qObj) {
+      return [];
+    }
+
+    let valid = true;
+    for (let qe of params.q) {
+      if (qObj[qe.prop] !== qe.value) {
+        valid = false;
+        break;
+      }
+    }
+
+    let result: ObjectType[] = [];
+    if (valid) {
+      result.push(qObj);
+    }
+
+    const depth = params.depth !== undefined ? params.depth : 1;
+    if (depth > 0) {
+      if (qObj._children) {
+        result = qObj._children.reduce((acc, childObj) => {
+          const childQueryResult = this.query({
+            rootObj: childObj,
+            q: params.q,
+            depth: depth - 1,
+          });
+          return acc.concat(childQueryResult);
+        }, result);
+      }
+    }
+
+    return result;
+
+    // return Object.values(this.objects)
+    //   .filter((o: ObjectType) => {
+    //     let ok = true;
+    //     for (let qe of q) {
+    //       if (o[qe.prop] !== qe.value) {
+    //         ok = false;
+    //         break;
+    //       }
+    //     }
+    //     return ok;
+    //   })
+    //   .map((o: ObjectType) => {
+    //     const cp = { ...o };
+    //     delete cp._children;
+    //     return cp;
+    //   });
   }
 
   public getRoot() {
@@ -206,7 +252,7 @@ export class Project {
 
   // -----------------------------------------------------
 
-  validateCreateObjectId(id: string) {
+  private validateCreateObjectId(id: string) {
     const [clientId, index] = id.split(":");
     if (this.clientId !== DEFAULT_CLIENTID && this.clientId !== clientId) {
       return false;

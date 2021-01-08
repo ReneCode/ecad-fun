@@ -536,34 +536,79 @@ describe("Project", () => {
   });
 
   describe("query", () => {
-    it("get without children", () => {
+    it("get one obj", () => {
       const project = new Project("A");
 
       project.createObjects([
-        { id: "1:0", name: "p1" },
-        { id: "1:1", name: "p2" },
-        { id: "2:0", name: "e1", _parent: "1:0-5" },
+        { id: "1:0", name: "p1", _parent: "0:0" },
+        { id: "1:1", name: "p2", _parent: "0:0" },
       ]);
 
-      const [result] = project.query([{ prop: "id", value: "1:0" }]);
-      expect(result.id).toBe("1:0");
-      expect(result.name).toBe("p1");
-      expect(result._children).toBeUndefined();
+      const [result] = project.query({ q: [{ prop: "name", value: "p2" }] });
+      expect(result.id).toBe("1:1");
+      expect(result.name).toBe("p2");
     });
 
-    it("get by type", () => {
+    it("get multiple objects by type", () => {
       const project = new Project("A");
 
       project.createObjects([
-        { id: "1:0", type: "page", name: "p1" },
-        { id: "1:1", type: "page", name: "p2" },
-        { id: "2:0", name: "e1", _parent: "1:0-5" },
+        { id: "1:0", type: "page", name: "p1", _parent: "0:0" },
+        { id: "1:1", type: "page", name: "p2", _parent: "0:0" },
+        { id: "1:2", type: "layer", name: "l1", _parent: "0:0" },
       ]);
 
-      const result = project.query([{ prop: "type", value: "page" }]);
+      const result = project.query({ q: [{ prop: "type", value: "page" }] });
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe("1:0");
       expect(result[1].id).toBe("1:1");
+    });
+
+    it("get none in the 2.level without depth parameter", () => {
+      const project = new Project("A");
+
+      project.createObjects([
+        { id: "1:0", type: "page", name: "p1", _parent: "0:0" },
+        { id: "1:1", type: "page", name: "p2", _parent: "0:0" },
+        { id: "2:0", name: "e1", _parent: "1:0-5" },
+      ]);
+
+      const result = project.query({ q: [{ prop: "name", value: "e1" }] });
+      expect(result).toHaveLength(0);
+    });
+
+    it("get one in the 2.level, because depth=2", () => {
+      const project = new Project("A");
+
+      project.createObjects([
+        { id: "1:0", type: "page", name: "p1", _parent: "0:0" },
+        { id: "1:1", type: "page", name: "p2", _parent: "0:0" },
+        { id: "2:0", name: "e1", _parent: "1:0-5" },
+      ]);
+
+      const result = project.query({
+        depth: 2,
+        q: [{ prop: "name", value: "e1" }],
+      });
+      expect(result).toHaveLength(1);
+    });
+
+    it("get one to a given root", () => {
+      const project = new Project("A");
+
+      project.createObjects([
+        { id: "1:0", type: "page", name: "p1", _parent: "0:0" },
+        { id: "1:1", type: "page", name: "p2", _parent: "0:0" },
+        { id: "2:0", name: "e1", _parent: "1:1" },
+        { id: "2:1", name: "e2", _parent: "1:1" },
+      ]);
+
+      const result = project.query({
+        rootId: "1:1",
+        q: [{ prop: "name", value: "e2" }],
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe("2:1");
     });
   });
 });
