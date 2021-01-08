@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useHistory } from "react-router";
 
+import ContextMenu from "../ContextMenu"
+
 import "./Projects.scss";
 import Card from "./Card";
 import Header from "../Header";
@@ -85,6 +87,24 @@ const Projects = () => {
     }
   };
 
+  const handleDelete = () => {
+    console.log("delete")
+  }
+
+  const showContextMenu = (ev: React.MouseEvent) => {
+    ev.stopPropagation();
+
+    ContextMenu.push({
+      options:[
+        {label: "Delete",
+        action: handleDelete
+      }
+      ],
+      left: ev.clientX,
+      top: ev.clientY
+    })
+  }
+
   return (
     <div>
       <Header></Header>
@@ -96,14 +116,18 @@ const Projects = () => {
         {projects.map((project) => {
           return (
             <Card key={project.id} onClick={() => openProject(project.id)}>
+              <div className="project-info">
+
               <div
                 className="project-card"
                 contentEditable={project.editable}
                 suppressContentEditableWarning={true}
                 onClick={(ev) => editProjectName(ev, project.id)}
                 onBlur={(ev) => finishEditProjectName(ev, project.id)}
-              >
+                >
                 {project.name}
+              </div>
+              <Button type="dot" onClick={(ev) => showContextMenu(ev)}>...</Button>
               </div>
             </Card>
           );
