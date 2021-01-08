@@ -7,6 +7,7 @@ import {
   dbGetProjectById,
   dbGetProjects,
   dbUpdateProject,
+  dbDeleteProject,
 } from "../Database";
 import { getUserIdFromRequest } from "../utils";
 
@@ -53,8 +54,11 @@ router.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.delete("/:id", (req: Request, res: Response) => {
-  res.send("delete ok");
+router.delete("/:id", async (req: Request, res: Response) => {
+  const userId = getUserIdFromRequest(req);
+  const projectId = req.params.id;
+  await dbDeleteProject(userId, projectId);
+  res.status(HttpStatus.NO_CONTENT).send();
 });
 
 export default router;

@@ -59,3 +59,21 @@ export const apiUpdateProject = async (
   }
   return null;
 };
+
+export const apiDeleteProject = async (token: string, projectId: string) => {
+  if (!token || !projectId) {
+    return null;
+  }
+  const url = `${process.env.REACT_APP_SERVER}/api/projects/${projectId}`;
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (response.ok) {
+    return true;
+  }
+  return false;
+};

@@ -35,6 +35,10 @@ for API calls:
 
 take the user object from auth0 an there the unique property: `user.sub`
 
+# icons
+
+from: https://www.flaticon.com/
+
 # ideas
 
 easy is realative. (easy for whom)

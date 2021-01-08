@@ -16,3 +16,9 @@
   padding: 10px;
   cursor: default;
 }
+
+.project-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
