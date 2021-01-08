@@ -51,6 +51,15 @@ export const dbUpdateProject = async (
   return updateProject;
 };
 
+export const dbDeleteProject = async (userId: string, projectId: string) => {
+  await wait(50);
+  const projects = loadProjects();
+  const newProjects = projects.filter(
+    (p) => p.userId !== userId || p.id !== projectId
+  );
+  saveProjects(newProjects);
+};
+
 export const dbGetProjectById = async (userId: string, projectId: string) => {
   await wait(50);
   const projects = loadProjects();

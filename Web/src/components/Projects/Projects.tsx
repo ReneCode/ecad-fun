@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useHistory } from "react-router";
 
-import ContextMenu from "../ContextMenu"
+import ContextMenu from "../ContextMenu";
+import IconButon from "../common/IconButton";
 
 import "./Projects.scss";
 import Card from "./Card";
@@ -12,6 +13,7 @@ import { useUserId } from "../useUserId";
 
 import {
   apiCreateProject,
+  apiDeleteProject,
   apiGetAllProjects,
   apiUpdateProject,
 } from "./ApiProject";
@@ -87,23 +89,24 @@ const Projects = () => {
     }
   };
 
-  const handleDelete = () => {
-    console.log("delete")
-  }
+  // const handleDelete = () => {
+  //   console.log("delete");
+  // };
 
-  const showContextMenu = (ev: React.MouseEvent) => {
-    ev.stopPropagation();
+  // const showContextMenu = (ev: React.MouseEvent) => {
+  //   ev.stopPropagation();
 
-    ContextMenu.push({
-      options:[
-        {label: "Delete",
-        action: handleDelete
-      }
-      ],
-      left: ev.clientX,
-      top: ev.clientY
-    })
-  }
+  //   ContextMenu.push({
+  //     options: [{ label: "Delete", action: handleDelete }],
+  //     left: ev.clientX,
+  //     top: ev.clientY,
+  //   });
+  // };
+
+  const onDeleteProject = async (projectId: string) => {
+    await apiDeleteProject(await getAccessTokenSilently(), projectId);
+    setProjects(projects.filter((p) => p.id !== projectId));
+  };
 
   return (
     <div>
@@ -117,17 +120,24 @@ const Projects = () => {
           return (
             <Card key={project.id} onClick={() => openProject(project.id)}>
               <div className="project-info">
-
-              <div
-                className="project-card"
-                contentEditable={project.editable}
-                suppressContentEditableWarning={true}
-                onClick={(ev) => editProjectName(ev, project.id)}
-                onBlur={(ev) => finishEditProjectName(ev, project.id)}
+                <div
+                  className="project-card"
+                  contentEditable={project.editable}
+                  suppressContentEditableWarning={true}
+                  onClick={(ev) => editProjectName(ev, project.id)}
+                  onBlur={(ev) => finishEditProjectName(ev, project.id)}
                 >
-                {project.name}
-              </div>
-              <Button type="dot" onClick={(ev) => showContextMenu(ev)}>...</Button>
+                  {project.name}
+                </div>
+                <IconButon
+                  icon="trash2"
+                  onClick={() => {
+                    onDeleteProject(project.id);
+                  }}
+                ></IconButon>
+                {/* <Button type="dot" onClick={(ev) => showContextMenu(ev)}>
+                  ...
+                </Button> */}
               </div>
             </Card>
           );
