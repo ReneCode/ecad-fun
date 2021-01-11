@@ -1,5 +1,5 @@
 import path from "path";
-import { Project } from "./share";
+import { ObjectType, Project } from "./share";
 import { wait } from "./utils";
 import { Scheduler } from "./Scheduler";
 import { loadJson, saveJson } from "./utils/json";
@@ -16,12 +16,6 @@ class ProjectService {
       projects.push(key);
     });
     return projects;
-  }
-
-  public async create({ name }: { name: string }): Promise<string> {
-    await wait();
-
-    return "";
   }
 
   public async open(projectId: string) {

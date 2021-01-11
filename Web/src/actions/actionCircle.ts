@@ -9,13 +9,12 @@ export const actionCircle: Action = {
     const y = state.pointerY;
     const element: ECadCircleElement = {
       id: project.createNewId(),
-      _parent: project.getRoot().id,
+      _parent: state.currentPageId,
       type: "circle",
       x,
       y,
       radius: 0,
-      lineWidth: 1,
-      color: "#33ee4488",
+      color: "#ee5228",
     };
     return {
       state: {

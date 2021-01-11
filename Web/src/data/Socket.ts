@@ -6,7 +6,11 @@ const WS_SERVER = process.env.REACT_APP_WEBSOCKET_SERVER as string;
 export class Socket {
   private socket: SocketIOClient.Socket | undefined;
 
-  init(project: Project, callbackRedraw: () => void) {
+  init(
+    project: Project,
+    callbackProjectOpen: (project: Project) => void,
+    callbackProjectChange: (project: Project) => void
+  ) {
     console.log("socket init:", WS_SERVER);
     this.socket = io(WS_SERVER);
 
@@ -14,12 +18,13 @@ export class Socket {
     this.socket.on("open-project", (data: any) => {
       // console.log("got open-project:", data);
       project.load(data);
-      callbackRedraw();
+      callbackProjectOpen(project);
     });
 
     this.socket.on("send-clientid", (clientId: string) => {
       console.debug("set clientId", clientId);
       project.setClientId(parseInt(clientId));
+      // callbackInit(project);
     });
 
     this.socket.on("create-object", (response: string, data: ObjectType[]) => {
@@ -30,7 +35,7 @@ export class Socket {
         // it's the answer of some other client creating
         // so I have to follow that creating
         project.createObjects(data);
-        callbackRedraw();
+        callbackProjectChange(project);
       }
     });
 
@@ -39,7 +44,7 @@ export class Socket {
         // done
       } else {
         project.updateObjects(data);
-        callbackRedraw();
+        callbackProjectChange(project);
       }
     });
 
@@ -48,7 +53,7 @@ export class Socket {
         // done
       } else {
         project.deleteObjects(data);
-        callbackRedraw();
+        callbackProjectChange(project);
       }
     });
 

@@ -8,7 +8,7 @@ export const actionLine: Action = {
     const y = state.pointerY;
     const element: ECadLineElement = {
       id: project.createNewId(),
-      _parent: project.getRoot().id,
+      _parent: state.currentPageId,
       type: "line",
       x1: x,
       y1: y,

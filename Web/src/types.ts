@@ -76,6 +76,7 @@ export type AppState = {
   selectedElementIds: string[];
   selectionBox: ECadRectangleElement | null;
 
+  currentPageId: string;
   // elements: readonly ECadBaseElement[];
 };
 
@@ -98,6 +99,7 @@ export const getDefaultAppState = (): AppState => {
     selectedElementIds: [],
     selectionBox: null,
 
+    currentPageId: "",
     // elements: [],
   };
 };
@@ -109,6 +111,7 @@ export const getDefaultAppState = (): AppState => {
 export type Action = {
   name: string;
 
+  keyTest?: (event: KeyboardEvent) => boolean;
   // render?: React.FC<{ state: AppState }>;
 
   stop?: ActionFn;
