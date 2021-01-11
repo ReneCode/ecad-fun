@@ -11,8 +11,9 @@ import {
   insideSelectionBox,
   updateMoveElementByDelta,
   updateMoveHandleOfElement,
-  getElements,
 } from "../elements";
+
+import { getCurrentPageElements } from "../data/getCurrentPageElements";
 import { COLOR } from "../utils/color";
 import { ObjectType } from "../share";
 
@@ -34,7 +35,7 @@ export const actionSelect: Action = {
     const x = state.pointerX;
     const y = state.pointerY;
 
-    const elements = getElements(project);
+    const elements = getCurrentPageElements(project, state);
     //  check selection on the selected elements
     const selectedElements = elements.filter((e) =>
       state.selectedElementIds.includes(e.id)
@@ -102,8 +103,8 @@ export const actionSelect: Action = {
     actionState,
     params,
   }): ActionResult | void => {
-    const elements = project.getRoot()._children as ECadBaseElement[];
-    if (!elements) {
+    const elements = getCurrentPageElements(project, state);
+    if (elements.length === 0) {
       return;
     }
 

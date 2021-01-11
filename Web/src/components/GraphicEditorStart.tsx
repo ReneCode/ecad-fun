@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import GraphicEditor from "./GraphicEditor";
 import { AppState } from "../types";
 import { saveDebounced } from "../state";
@@ -7,6 +7,7 @@ import { Project } from "../share";
 
 const ProjectStart = () => {
   const { id: projectId } = useParams<{ id: string }>();
+  const location = useLocation();
 
   const [size, setSize] = useState({
     width: window.innerWidth,
@@ -28,12 +29,15 @@ const ProjectStart = () => {
     saveDebounced(appState, project);
   };
 
+  const pageId = new URLSearchParams(location.search).get("pid") || "";
+
   return (
     <GraphicEditor
       width={size.width}
       height={size.height}
       onChange={onChange}
       projectId={projectId}
+      pageId={pageId}
     />
   );
 };

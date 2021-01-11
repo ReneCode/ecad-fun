@@ -132,12 +132,16 @@ export class ActionManager {
     }
   }
 
-  // public getRenderComponent() {
-  //   const action = this.getAction(this.runningActionName);
-  //   if (action) {
-  //     return action.render;
-  //   }
-  // }
+  public keyDown(event: KeyboardEvent) {
+    const action = this.allActions.find(
+      (action) => action.keyTest && action.keyTest(event)
+    );
+    if (action) {
+      this.execute(action.name, []);
+    }
+  }
+
+  // ----------------------------------------------------
 
   private getAction(actionName: string) {
     return this.allActions.find((action) => action.name === actionName);

@@ -73,6 +73,8 @@ export const dbGetProjectById = async (userId: string, projectId: string) => {
   return undefined;
 };
 
+// ----------------------------------------------------------
+
 const saveProjects = (projects: DbProject[]) => {
   saveJson("db-projects.json", projects);
 };

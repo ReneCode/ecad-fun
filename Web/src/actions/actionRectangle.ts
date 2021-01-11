@@ -8,7 +8,7 @@ export const actionRectangle: Action = {
     const y = state.pointerY;
     const element: ECadRectangleElement = {
       id: project.createNewId(),
-      _parent: project.getRoot().id,
+      _parent: state.currentPageId,
       type: "rectangle",
       x1: x,
       y1: y,

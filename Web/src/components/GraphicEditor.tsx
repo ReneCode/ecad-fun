@@ -1,4 +1,5 @@
 import React from "react";
+
 import Toolbox from "./Toobox";
 import Status from "./Status";
 import { renderScene } from "../renderer";
@@ -6,23 +7,23 @@ import { ActionManager, EventType } from "../actions/actionManager";
 import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
 import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
-import { Project } from "../share";
+import { ObjectType, Project } from "../share";
 import { Socket } from "../data/Socket";
-import { getElements } from "../elements";
-import GitHubLink from "./GitHubLink";
+import { ProjectService } from "../data/project";
 
 type Props = {
   width: number;
   height: number;
   onChange: (appState: AppState, project: Project) => void;
   projectId: string;
+  pageId?: string;
 };
 
 class GraphicEditor extends React.Component<Props, AppState> {
   canvas: HTMLCanvasElement | null = null;
   actionMananger: ActionManager | undefined;
-  project: Project | undefined;
   socket: Socket = new Socket();
+  projectService: ProjectService = (undefined as unknown) as ProjectService;
 
   state: AppState = getDefaultAppState();
 
@@ -36,19 +37,66 @@ class GraphicEditor extends React.Component<Props, AppState> {
   // );
   // }
 
+  componentDidUpdate() {
+    if (this.canvas) {
+      this.canvas.style.cursor = this.state.cursor;
+
+      let dynamicElements: ECadBaseElement[] = [];
+      if (this.state.editingElement) {
+        dynamicElements.push(this.state.editingElement);
+      }
+      if (this.state.selectionBox) {
+        dynamicElements.push(this.state.selectionBox);
+      }
+
+      const currentPage = this.projectService.getPage(this.state.currentPageId);
+      // console.log("currentPage:", currentPage);
+      const elements = (currentPage?._children
+        ? currentPage._children
+        : []) as ECadBaseElement[];
+
+      renderScene(this.canvas, elements, dynamicElements, this.state);
+      this.props.onChange(this.state, this.projectService.getProject());
+    }
+  }
+
   componentDidMount() {
-    this.project = new Project(this.props.projectId);
-    this.socket.init(this.project, () => {
-      // redraw
-      this.setState({});
-    });
+    const project = new Project(this.props.projectId);
+    this.projectService = new ProjectService(project, this.socket);
+
+    this.socket.init(
+      project,
+      // project open
+      (project) => {
+        // open page
+        const pages = this.projectService.getPages(project);
+        let currentPageId: string;
+        if (pages.length === 0) {
+          const newPage = this.projectService.createPage(project);
+          currentPageId = newPage.id;
+        } else {
+          let page = pages.find((p) => p.id === this.props.pageId);
+          if (page) {
+            currentPageId = page.id;
+          } else {
+            // take first page
+            currentPageId = pages[0].id;
+          }
+        }
+        this.setState({ currentPageId: currentPageId });
+      },
+      // project change
+      (project: Project) => {
+        this.setState({});
+      }
+    );
 
     this.actionMananger = new ActionManager(
       () => this.getState(),
       this.setStateValues,
       () => [],
       () => {},
-      this.project,
+      project,
       this.socket
       // () => this.project.getElements(),
       // (elements) => this.project.setElements(elements)
@@ -79,12 +127,15 @@ class GraphicEditor extends React.Component<Props, AppState> {
     // window.addEventListener("resize", this.onResize);
     window.addEventListener("dragover", this.disableEvent, false);
     window.addEventListener("drop", this.disableEvent, false);
+
+    window.addEventListener("keydown", this.onKeyDown, false);
   };
 
   removeEventListeners = () => {
     // window.removeEventListener("resize", this.onResize);
     window.removeEventListener("dragover", this.disableEvent, false);
     window.removeEventListener("drop", this.disableEvent, false);
+    window.removeEventListener("keydown", this.onKeyDown, false);
   };
 
   private disableEvent = (event: UIEvent) => {
@@ -117,29 +168,9 @@ class GraphicEditor extends React.Component<Props, AppState> {
     return this.state;
   };
 
-  componentDidUpdate() {
-    if (this.canvas) {
-      this.canvas.style.cursor = this.state.cursor;
-
-      const elements = this.project ? getElements(this.project) : [];
-
-      let dynamicElements: ECadBaseElement[] = [];
-      if (this.state.editingElement) {
-        dynamicElements.push(this.state.editingElement);
-      }
-      if (this.state.selectionBox) {
-        dynamicElements.push(this.state.selectionBox);
-      }
-      renderScene(this.canvas, elements, dynamicElements, this.state);
-      if (this.project) {
-        this.props.onChange(this.state, this.project);
-      }
-    }
-  }
-
   private setDebugging() {
     (window as any).h = {
-      project: this.project,
+      project: this.projectService.getProject(),
     };
   }
 
@@ -182,6 +213,12 @@ class GraphicEditor extends React.Component<Props, AppState> {
   private onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     this.dispatchPointerEvent("pointerDown", event);
   };
+  private onKeyDown = (event: KeyboardEvent) => {
+    console.log("key:", event);
+
+    this.actionMananger?.keyDown(event);
+  };
+
   private onDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
     this.actionMananger?.execute("importDocument", event);
   };
