@@ -137,45 +137,14 @@ export class Project {
     return results;
   }
 
-  public updateObjects(os: ObjectType[]) {
-    const todos: { current: ObjectType; update: ObjectType }[] = [];
-    for (let o of os) {
-      if (!o.id) {
-        throw new Error("id missing");
-      }
+  public updateObjects(newObjects: ObjectType[]) {
+    const oldObjects = this.internalUpdateObject(newObjects);
+    this.dispatcher.dispatch("update-object", newObjects);
 
-      const currentObject = this.getObject(o.id);
-      if (!currentObject) {
-        throw new Error(`object with id ${o.id} does not exist`);
-      }
-      todos.push({
-        current: currentObject,
-        update: o,
-      });
+    if (this.undoRedo) {
+      this.undoRedo.updateObjects(oldObjects, newObjects);
     }
-
-    this.dirty = true;
-
-    const results: ObjectType[] = [];
-    for (let { current, update } of todos) {
-      // apply changes
-      const copyUpdate = this.cloneObject(update);
-      for (const key of Object.keys(update)) {
-        if (key === "id") {
-          // id will stay unchanged
-        } else if (key === "_parent") {
-          this.removeFromCurrentParent(current);
-          (current as any)[key] = (update as any)[key];
-          this.applyParentProperty(current);
-        } else {
-          (current as any)[key] = (update as any)[key];
-        }
-      }
-      results.push(copyUpdate);
-    }
-
-    this.dispatcher.dispatch("update-object", results);
-    return results;
+    return oldObjects;
   }
 
   public deleteObjects(ids: string[]) {
@@ -241,11 +210,12 @@ export class Project {
 
   private internalCUR({ type, data }: CURType) {
     switch (type) {
-      // case "update":
-      //   return this.internalUpdateObjects(data);
-
       case "create":
         return this.internalCreateObjects(data as ObjectType[]);
+
+      case "update":
+        return this.internalUpdateObject(data as ObjectType[]);
+
       case "delete":
         return this.internalDeleteObjects(data as string[]);
 
@@ -270,6 +240,48 @@ export class Project {
       this.applyParentProperty(obj);
       this.addObject(obj);
       results.push(this.getObject(obj.id));
+    }
+    return results;
+  }
+
+  public internalUpdateObject(os: ObjectType[]) {
+    const todos: { current: ObjectType; update: ObjectType }[] = [];
+    for (let o of os) {
+      if (!o.id) {
+        throw new Error("id missing");
+      }
+
+      const currentObject = this.getObject(o.id);
+      if (!currentObject) {
+        throw new Error(`object with id ${o.id} does not exist`);
+      }
+      todos.push({
+        current: currentObject,
+        update: o,
+      });
+    }
+
+    this.dirty = true;
+
+    const results: ObjectType[] = [];
+    for (let { current, update } of todos) {
+      const oldChanges = { id: current.id };
+      // const copyUpdate = this.cloneObject(update);
+      for (const key of Object.keys(update)) {
+        if (key === "id") {
+          // id will stay unchanged
+        } else if (key === "_parent") {
+          this.removeFromCurrentParent(current);
+          (oldChanges as any)[key] = (current as any)[key];
+          (current as any)[key] = (update as any)[key];
+          this.applyParentProperty(current);
+        } else {
+          (oldChanges as any)[key] = (current as any)[key];
+          (current as any)[key] = (update as any)[key];
+        }
+      }
+      // results.push(copyUpdate);
+      results.push(oldChanges);
     }
     return results;
   }

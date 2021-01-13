@@ -30,6 +30,11 @@ export class UndoRedo {
     this.addEntry("create", undefined, objects);
   }
 
+  public updateObjects(oldObjects: ObjectType[], newObjects: ObjectType[]) {
+    this.addEntry(TYPE_START);
+    this.addEntry("update", oldObjects, newObjects);
+  }
+
   public deleteObjects(objects: ObjectType[]) {
     this.addEntry(TYPE_START);
     this.addEntry("delete", objects, undefined);

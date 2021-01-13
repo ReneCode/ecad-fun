@@ -103,13 +103,14 @@ describe("Project", () => {
   it("update root-object", () => {
     const project = new Project("a");
     const root = project.getRoot();
+    const oldName = root.name;
     const fn = jest.fn();
     project.subscribe("update-object", fn);
 
     const update = { id: root.id, name: "newName" };
     const results = project.updateObjects([update]);
     expect(results).toHaveLength(1);
-    expect(results[0].name).toEqual("newName");
+    expect(results[0].name).toEqual(oldName);
     expect(results[0].id).toEqual(root.id);
     const r = project.getRoot();
     expect(r).toHaveProperty("id", "0:0");
@@ -155,7 +156,7 @@ describe("Project", () => {
     expect(r._children?.map((o) => o.name)).toEqual(["p2", "p1", "p3"]);
   });
 
-  it("update object - return only changes", () => {
+  it("update object - return changes with old data", () => {
     const project = new Project("a");
 
     const id = project.createNewId();
@@ -163,7 +164,7 @@ describe("Project", () => {
     project.createObjects([p1]);
     const [changes] = project.updateObjects([{ id, name: "p2" }]);
     // only changes
-    expect(changes).toEqual({ id, name: "p2" });
+    expect(changes).toEqual({ id, name: "p1" });
     // complete object
     expect(project.getObject(id)).toEqual({
       id,
@@ -201,6 +202,8 @@ describe("Project", () => {
 
     const element = { id: "0:3", name: "line", _parent: `${page1.id}-5` };
     project.createObjects([element]);
+    const oldElementParent = project.getObject("0:3")._parent;
+
     p1 = project.getObject(page1.id);
     expect(p1).toHaveProperty("name", "p1");
     expect(p1).toHaveProperty("_children", [element]);
@@ -209,7 +212,7 @@ describe("Project", () => {
     expect(project.updateObjects([update])).toEqual([
       {
         id: element.id,
-        _parent: `${page2.id}-5`,
+        _parent: oldElementParent,
       },
     ]);
     const e = project.getObject(element.id);
@@ -241,8 +244,8 @@ describe("Project", () => {
       { id: "1:1", name: "p2b" },
     ]);
     expect(update).toEqual([
-      { id: "1:0", type: "page" },
-      { id: "1:1", name: "p2b" },
+      { id: "1:0", type: undefined },
+      { id: "1:1", name: "p2" },
     ]);
     expect(project.getObject("1:0")).toEqual({
       id: "1:0",
@@ -663,6 +666,24 @@ describe("Project", () => {
       project.undo();
       const p1ReCreated = project.getObject(id);
       expect(p1ReCreated).toEqual({ id, name: "p1", type: "page" });
+    });
+
+    it("undo/redo update simple object", () => {
+      const project = new Project("A", { undoRedo: true });
+      const id = project.createNewId();
+      project.createObjects([{ id, name: "p1", type: "page" }]);
+
+      project.updateObjects([{ id, name: "p2" }]);
+      const p1Updated = project.getObject(id);
+      expect(p1Updated).toEqual({ id, name: "p2", type: "page" });
+
+      project.undo();
+      const p1UndoUpdate = project.getObject(id);
+      expect(p1UndoUpdate).toEqual({ id, name: "p1", type: "page" });
+
+      project.redo();
+      const p1RedoUpdate = project.getObject(id);
+      expect(p1RedoUpdate).toEqual({ id, name: "p2", type: "page" });
     });
   });
 });
