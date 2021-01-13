@@ -277,13 +277,15 @@ describe("Project", () => {
     const project = new Project("a");
     const root = project.getRoot();
 
-    const page = { id: "0:1", name: "page", _parent: `${root.id}-5` };
+    const pageId = "1:1";
+    const page = { id: pageId, name: "page", _parent: `${root.id}-5` };
     project.createObjects([page]);
+    const elementId = "1:2";
     const elements = project.createObjects([
       {
-        id: "0:2",
+        id: elementId,
         name: "line",
-        _parent: `${page.id}-1`,
+        _parent: `${pageId}-1`,
       },
     ]);
 
@@ -291,8 +293,8 @@ describe("Project", () => {
 
     const r = project.getRoot();
     expect(r).toHaveProperty("_children", []);
-    expect(project.getObject(page.id)).toBeUndefined();
-    expect(project.getObject(elements[0].id)).toBeUndefined();
+    expect(project.getObject(pageId)).toBeUndefined();
+    expect(project.getObject(elementId)).toBeUndefined();
   });
 
   it("multiple deleteObject", () => {
@@ -684,6 +686,41 @@ describe("Project", () => {
       project.redo();
       const p1RedoUpdate = project.getObject(id);
       expect(p1RedoUpdate).toEqual({ id, name: "p2", type: "page" });
+    });
+
+    it("undo/redo create,delete _parent", () => {
+      const project = new Project("A", { undoRedo: true });
+      const pageId = project.createNewId();
+      project.createObjects([
+        { id: pageId, name: "p1", type: "page", _parent: "0:0" },
+      ]);
+      expect(project.getObject(pageId)._children).toEqual(undefined);
+      const elementId = project.createNewId();
+      project.createObjects([
+        { id: elementId, name: "e1", type: "line", _parent: pageId },
+      ]);
+      const elementCreated = project.getObject(elementId);
+      expect(project.getObject(pageId)._children).toEqual([elementCreated]);
+
+      project.undo();
+      expect(project.getObject(pageId)._children).toEqual([]);
+
+      project.redo();
+      expect(project.getObject(pageId)._children).toEqual([elementCreated]);
+
+      project.deleteObjects([elementId]);
+      expect(project.getObject(pageId)._children).toEqual([]);
+      expect(project.getObject(elementId)).toEqual(undefined);
+
+      project.undo();
+      const elementReCreated = project.getObject(elementId);
+      expect(elementReCreated).toEqual({
+        id: elementId,
+        name: "e1",
+        type: "line",
+        _parent: pageId + "-1",
+      });
+      expect(project.getObject(pageId)._children).toEqual([elementReCreated]);
     });
   });
 });
