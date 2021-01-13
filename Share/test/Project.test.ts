@@ -172,6 +172,20 @@ describe("Project", () => {
     });
   });
 
+  it("update object - will change the current object", () => {
+    const project = new Project("A");
+    const id = project.createNewId();
+    const p1New = { id, name: "p1", type: "page" };
+    project.createObjects([p1New]);
+    const p1 = project.getObject(id);
+    expect(p1).toEqual({ id, name: "p1", type: "page" });
+    const [_] = project.updateObjects([{ id, name: "p2" }]);
+    const p1Update = project.getObject(id);
+    expect(p1).toBe(p1Update);
+    expect(p1Update).toEqual({ id, name: "p2", type: "page" });
+    expect(p1).toEqual({ id, name: "p2", type: "page" });
+  });
+
   it("update parent", () => {
     const project = new Project("a");
     const root = project.getRoot();
@@ -609,6 +623,28 @@ describe("Project", () => {
       });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("2:1");
+    });
+  });
+
+  describe("undo redo", () => {
+    it("exception, in default-project", () => {
+      const project = new Project("A");
+      expect(() => project.undo()).toThrow();
+    });
+    it("exception, in default-project", () => {
+      const project = new Project("A");
+      expect(() => project.redo()).toThrow();
+    });
+
+    it("undo create simple object", () => {
+      const project = new Project("A", { undoRedo: true });
+      const id = project.createNewId();
+      project.createObjects([{ id, name: "p1", type: "page" }]);
+      const p1 = project.getObject(id);
+      expect(p1).toEqual({ id, name: "p1", type: "page" });
+      project.undo();
+      const p1Deleted = project.getObject(id);
+      expect(p1Deleted).toEqual(undefined);
     });
   });
 });

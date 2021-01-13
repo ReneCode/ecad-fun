@@ -1,6 +1,7 @@
 import { deepCopy } from "./deepCopy";
 import { Dispatcher } from "./Dispatcher";
 import { ObjectType } from "./types";
+import { CURType, UndoRedo } from "./UndoRedo";
 import {
   appendToArray,
   combineParentProperty,
@@ -21,6 +22,8 @@ type QueryParams = {
 export class Project {
   public readonly id: string;
 
+  private undoRedo?: UndoRedo;
+
   private dirty: boolean = false;
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
@@ -28,8 +31,11 @@ export class Project {
   private clientId: string = DEFAULT_CLIENTID;
   private lastObjectIndex: number = 0;
 
-  constructor(id: string) {
+  constructor(id: string, options?: { undoRedo: boolean }) {
     this.id = id;
+    if (options) {
+      this.undoRedo = new UndoRedo();
+    }
 
     const root = { id: ROOT_ID, projectId: id, _type: "project" };
     this.clientId = DEFAULT_CLIENTID;
@@ -42,6 +48,10 @@ export class Project {
     const dirty = this.dirty;
     this.dirty = false;
     return dirty;
+  }
+
+  public createNewId() {
+    return `${this.clientId}:${++this.lastObjectIndex}`;
   }
 
   public setClientId(clientId: number) {
@@ -116,29 +126,14 @@ export class Project {
     });
   }
 
-  public createNewId() {
-    return `${this.clientId}:${++this.lastObjectIndex}`;
-  }
-
-  public createObjects(os: ObjectType[]): ObjectType[] {
-    for (let o of os) {
-      if (!o.id) {
-        throw new Error("id missing");
-      }
-    }
-
-    this.dirty = true;
-
-    const results = [];
-    for (let o of os) {
-      const obj = this.cloneObject(o);
-      delete obj._children;
-      this.applyParentProperty(obj);
-      this.addObject(obj);
-      results.push(this.getObject(obj.id));
-    }
+  public createObjects(objects: ObjectType[]): ObjectType[] {
+    const results = this.internalCreateObjects(objects);
 
     this.dispatcher.dispatch("create-object", results);
+
+    if (this.undoRedo) {
+      this.undoRedo.createObjects(results);
+    }
     return results;
   }
 
@@ -233,7 +228,71 @@ export class Project {
     }
   }
 
+  public undo() {
+    if (!this.undoRedo) {
+      throw new Error("undoRedo not activated");
+    }
+    const todos = this.undoRedo.undo();
+    todos.forEach((todo) => this.internalCUR(todo));
+  }
+
+  public redo() {
+    if (!this.undoRedo) {
+      throw new Error("undoRedo not activated");
+    }
+  }
+
   // -----------------------------------------------------
+
+  private internalCUR({ type, data }: CURType) {
+    switch (type) {
+      // case "create":
+      //   return this.internalCreateObjects(data);
+      // case "update":
+      //   return this.internalUpdateObjects(data);
+      case "delete":
+        return this.internalDeleteObjects(data as string[]);
+
+      default:
+        throw new Error("internalCUR: bad type");
+    }
+  }
+
+  private internalCreateObjects(objects: ObjectType[]): ObjectType[] {
+    for (let obj of objects) {
+      if (!obj.id) {
+        throw new Error("id missing");
+      }
+    }
+
+    this.dirty = true;
+
+    const results: ObjectType[] = [];
+    for (let o of objects) {
+      const obj = this.cloneObject(o);
+      delete obj._children;
+      this.applyParentProperty(obj);
+      this.addObject(obj);
+      results.push(this.getObject(obj.id));
+    }
+    return results;
+  }
+
+  public internalDeleteObjects(ids: string[]) {
+    this.dirty = true;
+
+    for (let id of ids) {
+      const currentObject = this.getObject(id);
+      if (currentObject) {
+        this.traverse(currentObject, (o) => {
+          if (o._parent) {
+            this.removeFromCurrentParent(currentObject);
+          }
+          delete this.objects[o.id];
+        });
+      }
+    }
+  }
 
   private validateCreateObjectId(id: string) {
     const [clientId, index] = id.split(":");
