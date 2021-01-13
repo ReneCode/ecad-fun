@@ -179,21 +179,14 @@ export class Project {
   }
 
   public deleteObjects(ids: string[]) {
-    this.dirty = true;
-
-    for (let id of ids) {
-      const currentObject = this.getObject(id);
-      if (currentObject) {
-        this.traverse(currentObject, (o) => {
-          if (o._parent) {
-            this.removeFromCurrentParent(currentObject);
-          }
-          delete this.objects[o.id];
-        });
-      }
+    const results = this.internalDeleteObjects(ids);
+    if (this.undoRedo) {
+      this.undoRedo.deleteObjects(results);
     }
-    this.dispatcher.dispatch("delete-object", ids);
-    return ids;
+
+    const deletedIds = results.map((o) => o.id);
+    this.dispatcher.dispatch("delete-object", deletedIds);
+    return deletedIds;
   }
 
   public getObject(id: string) {
@@ -240,21 +233,24 @@ export class Project {
     if (!this.undoRedo) {
       throw new Error("undoRedo not activated");
     }
+    const todos = this.undoRedo.redo();
+    todos.forEach((todo) => this.internalCUR(todo));
   }
 
   // -----------------------------------------------------
 
   private internalCUR({ type, data }: CURType) {
     switch (type) {
-      // case "create":
-      //   return this.internalCreateObjects(data);
       // case "update":
       //   return this.internalUpdateObjects(data);
+
+      case "create":
+        return this.internalCreateObjects(data as ObjectType[]);
       case "delete":
         return this.internalDeleteObjects(data as string[]);
 
       default:
-        throw new Error("internalCUR: bad type");
+        throw new Error(`internalCUR: bad type:${type}`);
     }
   }
 
@@ -280,10 +276,11 @@ export class Project {
 
   public internalDeleteObjects(ids: string[]) {
     this.dirty = true;
-
+    const result = [];
     for (let id of ids) {
       const currentObject = this.getObject(id);
       if (currentObject) {
+        result.push(currentObject);
         this.traverse(currentObject, (o) => {
           if (o._parent) {
             this.removeFromCurrentParent(currentObject);
@@ -292,6 +289,7 @@ export class Project {
         });
       }
     }
+    return result;
   }
 
   private validateCreateObjectId(id: string) {

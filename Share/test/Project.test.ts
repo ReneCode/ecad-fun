@@ -298,8 +298,8 @@ describe("Project", () => {
       { id: "1:0", name: "p1" },
       { id: "1:1", name: "p2" },
     ]);
-    const update = project.deleteObjects(["1:0", "1:1"]);
-    expect(update).toEqual(["1:0", "1:1"]);
+    const result = project.deleteObjects(["1:0", "1:1"]);
+    expect(result).toEqual(["1:0", "1:1"]);
     expect(project.getObject("1:0")).toBeUndefined();
     expect(project.getObject("1:1")).toBeUndefined();
   });
@@ -636,7 +636,7 @@ describe("Project", () => {
       expect(() => project.redo()).toThrow();
     });
 
-    it("undo create simple object", () => {
+    it("undo/redo create simple object", () => {
       const project = new Project("A", { undoRedo: true });
       const id = project.createNewId();
       project.createObjects([{ id, name: "p1", type: "page" }]);
@@ -645,6 +645,24 @@ describe("Project", () => {
       project.undo();
       const p1Deleted = project.getObject(id);
       expect(p1Deleted).toEqual(undefined);
+
+      project.redo();
+      const p1ReCreated = project.getObject(id);
+      expect(p1ReCreated).toEqual({ id, name: "p1", type: "page" });
+    });
+
+    it("undo/redo delete simple object", () => {
+      const project = new Project("A", { undoRedo: true });
+      const id = project.createNewId();
+      project.createObjects([{ id, name: "p1", type: "page" }]);
+
+      project.deleteObjects([id]);
+      const p1Deleted = project.getObject(id);
+      expect(p1Deleted).toEqual(undefined);
+
+      project.undo();
+      const p1ReCreated = project.getObject(id);
+      expect(p1ReCreated).toEqual({ id, name: "p1", type: "page" });
     });
   });
 });

@@ -30,6 +30,11 @@ export class UndoRedo {
     this.addEntry("create", undefined, objects);
   }
 
+  public deleteObjects(objects: ObjectType[]) {
+    this.addEntry(TYPE_START);
+    this.addEntry("delete", objects, undefined);
+  }
+
   public undo() {
     let index = this.currentIndex;
     let todos: CURType[] = [];
@@ -46,6 +51,27 @@ export class UndoRedo {
     index--;
     this.setIndex(index);
 
+    return todos;
+  }
+
+  public redo() {
+    let index = this.currentIndex;
+    index++;
+    if (this.entryList[index].type !== TYPE_START) {
+      throw new Error("bad redo list");
+    }
+
+    let todos: CURType[] = [];
+    while (
+      index + 1 < this.entryList.length &&
+      this.entryList[index + 1].type !== TYPE_START
+    ) {
+      index++;
+      const urEntry = this.entryList[index];
+      const todo = this.redoOneEntry(urEntry);
+      todos = todos.concat(todo);
+    }
+    this.setIndex(index);
     return todos;
   }
 
@@ -98,6 +124,34 @@ export class UndoRedo {
 
       default:
         throw new Error("bad call undoOneEntry");
+    }
+  }
+
+  private redoOneEntry(entry: UREntry): CURType {
+    switch (entry.type) {
+      case "create":
+        if (!entry.new) {
+          throw new Error("bad UREntry");
+        }
+        return { type: "create", data: entry.new };
+
+      case "delete":
+        if (!entry.old) {
+          throw new Error("bad UREntry");
+        }
+        return { type: "delete", data: entry.old.map((o) => o.id) };
+
+      case "update":
+        if (!entry.new) {
+          throw new Error("bad UREntry");
+        }
+        return {
+          type: "update",
+          data: entry.new,
+        };
+
+      default:
+        throw new Error("bad call redoOneEntry");
     }
   }
 
