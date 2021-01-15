@@ -16,8 +16,9 @@ import {
 import { getCurrentPageElements } from "../data/getCurrentPageElements";
 import { COLOR } from "../utils/color";
 import { ObjectType } from "../share";
+import { registerAction } from "./registerAction";
 
-export const actionSelect: Action = {
+export const actionSelect = registerAction({
   name: "select",
 
   stop: ({ state }) => {
@@ -191,7 +192,7 @@ export const actionSelect: Action = {
       },
     };
   },
-};
+});
 
 const createSelectionBox = (x: number, y: number): ECadRectangleElement => {
   return {

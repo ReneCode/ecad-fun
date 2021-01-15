@@ -1,14 +1,15 @@
-import { Action, AppState, ECadBaseElement } from "../types";
+import { AppState, ECadBaseElement } from "../types";
 import { fileSave } from "browser-nativefs";
 import { removeSymbolFromSymbolRef } from "../state";
+import { registerAction } from "./registerAction";
 
-export const actionExportDocument: Action = {
+export const actionExportDocument = registerAction({
   name: "exportDocument",
 
   execute: ({ state, elements, params }) => {
     exportToJsonFile(state, elements);
   },
-};
+});
 
 const serializeData = (
   appState: AppState,

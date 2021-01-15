@@ -12,10 +12,6 @@ import { COLOR } from "../utils/color";
 
 const GRIP_SIZE = 14;
 
-type RenderOptions = {
-  selected?: boolean;
-};
-
 export const renderScene = (
   canvas: HTMLCanvasElement,
   elements: readonly ECadBaseElement[],
@@ -26,6 +22,8 @@ export const renderScene = (
   if (!context) {
     return;
   }
+
+  // console.log("render scene", elements.length);
 
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;

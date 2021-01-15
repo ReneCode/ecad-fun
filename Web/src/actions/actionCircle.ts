@@ -1,7 +1,8 @@
-import { ECadCircleElement, Action } from "../types";
+import { ECadCircleElement } from "../types";
 import { distancePointToPoint } from "../utils/geometric";
+import { registerAction } from "./registerAction";
 
-export const actionCircle: Action = {
+export const actionCircle = registerAction({
   name: "circle",
 
   pointerDown: ({ state, project }) => {
@@ -56,4 +57,4 @@ export const actionCircle: Action = {
       };
     }
   },
-};
+});

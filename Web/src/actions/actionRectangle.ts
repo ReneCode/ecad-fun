@@ -1,6 +1,7 @@
-import { ECadRectangleElement, Action } from "../types";
+import { ECadRectangleElement } from "../types";
+import { registerAction } from "./registerAction";
 
-export const actionRectangle: Action = {
+export const actionRectangle = registerAction({
   name: "rectangle",
 
   pointerDown: ({ state, project }) => {
@@ -53,4 +54,4 @@ export const actionRectangle: Action = {
       };
     }
   },
-};
+});

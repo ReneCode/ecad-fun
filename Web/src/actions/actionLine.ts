@@ -1,6 +1,7 @@
-import { ECadLineElement, Action } from "../types";
+import { ECadLineElement } from "../types";
+import { registerAction } from "./registerAction";
 
-export const actionLine: Action = {
+export const actionLine = registerAction({
   name: "line",
 
   pointerDown: ({ state, project, params }) => {
@@ -65,4 +66,4 @@ export const actionLine: Action = {
       };
     }
   },
-};
+});

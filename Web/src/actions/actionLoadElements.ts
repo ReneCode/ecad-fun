@@ -1,7 +1,8 @@
 import { ECadLineElement, ECadCircleElement, Action } from "../types";
 import { randomId } from "../utils/randomId";
+import { registerAction } from "./registerAction";
 
-export const actionLoadElements: Action = {
+export const actionLoadElements = registerAction({
   name: "loadElements",
 
   execute: () => {
@@ -41,4 +42,4 @@ export const actionLoadElements: Action = {
       elements: [...lines, line, circle],
     };
   },
-};
+});
