@@ -124,3 +124,9 @@ export const insideSelectionBox = (
     return true;
   }
 };
+
+export const copyElements = (elements: ECadBaseElement[]) => {
+  return elements.map((e) => {
+    return { ...e };
+  });
+};

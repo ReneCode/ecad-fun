@@ -11,6 +11,7 @@ import {
   insideSelectionBox,
   updateMoveElementByDelta,
   updateMoveHandleOfElement,
+  copyElements,
 } from "../elements";
 
 import { getCurrentPageElements } from "../data/getCurrentPageElements";
@@ -48,14 +49,18 @@ export const actionSelect = registerAction({
         state.selectedElementIds.includes(result.id)
       ) {
         // element is allready selected
+        // update actionState.oldData
         return {
           actionState: {
             lastX: x,
             lastY: y,
+            ...saveOrginalElements(selectedElements),
           },
         };
       }
       if (result) {
+        // handle selected
+        // update actionState.oldData
         return {
           state: {
             selectedElementIds: [result.id],
@@ -64,6 +69,7 @@ export const actionSelect = registerAction({
             lastX: x,
             lastY: y,
             selectedHandleIdx: result.type === "handle" ? result.handleIdx : -1,
+            ...saveOrginalElements([element]),
           },
         };
       }
@@ -73,6 +79,7 @@ export const actionSelect = registerAction({
     for (let element of elements) {
       const result = hitTestElement(element, { x, y }, state);
       if (result) {
+        // select element by picking
         return {
           state: {
             selectedElementIds: [result.id],
@@ -81,6 +88,7 @@ export const actionSelect = registerAction({
             lastX: x,
             lastY: y,
             selectedHandleIdx: -1,
+            ...saveOrginalElements([element]),
           },
         };
       }
@@ -94,6 +102,7 @@ export const actionSelect = registerAction({
       },
       actionState: {
         selectionMode: "selectionbox",
+        ...saveOrginalElements([]),
       },
     };
   },
@@ -135,6 +144,7 @@ export const actionSelect = registerAction({
           actionState: {
             lastX: x,
             lastY: y,
+            newData: update,
           },
         };
       } else {
@@ -155,6 +165,7 @@ export const actionSelect = registerAction({
           actionState: {
             lastX: x,
             lastY: y,
+            newData: update,
           },
         };
       }
@@ -167,28 +178,40 @@ export const actionSelect = registerAction({
       state.pointerButtons & POINTER_BUTTONS.MAIN
     ) {
       const selectionBox = { ...state.selectionBox, x2: x, y2: y };
-      const selectedElementIds = elements
-        .filter((element) => {
-          return insideSelectionBox(element, selectionBox);
-        })
-        .map((element) => element.id);
+      const selectedElements = elements.filter((element) => {
+        return insideSelectionBox(element, selectionBox);
+      });
+      // select elements by box");
       return {
         state: {
           selectionBox: selectionBox,
-          selectedElementIds: selectedElementIds,
+          selectedElementIds: selectedElements.map((e) => e.id),
+        },
+        actionState: {
+          ...saveOrginalElements(selectedElements),
         },
       };
     }
   },
 
   pointerUp: ({ state, actionState }): ActionResult | void => {
+    let result = {};
+    if (actionState.newData && actionState.newData.length > 0) {
+      result = {
+        updateObjects: actionState.newData,
+        withUndo: true,
+        oldDataForUndo: actionState.oldData,
+      };
+    }
     return {
+      ...result,
       state: {
         selectionBox: null,
       },
       actionState: {
         selectionMode: "element",
         selectedHandleIdx: -1,
+        newData: [],
       },
     };
   },
@@ -204,5 +227,12 @@ const createSelectionBox = (x: number, y: number): ECadRectangleElement => {
     y1: y,
     x2: x,
     y2: y,
+  };
+};
+
+const saveOrginalElements = (elements: ECadBaseElement[]) => {
+  return {
+    oldData: copyElements(elements),
+    newData: [],
   };
 };

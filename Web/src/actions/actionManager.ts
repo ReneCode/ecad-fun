@@ -112,8 +112,6 @@ export class ActionManager {
       (action) => action.keyTest && action.keyTest(event)
     );
     if (action) {
-      console.log("key:", event, "execute", action.name);
-
       this.execute(action.name, []);
     }
   }
@@ -158,7 +156,11 @@ export class ActionManager {
           this.setState({});
         }
         if (result.updateObjects) {
-          const obj = this.project.updateObjects(result.updateObjects);
+          const options = {
+            withUndo: result.withUndo,
+            oldDataForUndo: result.oldDataForUndo,
+          };
+          const obj = this.project.updateObjects(result.updateObjects, options);
           this.socket.emit("update-object", obj);
           this.setState({});
         }

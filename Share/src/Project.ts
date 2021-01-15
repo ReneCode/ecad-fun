@@ -12,6 +12,11 @@ import {
 const DEFAULT_CLIENTID = "0";
 const ROOT_ID = "0:0";
 
+export type CUROptions = {
+  withUndo?: boolean;
+  oldDataForUndo?: ObjectType[];
+};
+
 type QueryParams = {
   depth?: number;
   rootId?: string;
@@ -137,12 +142,21 @@ export class Project {
     return results;
   }
 
-  public updateObjects(newObjects: ObjectType[]) {
+  public updateObjects(
+    newObjects: ObjectType[],
+    options: CUROptions | undefined = { withUndo: true }
+  ) {
     const oldObjects = this.internalUpdateObject(newObjects);
     this.dispatcher.dispatch("update-object", newObjects);
 
-    if (this.undoRedo) {
-      this.undoRedo.updateObjects(oldObjects, newObjects);
+    if (options && options.withUndo && this.undoRedo) {
+      if (options.oldDataForUndo) {
+        // the old data is set by options (dynamic move action)
+        // TODO check if oldData has the same .id
+        this.undoRedo.updateObjects(options.oldDataForUndo, newObjects);
+      } else {
+        this.undoRedo.updateObjects(oldObjects, newObjects);
+      }
     }
     return oldObjects;
   }
