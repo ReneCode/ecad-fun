@@ -213,8 +213,6 @@ class GraphicEditor extends React.Component<Props, AppState> {
     this.dispatchPointerEvent("pointerDown", event);
   };
   private onKeyDown = (event: KeyboardEvent) => {
-    console.log("key:", event);
-
     this.actionMananger?.keyDown(event);
   };
 

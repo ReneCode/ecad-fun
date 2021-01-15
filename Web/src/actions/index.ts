@@ -14,3 +14,4 @@ export { actionCreateSymbol } from "./actionCreateSymbol";
 export { actionPlaceSymbol } from "./actionPlaceSymbol";
 export { actionExportDocument } from "./actionExportDocument";
 export { actionImportDocument } from "./actionImportDocument";
+export { actionUndo } from "./actionUndoRedo";

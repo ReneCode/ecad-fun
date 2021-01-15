@@ -196,6 +196,7 @@ export class Project {
     }
     const todos = this.undoRedo.undo();
     todos.forEach((todo) => this.internalCUR(todo));
+    return todos;
   }
 
   public redo() {
@@ -204,6 +205,7 @@ export class Project {
     }
     const todos = this.undoRedo.redo();
     todos.forEach((todo) => this.internalCUR(todo));
+    return todos;
   }
 
   // -----------------------------------------------------

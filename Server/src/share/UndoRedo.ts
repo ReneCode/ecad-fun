@@ -22,7 +22,7 @@ export type CURType =
 export class UndoRedo {
   canUndo: boolean = false;
   canRedo: boolean = false;
-  currentIndex: number = 0;
+  currentIndex: number = -1;
   entryList: UREntry[] = [];
 
   public createObjects(objects: ObjectType[]) {
@@ -43,6 +43,11 @@ export class UndoRedo {
   public undo() {
     let index = this.currentIndex;
     let todos: CURType[] = [];
+    if (index < 0) {
+      // nothing to undo
+      return todos;
+    }
+
     while (index >= 0 && this.entryList[index].type !== TYPE_START) {
       const urEntry = this.entryList[index];
 
@@ -50,6 +55,7 @@ export class UndoRedo {
       todos = todos.concat(todo);
       index--;
     }
+
     if (this.entryList[index].type !== TYPE_START) {
       throw new Error("bad undo list");
     }
@@ -61,12 +67,17 @@ export class UndoRedo {
 
   public redo() {
     let index = this.currentIndex;
+    let todos: CURType[] = [];
+    if (index === this.entryList.length - 1) {
+      // nothing to redo
+      return todos;
+    }
+
     index++;
     if (this.entryList[index].type !== TYPE_START) {
       throw new Error("bad redo list");
     }
 
-    let todos: CURType[] = [];
     while (
       index + 1 < this.entryList.length &&
       this.entryList[index + 1].type !== TYPE_START

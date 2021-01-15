@@ -109,7 +109,7 @@ export const getDefaultAppState = (): AppState => {
  * otherwise it is a long-running action and start,stop,pointer... are called until actionResult.stopAction:true is returned.
  */
 export type Action = {
-  name: string;
+  name: ActionName;
 
   keyTest?: (event: KeyboardEvent) => boolean;
   // render?: React.FC<{ state: AppState }>;

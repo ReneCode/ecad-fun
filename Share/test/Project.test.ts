@@ -641,6 +641,18 @@ describe("Project", () => {
       expect(() => project.redo()).toThrow();
     });
 
+    it("no change if nothing to undo", () => {
+      const project = new Project("A", { undoRedo: true });
+      project.undo();
+      expect(1).toBe(1);
+    });
+
+    it("no change if nothing to redo", () => {
+      const project = new Project("A", { undoRedo: true });
+      project.redo();
+      expect(1).toBe(1);
+    });
+
     it("undo/redo create simple object", () => {
       const project = new Project("A", { undoRedo: true });
       const id = project.createNewId();

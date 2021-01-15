@@ -5,6 +5,7 @@ import { registerAction } from "./registerAction";
 export const actionDelete = registerAction({
   name: "delete",
   keyTest: (event) => [KEYS.DELETE, KEYS.BACKSPACE].includes(event.key),
+
   execute: ({ state, project }) => {
     if (!state.selectedElementIds.length) {
       return;

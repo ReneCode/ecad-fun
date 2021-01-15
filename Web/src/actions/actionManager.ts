@@ -112,6 +112,8 @@ export class ActionManager {
       (action) => action.keyTest && action.keyTest(event)
     );
     if (action) {
+      console.log("key:", event, "execute", action.name);
+
       this.execute(action.name, []);
     }
   }
