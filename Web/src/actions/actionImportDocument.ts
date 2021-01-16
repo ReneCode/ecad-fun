@@ -1,8 +1,9 @@
 import { Action, ECadBaseElement } from "../types";
 
 import { addSymbolToSymbolRef } from "../state";
+import { registerAction } from "./registerAction";
 
-export const actionImportDocument: Action = {
+export const actionImportDocument = registerAction({
   name: "importDocument",
 
   execute: async ({
@@ -32,7 +33,7 @@ export const actionImportDocument: Action = {
       }
     }
   },
-};
+});
 
 const importFromJsonFile = async (blob: any) => {
   try {

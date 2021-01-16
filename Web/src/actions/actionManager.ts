@@ -6,20 +6,9 @@ import {
   ECadBaseElement,
   ActionResult,
 } from "../types";
-import { actionLine } from "./actionLine";
-import { actionCircle } from "./actionCircle";
-import { actionRectangle } from "./actionRectangle";
-import { actionSelect } from "./actionSelect";
-import { actionDelete } from "./actionDelete";
-import { actionLoadElements } from "./actionLoadElements";
-import { actionZoomIn, actionZoomOut, actionZoomPinch } from "./actionZoom";
-import { actionPanning } from "./actionPanning";
-import { actionCreateSymbol } from "./actionCreateSymbol";
-import { actionPlaceSymbol } from "./actionPlaceSymbol";
-import { actionExportDocument } from "./actionExportDocument";
-import { actionImportDocument } from "./actionImportDocument";
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
+import { actions } from "./registerAction";
 
 export type EventType =
   | "execute"
@@ -63,32 +52,18 @@ export class ActionManager {
     this.setElements = setElements;
     this.project = project;
     this.socket = socket;
+
+    console.log("actions:", actions.length);
+    actions.forEach((action) => {
+      this.register(action);
+    });
+
+    // default action
+    this.runningActionName = "select";
   }
 
   register(action: Action) {
     this.allActions.push(action);
-  }
-  registerAll() {
-    this.register(actionSelect);
-
-    this.register(actionLine);
-    this.register(actionCircle);
-    this.register(actionRectangle);
-    this.register(actionCreateSymbol);
-    this.register(actionPlaceSymbol);
-
-    this.register(actionLoadElements);
-    this.register(actionZoomIn);
-    this.register(actionZoomOut);
-    this.register(actionZoomPinch);
-    this.register(actionPanning);
-    this.register(actionDelete);
-
-    this.register(actionExportDocument);
-    this.register(actionImportDocument);
-
-    // default action
-    this.runningActionName = "select";
   }
 
   public registerAddin(name: string, fn: AddinFn) {
@@ -181,7 +156,11 @@ export class ActionManager {
           this.setState({});
         }
         if (result.updateObjects) {
-          const obj = this.project.updateObjects(result.updateObjects);
+          const options = {
+            withUndo: result.withUndo,
+            oldDataForUndo: result.oldDataForUndo,
+          };
+          const obj = this.project.updateObjects(result.updateObjects, options);
           this.socket.emit("update-object", obj);
           this.setState({});
         }

@@ -1,6 +1,6 @@
-import { Action } from "../types";
+import { registerAction } from "./registerAction";
 
-export const actionPanning: Action = {
+export const actionPanning = registerAction({
   name: "panning",
 
   execute: ({ state, params }) => {
@@ -11,4 +11,4 @@ export const actionPanning: Action = {
       },
     };
   },
-};
+});

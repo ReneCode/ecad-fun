@@ -109,7 +109,7 @@ export const getDefaultAppState = (): AppState => {
  * otherwise it is a long-running action and start,stop,pointer... are called until actionResult.stopAction:true is returned.
  */
 export type Action = {
-  name: string;
+  name: ActionName;
 
   keyTest?: (event: KeyboardEvent) => boolean;
   // render?: React.FC<{ state: AppState }>;
@@ -130,6 +130,12 @@ export type ActionState = {
   selectedHandleIdx: number;
   shiftKey: boolean;
   selectionMode: "selectionbox" | "element";
+
+  // for dynamic actions
+  // oldData: save element before dynamicly change (onPointerMove)
+  // newData: the mutation (if it will be change later - onPointerUp)
+  oldData: ECadBaseElement[];
+  newData: ECadBaseElement[];
 };
 
 export const defaultActionState: ActionState = {
@@ -138,12 +144,16 @@ export const defaultActionState: ActionState = {
   selectedHandleIdx: -1,
   shiftKey: false,
   selectionMode: "element",
+  oldData: [],
+  newData: [],
 };
 
 export type ActionResult = {
   state?: Partial<AppState>;
   elements?: readonly ECadBaseElement[];
 
+  withUndo?: boolean;
+  oldDataForUndo?: ObjectType[];
   createObjects?: ObjectType[];
   updateObjects?: ObjectType[];
   deleteObjects?: string[];

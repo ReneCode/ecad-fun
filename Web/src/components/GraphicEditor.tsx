@@ -1,5 +1,6 @@
 import React from "react";
 
+import "../actions";
 import Toolbox from "./Toobox";
 import Status from "./Status";
 import { renderScene } from "../renderer";
@@ -9,7 +10,7 @@ import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 import { ObjectType, Project } from "../share";
 import { Socket } from "../data/Socket";
-import { ProjectService } from "../data/project";
+import { ProjectService } from "../data/ProjectService";
 
 type Props = {
   width: number;
@@ -61,7 +62,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
   }
 
   componentDidMount() {
-    const project = new Project(this.props.projectId);
+    const project = new Project(this.props.projectId, { undoRedo: true });
     this.projectService = new ProjectService(project, this.socket);
 
     this.socket.init(
@@ -101,8 +102,6 @@ class GraphicEditor extends React.Component<Props, AppState> {
       // () => this.project.getElements(),
       // (elements) => this.project.setElements(elements)
     );
-
-    this.actionMananger.registerAll();
 
     const { state } = loadFromLocalStorage();
     const matrix = calcTransformationMatrix(
@@ -214,8 +213,6 @@ class GraphicEditor extends React.Component<Props, AppState> {
     this.dispatchPointerEvent("pointerDown", event);
   };
   private onKeyDown = (event: KeyboardEvent) => {
-    console.log("key:", event);
-
     this.actionMananger?.keyDown(event);
   };
 

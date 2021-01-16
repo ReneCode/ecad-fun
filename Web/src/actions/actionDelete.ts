@@ -1,11 +1,11 @@
-import { getElements } from "../elements";
-import { Action } from "../types";
 import { getCurrentPageElements } from "../data/getCurrentPageElements";
 import { KEYS } from "./keys";
+import { registerAction } from "./registerAction";
 
-export const actionDelete: Action = {
+export const actionDelete = registerAction({
   name: "delete",
   keyTest: (event) => [KEYS.DELETE, KEYS.BACKSPACE].includes(event.key),
+
   execute: ({ state, project }) => {
     if (!state.selectedElementIds.length) {
       return;
@@ -18,4 +18,4 @@ export const actionDelete: Action = {
       deleteObjects: ids,
     };
   },
-};
+});

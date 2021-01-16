@@ -1,8 +1,9 @@
 import { Action, ECadSymbolElement } from "../types";
 import elementWorkerManager from "../elements/ElementWorkerManager";
 import { getElements } from "../elements";
+import { registerAction } from "./registerAction";
 
-export const actionCreateSymbol: Action = {
+export const actionCreateSymbol = registerAction({
   name: "createSymbol",
 
   execute: ({ state, project }) => {
@@ -55,4 +56,4 @@ export const actionCreateSymbol: Action = {
       deleteObjects: children.map((e) => e.id),
     };
   },
-};
+});

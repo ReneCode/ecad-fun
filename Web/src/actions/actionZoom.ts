@@ -1,4 +1,5 @@
-import { Action, AppState, ActionResult } from "../types";
+import { AppState, ActionResult } from "../types";
+import { registerAction } from "./registerAction";
 
 const zoom = (
   appState: AppState,
@@ -26,23 +27,23 @@ const zoom = (
   };
 };
 
-export const actionZoomIn: Action = {
+export const actionZoomIn = registerAction({
   name: "zoomIn",
 
   execute: ({ state }) => {
     return zoom(state, 1.1, window.innerWidth / 2, window.innerHeight / 2);
   },
-};
+});
 
-export const actionZoomOut: Action = {
+export const actionZoomOut = registerAction({
   name: "zoomOut",
 
   execute: ({ state }) => {
     return zoom(state, 1 / 1.1, window.innerWidth / 2, window.innerHeight / 2);
   },
-};
+});
 
-export const actionZoomPinch: Action = {
+export const actionZoomPinch = registerAction({
   name: "zoomPinch",
 
   execute: ({ state, params }: { state: AppState; params: WheelEvent }) => {
@@ -53,4 +54,4 @@ export const actionZoomPinch: Action = {
 
     return zoom(state, 1 - delta / 100, params.clientX, params.clientY);
   },
-};
+});

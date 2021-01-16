@@ -1,6 +1,7 @@
 import { deepCopy } from "./deepCopy";
 import { Dispatcher } from "./Dispatcher";
 import { ObjectType } from "./types";
+import { CURType, UndoRedo } from "./UndoRedo";
 import {
   appendToArray,
   combineParentProperty,
@@ -10,6 +11,11 @@ import {
 
 const DEFAULT_CLIENTID = "0";
 const ROOT_ID = "0:0";
+
+export type CUROptions = {
+  withUndo?: boolean;
+  oldDataForUndo?: ObjectType[];
+};
 
 type QueryParams = {
   depth?: number;
@@ -21,6 +27,8 @@ type QueryParams = {
 export class Project {
   public readonly id: string;
 
+  private undoRedo?: UndoRedo;
+
   private dirty: boolean = false;
   private objects: Record<string, ObjectType> = {};
   private root: ObjectType;
@@ -28,8 +36,11 @@ export class Project {
   private clientId: string = DEFAULT_CLIENTID;
   private lastObjectIndex: number = 0;
 
-  constructor(id: string) {
+  constructor(id: string, options?: { undoRedo: boolean }) {
     this.id = id;
+    if (options) {
+      this.undoRedo = new UndoRedo();
+    }
 
     const root = { id: ROOT_ID, projectId: id, _type: "project" };
     this.clientId = DEFAULT_CLIENTID;
@@ -42,6 +53,10 @@ export class Project {
     const dirty = this.dirty;
     this.dirty = false;
     return dirty;
+  }
+
+  public createNewId() {
+    return `${this.clientId}:${++this.lastObjectIndex}`;
   }
 
   public setClientId(clientId: number) {
@@ -116,89 +131,45 @@ export class Project {
     });
   }
 
-  public createNewId() {
-    return `${this.clientId}:${++this.lastObjectIndex}`;
-  }
-
-  public createObjects(os: ObjectType[]): ObjectType[] {
-    for (let o of os) {
-      if (!o.id) {
-        throw new Error("id missing");
-      }
-    }
-
-    this.dirty = true;
-
-    const results = [];
-    for (let o of os) {
-      const obj = this.cloneObject(o);
-      delete obj._children;
-      this.applyParentProperty(obj);
-      this.addObject(obj);
-      results.push(this.getObject(obj.id));
-    }
+  public createObjects(objects: ObjectType[]): ObjectType[] {
+    const results = this.internalCreateObjects(objects);
 
     this.dispatcher.dispatch("create-object", results);
+
+    if (this.undoRedo) {
+      this.undoRedo.createObjects(results);
+    }
     return results;
   }
 
-  public updateObjects(os: ObjectType[]) {
-    const todos: { current: ObjectType; update: ObjectType }[] = [];
-    for (let o of os) {
-      if (!o.id) {
-        throw new Error("id missing");
-      }
+  public updateObjects(
+    newObjects: ObjectType[],
+    options: CUROptions | undefined = { withUndo: true }
+  ) {
+    const oldObjects = this.internalUpdateObject(newObjects);
+    this.dispatcher.dispatch("update-object", newObjects);
 
-      const currentObject = this.getObject(o.id);
-      if (!currentObject) {
-        throw new Error(`object with id ${o.id} does not exist`);
+    if (options && options.withUndo && this.undoRedo) {
+      if (options.oldDataForUndo) {
+        // the old data is set by options (dynamic move action)
+        // TODO check if oldData has the same .id
+        this.undoRedo.updateObjects(options.oldDataForUndo, newObjects);
+      } else {
+        this.undoRedo.updateObjects(oldObjects, newObjects);
       }
-      todos.push({
-        current: currentObject,
-        update: o,
-      });
     }
-
-    this.dirty = true;
-
-    const results: ObjectType[] = [];
-    for (let { current, update } of todos) {
-      // apply changes
-      const copyUpdate = this.cloneObject(update);
-      for (const key of Object.keys(update)) {
-        if (key === "id") {
-          // id will stay unchanged
-        } else if (key === "_parent") {
-          this.removeFromCurrentParent(current);
-          (current as any)[key] = (update as any)[key];
-          this.applyParentProperty(current);
-        } else {
-          (current as any)[key] = (update as any)[key];
-        }
-      }
-      results.push(copyUpdate);
-    }
-
-    this.dispatcher.dispatch("update-object", results);
-    return results;
+    return oldObjects;
   }
 
   public deleteObjects(ids: string[]) {
-    this.dirty = true;
-
-    for (let id of ids) {
-      const currentObject = this.getObject(id);
-      if (currentObject) {
-        this.traverse(currentObject, (o) => {
-          if (o._parent) {
-            this.removeFromCurrentParent(currentObject);
-          }
-          delete this.objects[o.id];
-        });
-      }
+    const results = this.internalDeleteObjects(ids);
+    if (this.undoRedo) {
+      this.undoRedo.deleteObjects(results);
     }
-    this.dispatcher.dispatch("delete-object", ids);
-    return ids;
+
+    const deletedIds = results.map((o) => o.id);
+    this.dispatcher.dispatch("delete-object", deletedIds);
+    return deletedIds;
   }
 
   public getObject(id: string) {
@@ -233,7 +204,121 @@ export class Project {
     }
   }
 
+  public undo() {
+    if (!this.undoRedo) {
+      throw new Error("undoRedo not activated");
+    }
+    const todos = this.undoRedo.undo();
+    todos.forEach((todo) => this.internalCUR(todo));
+    return todos;
+  }
+
+  public redo() {
+    if (!this.undoRedo) {
+      throw new Error("undoRedo not activated");
+    }
+    const todos = this.undoRedo.redo();
+    todos.forEach((todo) => this.internalCUR(todo));
+    return todos;
+  }
+
   // -----------------------------------------------------
+
+  private internalCUR({ type, data }: CURType) {
+    switch (type) {
+      case "create":
+        return this.internalCreateObjects(data as ObjectType[]);
+
+      case "update":
+        return this.internalUpdateObject(data as ObjectType[]);
+
+      case "delete":
+        return this.internalDeleteObjects(data as string[]);
+
+      default:
+        throw new Error(`internalCUR: bad type:${type}`);
+    }
+  }
+
+  private internalCreateObjects(objects: ObjectType[]): ObjectType[] {
+    for (let obj of objects) {
+      if (!obj.id) {
+        throw new Error("id missing");
+      }
+    }
+
+    this.dirty = true;
+
+    const results: ObjectType[] = [];
+    for (let o of objects) {
+      const obj = this.cloneObject(o);
+      delete obj._children;
+      this.applyParentProperty(obj);
+      this.addObject(obj);
+      results.push(this.getObject(obj.id));
+    }
+    return results;
+  }
+
+  public internalUpdateObject(os: ObjectType[]) {
+    const todos: { current: ObjectType; update: ObjectType }[] = [];
+    for (let o of os) {
+      if (!o.id) {
+        throw new Error("id missing");
+      }
+
+      const currentObject = this.getObject(o.id);
+      if (!currentObject) {
+        throw new Error(`object with id ${o.id} does not exist`);
+      }
+      todos.push({
+        current: currentObject,
+        update: o,
+      });
+    }
+
+    this.dirty = true;
+
+    const results: ObjectType[] = [];
+    for (let { current, update } of todos) {
+      const oldChanges = { id: current.id };
+      // const copyUpdate = this.cloneObject(update);
+      for (const key of Object.keys(update)) {
+        if (key === "id") {
+          // id will stay unchanged
+        } else if (key === "_parent") {
+          this.removeFromCurrentParent(current);
+          (oldChanges as any)[key] = (current as any)[key];
+          (current as any)[key] = (update as any)[key];
+          this.applyParentProperty(current);
+        } else {
+          (oldChanges as any)[key] = (current as any)[key];
+          (current as any)[key] = (update as any)[key];
+        }
+      }
+      // results.push(copyUpdate);
+      results.push(oldChanges);
+    }
+    return results;
+  }
+
+  public internalDeleteObjects(ids: string[]) {
+    this.dirty = true;
+    const result = [];
+    for (let id of ids) {
+      const currentObject = this.getObject(id);
+      if (currentObject) {
+        result.push(currentObject);
+        this.traverse(currentObject, (o) => {
+          if (o._parent) {
+            this.removeFromCurrentParent(currentObject);
+          }
+          delete this.objects[o.id];
+        });
+      }
+    }
+    return result;
+  }
 
   private validateCreateObjectId(id: string) {
     const [clientId, index] = id.split(":");
