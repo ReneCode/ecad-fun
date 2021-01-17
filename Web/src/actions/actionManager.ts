@@ -150,23 +150,11 @@ export class ActionManager {
           }
         }
 
-        if (result.deleteObjects) {
-          const obj = this.project.deleteObjects(result.deleteObjects);
-          this.socket.emit("delete-object", obj);
-          this.setState({});
-        }
-        if (result.updateObjects) {
-          const options = {
-            withUndo: result.withUndo,
-            oldDataForUndo: result.oldDataForUndo,
-          };
-          const obj = this.project.updateObjects(result.updateObjects, options);
-          this.socket.emit("update-object", obj);
-          this.setState({});
-        }
-        if (result.createObjects) {
-          const obj = this.project.createObjects(result.createObjects);
-          this.socket.emit("create-object", obj);
+        if (result.doCUD) {
+          const withUndo =
+            result.withUndo !== undefined ? result.withUndo : true;
+          this.project.doCUD(result.doCUD, { withUndo });
+          this.socket.emit("do-cud", result.doCUD);
           this.setState({});
         }
 

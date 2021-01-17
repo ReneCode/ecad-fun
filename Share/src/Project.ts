@@ -1,7 +1,7 @@
 import { deepCopy } from "./deepCopy";
 import { Dispatcher } from "./Dispatcher";
-import { ObjectType } from "./types";
-import { CURType, UndoRedo } from "./UndoRedo";
+import { CUDType, ObjectType } from "./types";
+import { UndoRedo } from "./UndoRedo";
 import {
   appendToArray,
   combineParentProperty,
@@ -131,6 +131,62 @@ export class Project {
     });
   }
 
+  public doCUD(cud: CUDType[], options?: { withUndo: boolean }) {
+    const withUndo = this.undoRedo && (options ? options.withUndo : true);
+    cud.forEach((cud) => {
+      switch (cud.type) {
+        case "create":
+          {
+            const result = this.internalCreateObjects(cud.data);
+            if (withUndo) {
+              this.undoRedo?.createObjects(cud.data);
+            }
+          }
+          break;
+
+        case "update":
+          {
+            const result = this.internalUpdateObject(cud.data);
+            if (withUndo) {
+              if (cud.oldDataForUndo) {
+                const oldIds = cud.oldDataForUndo.map((o) => o.id).sort();
+                const updateIds = cud.data.map((o) => o.id).sort();
+                let ok = true;
+                if (oldIds.length != updateIds.length) {
+                  ok = false;
+                }
+                for (let i = 0; i < updateIds.length; i++) {
+                  if (updateIds[i] !== oldIds[i]) {
+                    ok = false;
+                  }
+                }
+
+                if (!ok) {
+                  throw new Error("bad oldDataForUndo on update");
+                }
+                this.undoRedo?.updateObjects(cud.oldDataForUndo, cud.data);
+              } else {
+                this.undoRedo?.updateObjects(result, cud.data);
+              }
+            }
+          }
+          break;
+
+        case "delete":
+          {
+            const result = this.internalDeleteObjects(cud.data);
+            if (withUndo) {
+              this.undoRedo?.deleteObjects(result);
+            }
+          }
+          break;
+
+        default:
+          throw new Error(`bad cudType: ${(cud as any).type}`);
+      }
+    });
+  }
+
   public createObjects(objects: ObjectType[]): ObjectType[] {
     const results = this.internalCreateObjects(objects);
 
@@ -209,7 +265,7 @@ export class Project {
       throw new Error("undoRedo not activated");
     }
     const todos = this.undoRedo.undo();
-    todos.forEach((todo) => this.internalCUR(todo));
+    // todos.forEach((todo) => this.internalCUD(todo));
     return todos;
   }
 
@@ -218,13 +274,13 @@ export class Project {
       throw new Error("undoRedo not activated");
     }
     const todos = this.undoRedo.redo();
-    todos.forEach((todo) => this.internalCUR(todo));
+    // todos.forEach((todo) => this.internalCUD(todo));
     return todos;
   }
 
   // -----------------------------------------------------
 
-  private internalCUR({ type, data }: CURType) {
+  private internalCUD({ type, data }: CUDType) {
     switch (type) {
       case "create":
         return this.internalCreateObjects(data as ObjectType[]);
@@ -236,7 +292,7 @@ export class Project {
         return this.internalDeleteObjects(data as string[]);
 
       default:
-        throw new Error(`internalCUR: bad type:${type}`);
+        throw new Error(`internalCUD: bad type:${type}`);
     }
   }
 

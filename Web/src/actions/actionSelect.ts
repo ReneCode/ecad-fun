@@ -4,6 +4,8 @@ import {
   ECadRectangleElement,
   ActionResult,
   ECadBaseElement,
+  CUD_Update,
+  ActionState,
 } from "../types";
 import {
   hitTestElement,
@@ -139,7 +141,8 @@ export const actionSelect = registerAction({
           })
           .filter((o) => !!o) as ObjectType[];
         return {
-          updateObjects: update,
+          doCUD: [CUD_Update(update)],
+          withUndo: false,
           // elements: replaceElements(elements, replace),
           actionState: {
             lastX: x,
@@ -161,7 +164,8 @@ export const actionSelect = registerAction({
           })
           .filter((o) => !!o) as ObjectType[];
         return {
-          updateObjects: update,
+          doCUD: [CUD_Update(update)],
+          withUndo: false,
           actionState: {
             lastX: x,
             lastY: y,
@@ -198,9 +202,7 @@ export const actionSelect = registerAction({
     let result = {};
     if (actionState.newData && actionState.newData.length > 0) {
       result = {
-        updateObjects: actionState.newData,
-        withUndo: true,
-        oldDataForUndo: actionState.oldData,
+        doCUD: [CUD_Update(actionState.newData, actionState.oldData)],
       };
     }
     return {
@@ -230,7 +232,9 @@ const createSelectionBox = (x: number, y: number): ECadRectangleElement => {
   };
 };
 
-const saveOrginalElements = (elements: ECadBaseElement[]) => {
+const saveOrginalElements = (
+  elements: ECadBaseElement[]
+): Partial<ActionState> => {
   return {
     oldData: copyElements(elements),
     newData: [],

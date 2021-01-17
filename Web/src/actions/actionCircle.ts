@@ -1,4 +1,4 @@
-import { ECadCircleElement } from "../types";
+import { CUD_Create, ECadCircleElement } from "../types";
 import { distancePointToPoint } from "../utils/geometric";
 import { registerAction } from "./registerAction";
 
@@ -52,7 +52,7 @@ export const actionCircle = registerAction({
         state: {
           editingElement: null,
         },
-        createObjects: [state.editingElement],
+        doCUD: [CUD_Create([state.editingElement])],
         stopAction: true,
       };
     }

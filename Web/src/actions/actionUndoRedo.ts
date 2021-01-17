@@ -9,8 +9,10 @@ export const actionUndo = registerAction({
 
   execute: ({ project }) => {
     console.log("undo");
-    project.undo();
+    const result = project.undo();
     return {
+      withUndo: false,
+      doCUD: result,
       state: {},
     };
   },
@@ -23,8 +25,10 @@ export const actionRedo = registerAction({
 
   execute: ({ project }) => {
     console.log("redo");
-    project.redo();
+    const result = project.redo();
     return {
+      withUndo: false,
+      doCUD: result,
       state: {},
     };
   },

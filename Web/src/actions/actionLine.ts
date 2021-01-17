@@ -1,4 +1,4 @@
-import { ECadLineElement } from "../types";
+import { CUD_Create, ECadLineElement } from "../types";
 import { registerAction } from "./registerAction";
 
 export const actionLine = registerAction({
@@ -61,7 +61,7 @@ export const actionLine = registerAction({
         state: {
           editingElement: null,
         },
-        createObjects: [state.editingElement],
+        doCUD: [CUD_Create([state.editingElement])],
         stopAction: true,
       };
     }
