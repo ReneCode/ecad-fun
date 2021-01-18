@@ -1,4 +1,4 @@
-import { Action, ECadSymbolElement } from "../types";
+import { ECadSymbolElement } from "../types";
 import elementWorkerManager from "../elements/ElementWorkerManager";
 import { getElements } from "../elements";
 import { registerAction } from "./registerAction";

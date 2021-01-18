@@ -53,7 +53,6 @@ export class ActionManager {
     this.project = project;
     this.socket = socket;
 
-    console.log("actions:", actions.length);
     actions.forEach((action) => {
       this.register(action);
     });
@@ -68,6 +67,10 @@ export class ActionManager {
 
   public registerAddin(name: string, fn: AddinFn) {
     this.addins[name] = fn;
+  }
+
+  public getCurrentAction() {
+    return this.runningActionName;
   }
 
   public async dispatch(type: EventType, params: any) {

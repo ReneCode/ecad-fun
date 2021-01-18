@@ -1,4 +1,3 @@
-import { Project } from "../share";
 import { KEYS } from "./keys";
 import { registerAction } from "./registerAction";
 
@@ -8,7 +7,6 @@ export const actionUndo = registerAction({
     KEYS.ctrlOrCmdKey(event) && !event.shiftKey && event.key === KEYS.Z,
 
   execute: ({ project }) => {
-    console.log("undo");
     const result = project.undo();
     return {
       withUndo: false,
@@ -21,10 +19,11 @@ export const actionUndo = registerAction({
 export const actionRedo = registerAction({
   name: "redo",
   keyTest: (event) =>
-    KEYS.ctrlOrCmdKey(event) && event.shiftKey && event.key === KEYS.Z,
+    KEYS.ctrlOrCmdKey(event) &&
+    event.shiftKey &&
+    event.key.toLowerCase() === KEYS.Z,
 
   execute: ({ project }) => {
-    console.log("redo");
     const result = project.redo();
     return {
       withUndo: false,

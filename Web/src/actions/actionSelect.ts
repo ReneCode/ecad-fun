@@ -1,5 +1,4 @@
 import {
-  Action,
   POINTER_BUTTONS,
   ECadRectangleElement,
   ActionResult,
