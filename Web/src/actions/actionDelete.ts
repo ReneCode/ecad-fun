@@ -1,4 +1,5 @@
 import { getCurrentPageElements } from "../data/getCurrentPageElements";
+import { CUD_Delete } from "../types";
 import { KEYS } from "./keys";
 import { registerAction } from "./registerAction";
 
@@ -15,7 +16,7 @@ export const actionDelete = registerAction({
       .filter((element) => state.selectedElementIds.includes(element.id))
       .map((e) => e.id);
     return {
-      deleteObjects: ids,
+      doCUD: [CUD_Delete(ids)],
     };
   },
 });

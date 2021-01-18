@@ -1,4 +1,4 @@
-import { ObjectType, Project } from "./share";
+import { ObjectType, Project, CUDType } from "./share";
 
 export type ActionName = string;
 
@@ -153,13 +153,35 @@ export type ActionResult = {
   elements?: readonly ECadBaseElement[];
 
   withUndo?: boolean;
-  oldDataForUndo?: ObjectType[];
-  createObjects?: ObjectType[];
-  updateObjects?: ObjectType[];
-  deleteObjects?: string[];
+  doCUD?: CUDType[];
 
   actionState?: Partial<ActionState> | any;
   stopAction?: boolean;
+};
+
+export const CUD_Create = (data: ObjectType[]): CUDType => {
+  return {
+    type: "create",
+    data,
+  };
+};
+
+export const CUD_Delete = (data: string[]): CUDType => {
+  return {
+    type: "delete",
+    data,
+  };
+};
+
+export const CUD_Update = (
+  data: ObjectType[],
+  oldDataForUndo?: ObjectType[]
+): CUDType => {
+  return {
+    type: "update",
+    data,
+    oldDataForUndo,
+  };
 };
 
 type ActionFn = (args: {

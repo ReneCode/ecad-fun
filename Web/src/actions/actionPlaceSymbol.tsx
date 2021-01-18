@@ -1,11 +1,11 @@
-import { Action, ECadSymbolRefElement, ECadSymbolElement } from "../types";
+import { ECadSymbolRefElement, ECadSymbolElement } from "../types";
 import { randomId } from "../utils/randomId";
 import { registerAction } from "./registerAction";
 
-type MyActionState = {
-  symbol: ECadSymbolElement;
-  symbolRef: ECadSymbolRefElement;
-};
+// type MyActionState = {
+//   symbol: ECadSymbolElement;
+//   symbolRef: ECadSymbolRefElement;
+// };
 
 export const actionPlaceSymbol = registerAction({
   name: "placeSymbol",

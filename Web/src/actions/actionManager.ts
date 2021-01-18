@@ -9,6 +9,7 @@ import {
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { actions } from "./registerAction";
+import { checkCreateObjectClientId } from "../elements";
 
 export type EventType =
   | "execute"
@@ -53,7 +54,6 @@ export class ActionManager {
     this.project = project;
     this.socket = socket;
 
-    console.log("actions:", actions.length);
     actions.forEach((action) => {
       this.register(action);
     });
@@ -68,6 +68,10 @@ export class ActionManager {
 
   public registerAddin(name: string, fn: AddinFn) {
     this.addins[name] = fn;
+  }
+
+  public getCurrentAction() {
+    return this.runningActionName;
   }
 
   public async dispatch(type: EventType, params: any) {
@@ -150,23 +154,21 @@ export class ActionManager {
           }
         }
 
-        if (result.deleteObjects) {
-          const obj = this.project.deleteObjects(result.deleteObjects);
-          this.socket.emit("delete-object", obj);
-          this.setState({});
-        }
-        if (result.updateObjects) {
-          const options = {
-            withUndo: result.withUndo,
-            oldDataForUndo: result.oldDataForUndo,
-          };
-          const obj = this.project.updateObjects(result.updateObjects, options);
-          this.socket.emit("update-object", obj);
-          this.setState({});
-        }
-        if (result.createObjects) {
-          const obj = this.project.createObjects(result.createObjects);
-          this.socket.emit("create-object", obj);
+        if (result.doCUD) {
+          const withUndo =
+            result.withUndo !== undefined ? result.withUndo : true;
+          const clientId = this.socket.getClientId();
+          // to not check if undo or redo action is executed
+          // because on undo/redo elements with other clientId
+          // than mine could be created.
+          // result.isUndoRedo is set on action[Undo|Redo]
+          if (
+            result.isUndoRedo ||
+            checkCreateObjectClientId(result.doCUD, clientId)
+          ) {
+            this.project.doCUD(result.doCUD, { withUndo });
+            this.socket.emit("do-cud", result.doCUD);
+          }
           this.setState({});
         }
 

@@ -1,10 +1,15 @@
 import io from "socket.io-client";
-import { Project, ObjectType } from "../share";
+import { Project, CUDType } from "../share";
 
 const WS_SERVER = process.env.REACT_APP_WEBSOCKET_SERVER as string;
 
 export class Socket {
   private socket: SocketIOClient.Socket | undefined;
+  private clientId: string = "";
+
+  public getClientId(): string {
+    return this.clientId;
+  }
 
   init(
     project: Project,
@@ -21,12 +26,33 @@ export class Socket {
       callbackProjectOpen(project);
     });
 
-    this.socket.on("send-clientid", (clientId: string) => {
+    this.socket.on("send-clientid", (clientId: number) => {
+      this.clientId = `${clientId}`;
       console.debug("set clientId", clientId);
-      project.setClientId(parseInt(clientId));
+      project.setClientId(clientId);
       // callbackInit(project);
     });
 
+    this.socket.on("do-cud", (response: string, data: CUDType[]) => {
+      switch (response) {
+        case "ack":
+          // my do-cud was well performed by the server
+          break;
+        case "err":
+          console.log("do-cud:", response, data);
+          break;
+        case "ok":
+          // some other clients changes
+          // follow that changes
+          if (!data) {
+            throw new Error("bad socket data");
+          }
+          project.doCUD(data, { withUndo: false });
+          callbackProjectChange(project);
+          break;
+      }
+    });
+    /*
     this.socket.on("create-object", (response: string, data: ObjectType[]) => {
       if (response === "ack") {
         // it's the answer of my own creating.
@@ -56,7 +82,7 @@ export class Socket {
         callbackProjectChange(project);
       }
     });
-
+*/
     this.socket.on("connect_failed", (a: any, b: any) => {
       console.log(">> connect_failed", a, b);
     });

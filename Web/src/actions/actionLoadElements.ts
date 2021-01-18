@@ -1,4 +1,4 @@
-import { ECadLineElement, ECadCircleElement, Action } from "../types";
+import { ECadLineElement, ECadCircleElement } from "../types";
 import { randomId } from "../utils/randomId";
 import { registerAction } from "./registerAction";
 

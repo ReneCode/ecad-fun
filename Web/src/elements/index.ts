@@ -15,7 +15,28 @@ import {
 } from "../utils/geometric";
 
 import elementWorkerManager from "../elements/ElementWorkerManager";
-import { Project } from "../share";
+import { CUDType, Project } from "../share";
+
+export const checkCreateObjectClientId = (
+  cuds: CUDType[],
+  validClientId: string
+) => {
+  for (let cud of cuds) {
+    if (cud.type === "create") {
+      // validate clientId of obj.id
+      // client is forced to use only its clienId
+      // when creating new objects
+      for (let obj of cud.data) {
+        const [cId, index] = obj.id.split(":");
+        if (cId !== validClientId) {
+          console.log("bad clientIds:", cId, validClientId);
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+};
 
 export const getElements = (project: Project): readonly ECadBaseElement[] => {
   const elements = project.getRoot()._children;

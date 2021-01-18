@@ -5,7 +5,7 @@ import SocketIO from "socket.io";
 import debug from "debug";
 import { clientService } from "./ObjectStore/ClientService";
 import { projectService } from "./ProjectService";
-import { ObjectType } from "./share/types";
+import { CUDType, ObjectType } from "./share/types";
 
 const socketDebug = debug("socket");
 const errorDebug = debug("error");
@@ -80,59 +80,18 @@ export const initSocketIO = (server: http.Server) => {
       }
     });
 
-    socket.on("create-object", async (objects: ObjectType[]) => {
+    socket.on("do-cud", async (cuds: CUDType[]) => {
       const projectId = clientService.getProjectIdBySocketId(socket.id);
       const clientId = `${clientService.getClientIdBySocketId(socket.id)}`;
-      socketDebug(`create-object projectId:${projectId} socket:${socket.id}`);
+      // socketDebug(`do-cud projectId:${projectId} socket:${socket.id}`);
       if (projectId) {
         const project = await projectService.open(projectId);
-        if (project) {
-          // validate clientId of obj.id
-          // client is forced to use only its clienId
-          let ok = true;
-          for (let obj of objects) {
-            const [cId, index] = obj.id.split(":");
-            if (cId !== clientId) {
-              ok = false;
-              break;
-            }
-          }
-          if (!ok) {
-            //
-            socket.emit("create-object", "err", objects);
-          } else {
-            const result = project.createObjects(objects);
-            socket.emit("create-object", "ack", result);
-            socket.broadcast.to(projectId).emit("create-object", "ok", result);
-          }
-        }
+        const result = project.doCUD(cuds);
+        // TODO result should be the eventualy fixed data (e.g. f-index fixed because of duplicate f-index)
+        socket.emit("do-cud", "ack", result);
+        socket.broadcast.to(projectId).emit("do-cud", "ok", cuds);
       } else {
         errorDebug(`no project for socket ${socket.id}`);
-      }
-    });
-
-    socket.on("update-object", async (objects: ObjectType[]) => {
-      const projectId = clientService.getProjectIdBySocketId(socket.id);
-      socketDebug(`update-object projectId:${projectId} socket:${socket.id}`);
-      if (projectId) {
-        const project = await projectService.open(projectId);
-        if (project) {
-          const result = project.updateObjects(objects);
-          socket.emit("update-object", "ack", result);
-          socket.broadcast.to(projectId).emit("update-object", "ok", result);
-        }
-      }
-    });
-    socket.on("delete-object", async (ids: string[]) => {
-      const projectId = clientService.getProjectIdBySocketId(socket.id);
-      socketDebug(`delete-object projectId:${projectId} socket:${socket.id}`);
-      if (projectId) {
-        const project = await projectService.open(projectId);
-        if (project) {
-          const result = project.deleteObjects(ids);
-          socket.emit("delete-object", "ack", result);
-          socket.broadcast.to(projectId).emit("delete-object", "ok", result);
-        }
       }
     });
 

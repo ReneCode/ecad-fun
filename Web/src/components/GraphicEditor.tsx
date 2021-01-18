@@ -1,14 +1,14 @@
 import React from "react";
 
 import "../actions";
-import Toolbox from "./Toobox";
+import Toolbox from "./Toolbox";
 import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/actionManager";
 import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
 import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
-import { ObjectType, Project } from "../share";
+import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { ProjectService } from "../data/ProjectService";
 
@@ -56,6 +56,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
         ? currentPage._children
         : []) as ECadBaseElement[];
 
+      const currentActionName = this.actionMananger?.getCurrentAction();
       renderScene(this.canvas, elements, dynamicElements, this.state);
       this.props.onChange(this.state, this.projectService.getProject());
     }
@@ -187,7 +188,10 @@ class GraphicEditor extends React.Component<Props, AppState> {
           project={this.project}
           actionManager={this.actionMananger}
         /> */}
-        <Toolbox onClick={this.onToolboxClick} />
+        <Toolbox
+          onClick={this.onToolboxClick}
+          currentActionName={this.actionMananger?.getCurrentAction() || ""}
+        />
         <Status x={this.state.pointerX} y={this.state.pointerY} />
         <canvas
           ref={this.handleCanvasRef}
@@ -232,6 +236,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
 
   private onToolboxClick = (action: string) => {
     this.actionMananger?.execute(action, null);
+    this.setState({});
   };
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {

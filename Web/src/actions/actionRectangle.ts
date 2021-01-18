@@ -1,4 +1,4 @@
-import { ECadRectangleElement } from "../types";
+import { CUD_Create, ECadRectangleElement } from "../types";
 import { registerAction } from "./registerAction";
 
 export const actionRectangle = registerAction({
@@ -49,7 +49,7 @@ export const actionRectangle = registerAction({
         state: {
           editingElement: null,
         },
-        createObjects: [state.editingElement],
+        doCUD: [CUD_Create([state.editingElement])],
         stopAction: true,
       };
     }

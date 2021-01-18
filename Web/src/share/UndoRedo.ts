@@ -1,4 +1,4 @@
-import { ObjectType } from "./types";
+import { CUDType, ObjectType } from "./types";
 
 const TYPE_START = "---";
 type EntryType = "---" | "create" | "update" | "delete";
@@ -8,16 +8,6 @@ type UREntry = {
   old: undefined | ObjectType[];
   new: undefined | ObjectType[];
 };
-
-export type CURType =
-  | {
-      type: "create" | "update";
-      data: ObjectType[];
-    }
-  | {
-      type: "delete";
-      data: string[];
-    };
 
 export class UndoRedo {
   canUndo: boolean = false;
@@ -42,7 +32,7 @@ export class UndoRedo {
 
   public undo() {
     let index = this.currentIndex;
-    let todos: CURType[] = [];
+    let todos: CUDType[] = [];
     if (index < 0) {
       // nothing to undo
       return todos;
@@ -67,7 +57,7 @@ export class UndoRedo {
 
   public redo() {
     let index = this.currentIndex;
-    let todos: CURType[] = [];
+    let todos: CUDType[] = [];
     if (index === this.entryList.length - 1) {
       // nothing to redo
       return todos;
@@ -118,7 +108,7 @@ export class UndoRedo {
     this.currentIndex = currentIndex;
   }
 
-  private undoOneEntry(entry: UREntry): CURType {
+  private undoOneEntry(entry: UREntry): CUDType {
     switch (entry.type) {
       case "create":
         if (!entry.new) {
@@ -143,7 +133,7 @@ export class UndoRedo {
     }
   }
 
-  private redoOneEntry(entry: UREntry): CURType {
+  private redoOneEntry(entry: UREntry): CUDType {
     switch (entry.type) {
       case "create":
         if (!entry.new) {

@@ -16,7 +16,7 @@ export const Header = () => {
       </div>
       <div className="right">
         <div className="user-name">{user?.name}</div>
-        {user && <img className="user-image" src={user?.picture} />}
+        {user && <img className="user-image" alt="home" src={user?.picture} />}
         {isAuthenticated ? (
           <Button onClick={() => logout({ returnTo: window.location.origin })}>
             Log Out{" "}
