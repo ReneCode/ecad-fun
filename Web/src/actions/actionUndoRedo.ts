@@ -19,7 +19,9 @@ export const actionUndo = registerAction({
 export const actionRedo = registerAction({
   name: "redo",
   keyTest: (event) =>
-    KEYS.ctrlOrCmdKey(event) && event.shiftKey && event.key === KEYS.Z,
+    KEYS.ctrlOrCmdKey(event) &&
+    event.shiftKey &&
+    event.key.toLowerCase() === KEYS.Z,
 
   execute: ({ project }) => {
     console.log("redo");
