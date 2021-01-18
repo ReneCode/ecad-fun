@@ -9,6 +9,7 @@ import {
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { actions } from "./registerAction";
+import { checkCreateObjectClientId } from "../elements";
 
 export type EventType =
   | "execute"
@@ -156,8 +157,18 @@ export class ActionManager {
         if (result.doCUD) {
           const withUndo =
             result.withUndo !== undefined ? result.withUndo : true;
-          this.project.doCUD(result.doCUD, { withUndo });
-          this.socket.emit("do-cud", result.doCUD);
+          const clientId = this.socket.getClientId();
+          // to not check if undo or redo action is executed
+          // because on undo/redo elements with other clientId
+          // than mine could be created.
+          // result.isUndoRedo is set on action[Undo|Redo]
+          if (
+            result.isUndoRedo ||
+            checkCreateObjectClientId(result.doCUD, clientId)
+          ) {
+            this.project.doCUD(result.doCUD, { withUndo });
+            this.socket.emit("do-cud", result.doCUD);
+          }
           this.setState({});
         }
 

@@ -5,6 +5,11 @@ const WS_SERVER = process.env.REACT_APP_WEBSOCKET_SERVER as string;
 
 export class Socket {
   private socket: SocketIOClient.Socket | undefined;
+  private clientId: string = "";
+
+  public getClientId(): string {
+    return this.clientId;
+  }
 
   init(
     project: Project,
@@ -21,9 +26,10 @@ export class Socket {
       callbackProjectOpen(project);
     });
 
-    this.socket.on("send-clientid", (clientId: string) => {
+    this.socket.on("send-clientid", (clientId: number) => {
+      this.clientId = `${clientId}`;
       console.debug("set clientId", clientId);
-      project.setClientId(parseInt(clientId));
+      project.setClientId(clientId);
       // callbackInit(project);
     });
 

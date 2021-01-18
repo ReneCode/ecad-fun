@@ -10,6 +10,7 @@ export const actionUndo = registerAction({
     const result = project.undo();
     return {
       withUndo: false,
+      isUndoRedo: true, // special - see actionManger
       doCUD: result,
       state: {},
     };
@@ -27,6 +28,8 @@ export const actionRedo = registerAction({
     const result = project.redo();
     return {
       withUndo: false,
+      isUndoRedo: true, // special - see actionManger
+
       doCUD: result,
       state: {},
     };
