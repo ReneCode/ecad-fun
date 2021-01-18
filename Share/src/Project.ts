@@ -185,6 +185,7 @@ export class Project {
           throw new Error(`bad cudType: ${(cud as any).type}`);
       }
     });
+    return cud;
   }
 
   public createObjects(objects: ObjectType[]): ObjectType[] {

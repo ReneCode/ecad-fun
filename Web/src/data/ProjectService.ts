@@ -41,13 +41,13 @@ export class ProjectService {
   }
 
   // ------------------------
-  private deleteObjects(deleteObjects: string[]) {
-    const result = this.project.deleteObjects(deleteObjects);
-    this.socket.emit("delete-object", result);
-    // this.setState({});
+  // private deleteObjects(deleteObjects: string[]) {
+  //   const result = this.project.deleteObjects(deleteObjects);
+  //   this.socket.emit("delete-object", result);
+  //   // this.setState({});
 
-    return result;
-  }
+  //   return result;
+  // }
 
   // if (result.updateObjects) {
   //   const obj = this.project.updateObjects(result.updateObjects);
@@ -55,11 +55,13 @@ export class ProjectService {
   //   this.setState({});
   // }
   private createObjects(createObjects: ObjectType[]) {
-    const result = this.project.createObjects(createObjects);
-    this.socket.emit("create-object", result);
+    const result = this.project.doCUD([
+      { type: "create", data: createObjects },
+    ]);
+    this.socket.emit("do-cud", result);
     // this.setState({});
 
-    return result;
+    return result[0].data as ObjectType[];
   }
 }
 
