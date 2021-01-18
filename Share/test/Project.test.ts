@@ -659,11 +659,11 @@ describe("Project", () => {
       project.createObjects([{ id, name: "p1", type: "page" }]);
       const p1 = project.getObject(id);
       expect(p1).toEqual({ id, name: "p1", type: "page" });
-      project.undo();
+      project.doCUD(project.undo(), { withUndo: false });
       const p1Deleted = project.getObject(id);
       expect(p1Deleted).toEqual(undefined);
 
-      project.redo();
+      project.doCUD(project.redo(), { withUndo: false });
       const p1ReCreated = project.getObject(id);
       expect(p1ReCreated).toEqual({ id, name: "p1", type: "page" });
     });
@@ -677,7 +677,7 @@ describe("Project", () => {
       const p1Deleted = project.getObject(id);
       expect(p1Deleted).toEqual(undefined);
 
-      project.undo();
+      project.doCUD(project.undo(), { withUndo: false });
       const p1ReCreated = project.getObject(id);
       expect(p1ReCreated).toEqual({ id, name: "p1", type: "page" });
     });
@@ -691,11 +691,11 @@ describe("Project", () => {
       const p1Updated = project.getObject(id);
       expect(p1Updated).toEqual({ id, name: "p2", type: "page" });
 
-      project.undo();
+      project.doCUD(project.undo(), { withUndo: false });
       const p1UndoUpdate = project.getObject(id);
       expect(p1UndoUpdate).toEqual({ id, name: "p1", type: "page" });
 
-      project.redo();
+      project.doCUD(project.redo(), { withUndo: false });
       const p1RedoUpdate = project.getObject(id);
       expect(p1RedoUpdate).toEqual({ id, name: "p2", type: "page" });
     });
@@ -714,17 +714,17 @@ describe("Project", () => {
       const elementCreated = project.getObject(elementId);
       expect(project.getObject(pageId)._children).toEqual([elementCreated]);
 
-      project.undo();
+      project.doCUD(project.undo(), { withUndo: false });
       expect(project.getObject(pageId)._children).toEqual([]);
 
-      project.redo();
+      project.doCUD(project.redo(), { withUndo: false });
       expect(project.getObject(pageId)._children).toEqual([elementCreated]);
 
       project.deleteObjects([elementId]);
       expect(project.getObject(pageId)._children).toEqual([]);
       expect(project.getObject(elementId)).toEqual(undefined);
 
-      project.undo();
+      project.doCUD(project.undo(), { withUndo: false });
       const elementReCreated = project.getObject(elementId);
       expect(elementReCreated).toEqual({
         id: elementId,
