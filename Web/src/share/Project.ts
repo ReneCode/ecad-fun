@@ -149,6 +149,21 @@ export class Project {
             const result = this.internalUpdateObject(cud.data);
             if (withUndo) {
               if (cud.oldDataForUndo) {
+                const oldIds = cud.oldDataForUndo.map((o) => o.id).sort();
+                const updateIds = cud.data.map((o) => o.id).sort();
+                let ok = true;
+                if (oldIds.length != updateIds.length) {
+                  ok = false;
+                }
+                for (let i = 0; i < updateIds.length; i++) {
+                  if (updateIds[i] !== oldIds[i]) {
+                    ok = false;
+                  }
+                }
+
+                if (!ok) {
+                  throw new Error("bad oldDataForUndo on update");
+                }
                 this.undoRedo?.updateObjects(cud.oldDataForUndo, cud.data);
               } else {
                 this.undoRedo?.updateObjects(result, cud.data);
