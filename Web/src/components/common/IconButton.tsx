@@ -42,18 +42,13 @@ const SvgItem = ({ item }: { item: any }) => {
 };
 
 type IProps = {
-  onClick: () => void;
+  onClick: (ev: React.MouseEvent) => void;
   icon: string | undefined;
   title?: string;
   disabled?: boolean;
 };
 
-const IconButton: React.FC<IProps> = ({
-  onClick,
-  icon,
-  title,
-  disabled,
-}) => {
+const IconButton: React.FC<IProps> = ({ onClick, icon, title, disabled }) => {
   if (!icon) {
     return null;
   }
@@ -61,29 +56,29 @@ const IconButton: React.FC<IProps> = ({
   const data = svgData[icon];
   if (!data) {
     console.log("icon not found", icon);
-    return null;
+    return <div className={`icon-btn icon-${icon}`}>{icon}</div>;
   }
   return (
     <div
       className={`icon-btn icon-${icon}`}
-      onClick={ev => {
+      onClick={(ev) => {
         if (!disabled) {
-          onClick();
+          onClick(ev);
           ev.stopPropagation();
         }
       }}
-      title={title || `# ${icon} `}>
+      title={title || `# ${icon} `}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox={data.viewBox || "0 0 40 40"}
         fill={data.fill}
         opacity={disabled ? 0.3 : 1}
         strokeLinejoin={data.strokeLinejoin}
-        stroke={data.stroke}>
+        stroke={data.stroke}
+      >
         {data.svg &&
-          data.svg.map((d: any, idx: number) => (
-            <SvgItem key={idx} item={d} />
-          ))}
+          data.svg.map((d: any, idx: number) => <SvgItem key={idx} item={d} />)}
         {data.path &&
           data.path.map((p: string, idx: number) => {
             return (

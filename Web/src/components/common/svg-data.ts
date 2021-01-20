@@ -294,7 +294,6 @@ const svgData: any = {
   },
   menu: {
     stroke: "#eee",
-    fill: "#eee",
     viewBox: "0 0 460 460",
     path: [
       "M0,382.5h459v-51H0V382.5z M0,255h459v-51H0V255z M0,76.5v51h459v-51H0z",

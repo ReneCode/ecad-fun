@@ -1,22 +1,30 @@
-.menu {
+.context-menu {
   width: 120px;
-  box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
-  position: relative;
-  display: none;
+  list-style: none;
+  background-color: #ddd;
+  border: 1px solid #333;
+  margin: 0px;
+  padding: 1px;
 
-  .menu-options {
-    list-style: none;
-    padding: 10px 0;
-
-    .menu-option {
+  .context-menu-option {
+    button {
       font-weight: 500;
       font-size: 14px;
-      padding: 10px 40px 10px 20px;
+      padding: 4px;
       cursor: pointer;
 
+      width: 100%;
+      background-color: #ddd;
+      border: 0;
+      text-align: start;
+
       &:hover {
-        background: rgba(0, 0, 0, 0.2);
+        background: #333;
+        color: #ddd;
       }
+    }
+    hr {
+      margin: 0;
     }
   }
 }

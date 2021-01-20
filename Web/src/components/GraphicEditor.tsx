@@ -11,6 +11,7 @@ import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { ProjectService } from "../data/ProjectService";
+import MainMenuButton from "./MainMenuButton";
 
 type Props = {
   width: number;
@@ -188,6 +189,9 @@ class GraphicEditor extends React.Component<Props, AppState> {
           project={this.project}
           actionManager={this.actionMananger}
         /> */}
+        {this.actionMananger && (
+          <MainMenuButton actionManager={this.actionMananger} />
+        )}
         <Toolbox
           onClick={this.onToolboxClick}
           currentActionName={this.actionMananger?.getCurrentAction() || ""}

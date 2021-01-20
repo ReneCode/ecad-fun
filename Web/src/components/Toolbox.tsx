@@ -17,13 +17,6 @@ const Toolbox: React.FC<Props> = ({ onClick, currentActionName }) => {
   ];
   return (
     <div className="toolbox">
-      <ToolButton
-        onClick={() => {
-          history.push("/");
-        }}
-      >
-        Home
-      </ToolButton>
       {buttons.map((b) => {
         return (
           <ToolButton
