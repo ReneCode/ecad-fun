@@ -16,6 +16,10 @@ const MainMenuButton: React.FC<Props> = ({ actionManager }) => {
     history.push("/");
   };
 
+  const executeAction = (actionName: string) => {
+    actionManager.execute(actionName, {});
+  };
+
   // show context menu
   const onClick = (ev: React.MouseEvent) => {
     ContextMenu.push({
@@ -27,13 +31,15 @@ const MainMenuButton: React.FC<Props> = ({ actionManager }) => {
           onClick: () => onHome(),
         },
         {
-          label: "",
+          label: "---",
         },
-
         {
           label: "PageList",
-          onClick: () => {},
+          onClick: () => {
+            executeAction("pageList");
+          },
         },
+        { label: "Grid", onClick: () => executeAction("switchGrid") },
       ],
     });
   };

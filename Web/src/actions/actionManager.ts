@@ -10,6 +10,7 @@ import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { actions } from "./registerAction";
 import { checkCreateObjectClientId } from "../elements";
+import { showDynamicDialogs } from "../components/Dialogs/showDynamicDialogs";
 
 export type EventType =
   | "execute"
@@ -120,6 +121,14 @@ export class ActionManager {
     }
   }
 
+  public renderAction(name: string): React.ReactElement | null {
+    const action = this.getAction(name);
+    if (action && action.render) {
+      return action.render({ state: this.getState(), project: this.project });
+    }
+    return null;
+  }
+
   // ----------------------------------------------------
 
   private getAction(actionName: string) {
@@ -187,6 +196,11 @@ export class ActionManager {
 
         if (result.stopAction) {
           this.execute("select", { params });
+        }
+
+        if (result.showDialog !== undefined) {
+          showDynamicDialogs.show(action.name, result.showDialog);
+          this.setState({});
         }
       }
     }

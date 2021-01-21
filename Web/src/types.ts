@@ -111,6 +111,8 @@ export const getDefaultAppState = (): AppState => {
 export type Action = {
   name: ActionName;
 
+  render?: ActionRenderFn;
+
   keyTest?: (event: KeyboardEvent) => boolean;
   // render?: React.FC<{ state: AppState }>;
 
@@ -157,6 +159,8 @@ export type ActionResult = {
 
   actionState?: Partial<ActionState> | any;
   stopAction?: boolean;
+
+  showDialog?: boolean;
 };
 
 export const CUD_Create = (data: ObjectType[]): CUDType => {
@@ -183,6 +187,11 @@ export const CUD_Update = (
     oldDataForUndo,
   };
 };
+
+type ActionRenderFn = (args: {
+  state: AppState;
+  project: Project;
+}) => React.ReactElement;
 
 type ActionFn = (args: {
   state: AppState;

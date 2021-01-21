@@ -2,6 +2,7 @@
 // please add all actions here
 // so that they will register themselfs
 
+export { actionPageList } from "./actionPageList";
 export { actionMenu } from "./actionMenu";
 export { actionLine } from "./actionLine";
 export { actionCircle } from "./actionCircle";

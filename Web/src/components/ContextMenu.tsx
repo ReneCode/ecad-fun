@@ -3,14 +3,14 @@ import React from "react";
 
 import "./ContextMenu.scss";
 import Popover from "./Popover";
+import { ActionManager } from "../actions/actionManager";
 
-type ContextMenuOption = { label: string; onClick?: () => void };
+export type ContextMenuOption = { label: string; onClick?: (ev: any) => void };
 
 type Props = {
   top: number;
   left: number;
   onCloseRequest?(): void;
-
   options: ContextMenuOption[];
 };
 
@@ -23,9 +23,13 @@ const ContextMenu: React.FC<Props> = ({
   return (
     <Popover top={top} left={left} onCloseRequest={onCloseRequest}>
       <ul className="context-menu">
-        {options.map(({ label, onClick }) => {
+        {options.map(({ label, onClick }, index) => {
           return (
-            <li className="context-menu-option" onClick={onCloseRequest}>
+            <li
+              key={index}
+              className="context-menu-option"
+              onClick={onCloseRequest}
+            >
               {onClick ? <button onClick={onClick}>{label}</button> : <hr></hr>}
             </li>
           );

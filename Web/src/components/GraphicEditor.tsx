@@ -12,6 +12,7 @@ import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { ProjectService } from "../data/ProjectService";
 import MainMenuButton from "./MainMenuButton";
+import DynamicDialogs from "./Dialogs/DynamicDialogs";
 
 type Props = {
   width: number;
@@ -57,7 +58,6 @@ class GraphicEditor extends React.Component<Props, AppState> {
         ? currentPage._children
         : []) as ECadBaseElement[];
 
-      const currentActionName = this.actionMananger?.getCurrentAction();
       renderScene(this.canvas, elements, dynamicElements, this.state);
       this.props.onChange(this.state, this.projectService.getProject());
     }
@@ -207,6 +207,9 @@ class GraphicEditor extends React.Component<Props, AppState> {
           onPointerMove={this.onPointerMove}
           onDrop={this.onDrop}
         ></canvas>
+        {this.actionMananger ? (
+          <DynamicDialogs actionManager={this.actionMananger} />
+        ) : null}
       </div>
     );
   }
