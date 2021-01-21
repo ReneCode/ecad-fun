@@ -21,7 +21,7 @@ type QueryParams = {
   depth?: number;
   rootId?: string;
   rootObj?: ObjectType;
-  q: { prop: string; value: any }[];
+  q: Record<string, any>;
 };
 
 export class Project {
@@ -88,8 +88,8 @@ export class Project {
     }
 
     let valid = true;
-    for (let qe of params.q) {
-      if (qObj[qe.prop] !== qe.value) {
+    for (const [key, value] of Object.entries(params.q)) {
+      if (qObj[key] !== value) {
         valid = false;
         break;
       }

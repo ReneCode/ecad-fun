@@ -5,7 +5,7 @@ export const getCurrentPageElements = (project: Project, state: AppState) => {
   if (!state.currentPageId) {
     return [];
   }
-  const pages = project.query({ q: [{ prop: "type", value: "page" }] });
+  const pages = project.query({ q: { type: "page" } });
   const page = pages.find((p) => p.id === state.currentPageId);
   if (!page) {
     return [];
