@@ -51,6 +51,16 @@ https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
 
 from: https://www.flaticon.com/
 
+# Undo-Redo
+
+## on dynamic graphic chnages
+
+see: actionLine: pointerDown, pointerUp
+
+- on start of the dynamic action make a copy of the element you want to dynamicly change, return that 'oldData' in ActionState
+- on mouse move change the element (in the project), return { ActionResult.withUndo: false }
+- when finished the mouse move return { ActionResult.doCUD with "update",newData,oldData}, get that oldData from the ActionState
+
 # ideas
 
 easy is realative. (easy for whom)

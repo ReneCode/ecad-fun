@@ -17,9 +17,10 @@ const Toolbox: React.FC<Props> = ({ onClick, currentActionName }) => {
   ];
   return (
     <div className="toolbox">
-      {buttons.map((b) => {
+      {buttons.map((b, index) => {
         return (
           <ToolButton
+            key={index}
             selected={currentActionName === b.action}
             onClick={() => onClick(b.action)}
           >

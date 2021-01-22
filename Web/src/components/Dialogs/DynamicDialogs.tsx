@@ -1,20 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { ActionManager } from "../../actions/actionManager";
-import { showDynamicDialogs } from "./showDynamicDialogs";
+import { ActionParams } from "../../types";
+import Dialog from "./Dialog";
 
 type Props = {
   actionManager: ActionManager;
+  actionParams: ActionParams;
+  dialogNames: string[];
 };
-const DynamicDialogs: React.FC<Props> = ({ actionManager }) => {
-  const names = showDynamicDialogs.getNames();
+const DynamicDialogs: React.FC<Props> = ({
+  actionParams,
+  dialogNames,
+  actionManager,
+}) => {
+  const onClose = (name: string) => {
+    actionManager.process({
+      state: {
+        openDialogs: actionParams
+          .getState()
+          .openDialogs.filter((n) => n !== name),
+      },
+    });
+  };
+
   return (
     <React.Fragment>
-      {names.map((name, index) => {
+      {dialogNames.map((name, index) => {
         return (
-          <React.Fragment key={index}>
-            {actionManager.renderAction(name)}
-          </React.Fragment>
+          <Dialog key={index} onClose={() => onClose(name)}>
+            {actionManager.renderAction(name, actionParams)}
+          </Dialog>
         );
       })}
     </React.Fragment>

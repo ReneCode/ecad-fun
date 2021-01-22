@@ -5,12 +5,12 @@ import {
   defaultActionState,
   ECadBaseElement,
   ActionResult,
+  ActionParams,
 } from "../types";
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { actions } from "./registerAction";
 import { checkCreateObjectClientId } from "../elements";
-import { showDynamicDialogs } from "../components/Dialogs/showDynamicDialogs";
 
 export type EventType =
   | "execute"
@@ -121,12 +121,21 @@ export class ActionManager {
     }
   }
 
-  public renderAction(name: string): React.ReactElement | null {
+  public renderAction(
+    name: string,
+    actionParams: ActionParams
+  ): React.ReactNode | null {
     const action = this.getAction(name);
     if (action && action.render) {
       return action.render({ state: this.getState(), project: this.project });
     }
     return null;
+  }
+
+  public process(parms: { state: Partial<AppState> }) {
+    if (parms.state) {
+      this.setState(parms.state);
+    }
   }
 
   // ----------------------------------------------------
@@ -155,6 +164,7 @@ export class ActionManager {
       } else {
         result = resultOrPromise;
       }
+
       if (result) {
         // addins
         for (let name in this.addins) {
@@ -167,6 +177,7 @@ export class ActionManager {
           const withUndo =
             result.withUndo !== undefined ? result.withUndo : true;
           const clientId = this.socket.getClientId();
+
           // to not check if undo or redo action is executed
           // because on undo/redo elements with other clientId
           // than mine could be created.
@@ -196,11 +207,6 @@ export class ActionManager {
 
         if (result.stopAction) {
           this.execute("select", { params });
-        }
-
-        if (result.showDialog !== undefined) {
-          showDynamicDialogs.show(action.name, result.showDialog);
-          this.setState({});
         }
       }
     }

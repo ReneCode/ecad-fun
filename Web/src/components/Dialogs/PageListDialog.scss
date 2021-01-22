@@ -1,0 +1,16 @@
+.page-list-dialog {
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      padding: 5px;
+      cursor: pointer;
+      &:hover {
+        background-color: #555;
+        color: #ddd;
+      }
+    }
+  }
+}
