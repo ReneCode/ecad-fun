@@ -1,3 +1,12 @@
+//
+
+type NodeTypeType = "DOCUMENT" | "PROJECT" | "PAGE" | "LINE";
+
+export type NodeType = Record<string, unknown> & {
+  id: string;
+  type: NodeTypeType;
+};
+
 export type ObjectType = Record<string, unknown> & {
   id: string;
   _parent?: string;

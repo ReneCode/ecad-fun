@@ -7,7 +7,7 @@ const middle = alphabet[Math.floor(alphabet.length / 2)];
 
 export class FractionIndex {
   static start = () => {
-    return middle;
+    return secondChar;
   };
 
   static after = (s: string) => {
