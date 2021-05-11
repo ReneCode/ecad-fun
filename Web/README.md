@@ -2,6 +2,8 @@
 
 # setup
 
+.
+
 create an `.env` file containing environment variables for local useage:
 
 - REACT_APP_SERVER=http://localhost:8080
