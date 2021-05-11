@@ -563,9 +563,24 @@ describe("Project", () => {
         { id: "1:1", name: "p2", _parent: "0:0" },
       ]);
 
-      const [result] = project.query({ q: [{ prop: "name", value: "p2" }] });
+      const [result] = project.query({ q: { name: "p2" } });
       expect(result.id).toBe("1:1");
       expect(result.name).toBe("p2");
+    });
+
+    it("get one obj with mutiple query-values", () => {
+      const project = new Project("A");
+
+      project.createObjects([
+        { id: "1:0", name: "p2", age: 41, val: "x", _parent: "0:0" },
+        { id: "1:1", name: "p2", age: 42, val: "y", _parent: "0:0" },
+        { id: "1:2", name: "p2", age: 42, val: "x", _parent: "0:0" },
+      ]);
+
+      const results = project.query({ q: { name: "p2", val: "x" } });
+      expect(results).toHaveLength(2);
+      expect(results[0]).toHaveProperty("id", "1:0");
+      expect(results[1]).toHaveProperty("id", "1:2");
     });
 
     it("get multiple objects by type", () => {
@@ -577,7 +592,7 @@ describe("Project", () => {
         { id: "1:2", type: "layer", name: "l1", _parent: "0:0" },
       ]);
 
-      const result = project.query({ q: [{ prop: "type", value: "page" }] });
+      const result = project.query({ q: { type: "page" } });
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe("1:0");
       expect(result[1].id).toBe("1:1");
@@ -592,7 +607,7 @@ describe("Project", () => {
         { id: "2:0", name: "e1", _parent: "1:0-5" },
       ]);
 
-      const result = project.query({ q: [{ prop: "name", value: "e1" }] });
+      const result = project.query({ q: { name: "e1" } });
       expect(result).toHaveLength(0);
     });
 
@@ -607,7 +622,7 @@ describe("Project", () => {
 
       const result = project.query({
         depth: 2,
-        q: [{ prop: "name", value: "e1" }],
+        q: { name: "e1" },
       });
       expect(result).toHaveLength(1);
     });
@@ -624,7 +639,7 @@ describe("Project", () => {
 
       const result = project.query({
         rootId: "1:1",
-        q: [{ prop: "name", value: "e2" }],
+        q: { name: "e2" },
       });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("2:1");

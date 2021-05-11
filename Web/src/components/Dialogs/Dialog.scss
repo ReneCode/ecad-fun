@@ -1,0 +1,28 @@
+.dialog-container {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+
+  background-color: #ccc;
+  border: 1px solid #666;
+
+  .dialog-header {
+    height: 25px;
+    background-color: #444;
+    color: #eee;
+    padding: 2px 0 0 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    bottom: {
+      background-color: transparent;
+      left: auto;
+      right: 0px;
+    }
+  }
+
+  .dialog-content {
+    padding: 0;
+  }
+}

@@ -1,32 +1,49 @@
-import { render } from "react-dom"
-import React from "react"
+import { render, unmountComponentAtNode } from "react-dom";
+import React from "react";
 
-import "./ContextMenu.scss"
-import Popover from "./Popover"
+import "./ContextMenu.scss";
+import Popover from "./Popover";
+import { ActionManager } from "../actions/actionManager";
 
-type ContextMenuOption = {label:string, action: () => void }
+export type ContextMenuOption = { label: string; onClick?: (ev: any) => void };
 
 type Props = {
-    top:number
-    left: number,
-    options: ContextMenuOption[]
-}
+  top: number;
+  left: number;
+  onCloseRequest?(): void;
+  options: ContextMenuOption[];
+};
 
-const ContextMenu : React.FC<Props>= ({top, left, options}) => {
-    return <Popover top={top} left={left} >
-        <div className="menu">
-<ul className="menu-options">
-    <li>Delete</li>
-</ul>
-    </div>
-        ╬</Popover>
-}
+const ContextMenu: React.FC<Props> = ({
+  top,
+  left,
+  onCloseRequest,
+  options,
+}) => {
+  return (
+    <Popover top={top} left={left} onCloseRequest={onCloseRequest}>
+      <ul className="context-menu">
+        {options.map(({ label, onClick }, index) => {
+          return (
+            <li
+              key={index}
+              className="context-menu-option"
+              onClick={onCloseRequest}
+            >
+              {onClick ? <button onClick={onClick}>{label}</button> : <hr></hr>}
+            </li>
+          );
+        })}
+      </ul>
+    </Popover>
+  );
+};
 
-
-type  ContextMenuParams = {
-options:ContextMenuOption []
-, top: number, left: number
-}
+type ContextMenuParams = {
+  options: ContextMenuOption[];
+  top: number;
+  left: number;
+};
 
 let contextMenuNode: HTMLDivElement;
 const getContextMenuNode = (): HTMLDivElement => {
@@ -38,11 +55,28 @@ const getContextMenuNode = (): HTMLDivElement => {
   return (contextMenuNode = div);
 };
 
+const handleClose = () => {
+  unmountComponentAtNode(getContextMenuNode());
+};
+
 const push = (params: ContextMenuParams) => {
-    if (params.options.length >0) {
-        render(<ContextMenu top={params.top} left={params.left} options={params.options}></ContextMenu>, getContextMenuNode())
+  const options = Array.of<ContextMenuOption>();
+  params.options.forEach((option) => {
+    if (option) {
+      options.push(option);
     }
-}
+  });
+  if (options.length) {
+    render(
+      <ContextMenu
+        top={params.top}
+        left={params.left}
+        options={options}
+        onCloseRequest={handleClose}
+      ></ContextMenu>,
+      getContextMenuNode()
+    );
+  }
+};
 
-
-export default {push};
+export default { push };

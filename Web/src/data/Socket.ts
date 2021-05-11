@@ -16,12 +16,12 @@ export class Socket {
     callbackProjectOpen: (project: Project) => void,
     callbackProjectChange: (project: Project) => void
   ) {
-    console.log("socket init:", WS_SERVER);
+    // console.log("socket init:", WS_SERVER);
     this.socket = io(WS_SERVER);
 
     // register callbacks
     this.socket.on("open-project", (data: any) => {
-      // console.log("got open-project:", data);
+      console.debug("got open-project:", data);
       project.load(data);
       callbackProjectOpen(project);
     });

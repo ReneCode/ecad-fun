@@ -1,3 +1,4 @@
+import { ActionManager } from "./actions/actionManager";
 import { ObjectType, Project, CUDType } from "./share";
 
 export type ActionName = string;
@@ -77,6 +78,9 @@ export type AppState = {
   selectionBox: ECadRectangleElement | null;
 
   currentPageId: string;
+
+  openDialogs: string[];
+
   // elements: readonly ECadBaseElement[];
 };
 
@@ -101,6 +105,8 @@ export const getDefaultAppState = (): AppState => {
 
     currentPageId: "",
     // elements: [],
+
+    openDialogs: [],
   };
 };
 
@@ -110,6 +116,8 @@ export const getDefaultAppState = (): AppState => {
  */
 export type Action = {
   name: ActionName;
+
+  render?: ActionRenderFn;
 
   keyTest?: (event: KeyboardEvent) => boolean;
   // render?: React.FC<{ state: AppState }>;
@@ -182,6 +190,17 @@ export const CUD_Update = (
     data,
     oldDataForUndo,
   };
+};
+
+type ActionRenderFn = (args: {
+  state: AppState;
+  project: Project;
+}) => React.ReactNode;
+
+export type ActionParams = {
+  getState: () => AppState;
+  getProject: () => Project;
+  actionManager: ActionManager;
 };
 
 type ActionFn = (args: {

@@ -15,13 +15,13 @@ export class ProjectService {
       return [];
     }
 
-    const pages = project.query({ q: [{ prop: "type", value: TYPE_PAGE }] });
+    const pages = project.query({ q: { type: TYPE_PAGE } });
     return pages;
   }
 
   public getPage(pageId: string) {
     const pages = this.project.query({
-      q: [{ prop: "type", value: TYPE_PAGE }],
+      q: { type: TYPE_PAGE },
     });
     return pages.find((p) => p.id === pageId);
   }

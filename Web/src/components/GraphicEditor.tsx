@@ -5,12 +5,19 @@ import Toolbox from "./Toolbox";
 import Status from "./Status";
 import { renderScene } from "../renderer";
 import { ActionManager, EventType } from "../actions/actionManager";
-import { AppState, getDefaultAppState, ECadBaseElement } from "../types";
+import {
+  AppState,
+  getDefaultAppState,
+  ECadBaseElement,
+  ActionParams,
+} from "../types";
 import { loadFromLocalStorage } from "../state";
 import { transformPoint, calcTransformationMatrix } from "../utils/geometric";
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
 import { ProjectService } from "../data/ProjectService";
+import MainMenuButton from "./MainMenuButton";
+import DynamicDialogs from "./Dialogs/DynamicDialogs";
 
 type Props = {
   width: number;
@@ -20,6 +27,7 @@ type Props = {
   pageId?: string;
 };
 
+// React.Component<"properties", "StateType">
 class GraphicEditor extends React.Component<Props, AppState> {
   canvas: HTMLCanvasElement | null = null;
   actionMananger: ActionManager | undefined;
@@ -51,12 +59,10 @@ class GraphicEditor extends React.Component<Props, AppState> {
       }
 
       const currentPage = this.projectService.getPage(this.state.currentPageId);
-      // console.log("currentPage:", currentPage);
       const elements = (currentPage?._children
         ? currentPage._children
         : []) as ECadBaseElement[];
 
-      const currentActionName = this.actionMananger?.getCurrentAction();
       renderScene(this.canvas, elements, dynamicElements, this.state);
       this.props.onChange(this.state, this.projectService.getProject());
     }
@@ -85,10 +91,18 @@ class GraphicEditor extends React.Component<Props, AppState> {
             currentPageId = pages[0].id;
           }
         }
-        this.setState({ currentPageId: currentPageId });
+
+        const { state } = loadFromLocalStorage();
+        const matrix = calcTransformationMatrix(
+          state.screenOriginX,
+          state.screenOriginY,
+          state.zoom
+        );
+        this.setState({ ...state, ...matrix, currentPageId: currentPageId });
       },
       // project change
       (project: Project) => {
+        console.log("project change");
         this.setState({});
       }
     );
@@ -104,13 +118,6 @@ class GraphicEditor extends React.Component<Props, AppState> {
       // (elements) => this.project.setElements(elements)
     );
 
-    const { state } = loadFromLocalStorage();
-    const matrix = calcTransformationMatrix(
-      state.screenOriginX,
-      state.screenOriginY,
-      state.zoom
-    );
-    this.setState({ ...state, ...matrix });
     // this.project.setElements(elements);
 
     this.setDebugging();
@@ -181,6 +188,12 @@ class GraphicEditor extends React.Component<Props, AppState> {
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
 
+    const actionParams: ActionParams = {
+      getState: () => this.state,
+      getProject: () => this.projectService.getProject(),
+      actionManager: this.actionMananger as ActionManager,
+    };
+
     return (
       <div className="main">
         {/* <SymbolList
@@ -188,6 +201,7 @@ class GraphicEditor extends React.Component<Props, AppState> {
           project={this.project}
           actionManager={this.actionMananger}
         /> */}
+        {this.actionMananger && <MainMenuButton actionParams={actionParams} />}
         <Toolbox
           onClick={this.onToolboxClick}
           currentActionName={this.actionMananger?.getCurrentAction() || ""}
@@ -203,6 +217,13 @@ class GraphicEditor extends React.Component<Props, AppState> {
           onPointerMove={this.onPointerMove}
           onDrop={this.onDrop}
         ></canvas>
+        {
+          <DynamicDialogs
+            dialogNames={this.state.openDialogs}
+            actionParams={actionParams}
+            actionManager={this.actionMananger as ActionManager}
+          />
+        }
       </div>
     );
   }

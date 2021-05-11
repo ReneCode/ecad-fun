@@ -5,6 +5,7 @@ import {
   defaultActionState,
   ECadBaseElement,
   ActionResult,
+  ActionParams,
 } from "../types";
 import { Project } from "../share";
 import { Socket } from "../data/Socket";
@@ -120,6 +121,23 @@ export class ActionManager {
     }
   }
 
+  public renderAction(
+    name: string,
+    actionParams: ActionParams
+  ): React.ReactNode | null {
+    const action = this.getAction(name);
+    if (action && action.render) {
+      return action.render({ state: this.getState(), project: this.project });
+    }
+    return null;
+  }
+
+  public process(parms: { state: Partial<AppState> }) {
+    if (parms.state) {
+      this.setState(parms.state);
+    }
+  }
+
   // ----------------------------------------------------
 
   private getAction(actionName: string) {
@@ -146,6 +164,7 @@ export class ActionManager {
       } else {
         result = resultOrPromise;
       }
+
       if (result) {
         // addins
         for (let name in this.addins) {
@@ -158,6 +177,7 @@ export class ActionManager {
           const withUndo =
             result.withUndo !== undefined ? result.withUndo : true;
           const clientId = this.socket.getClientId();
+
           // to not check if undo or redo action is executed
           // because on undo/redo elements with other clientId
           // than mine could be created.

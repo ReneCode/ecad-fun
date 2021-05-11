@@ -1,4 +1,5 @@
-const alphabet = "0123456789";
+const alphabet =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const firstChar = alphabet[0];
 const secondChar = alphabet[1];
 const lastChar = alphabet[alphabet.length - 1];
