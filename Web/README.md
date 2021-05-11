@@ -2,7 +2,7 @@
 
 # setup
 
-.
+..
 
 create an `.env` file containing environment variables for local useage:
 
