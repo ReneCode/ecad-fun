@@ -1,6 +1,5 @@
 import React from "react";
 import { useHistory } from "react-router";
-import { ActionManager } from "../actions/actionManager";
 import { ActionParams } from "../types";
 import IconButton from "./common/IconButton";
 import ContextMenu from "./ContextMenu";
@@ -29,15 +28,12 @@ const MainMenuButton: React.FC<Props> = ({ actionParams }) => {
     const state = getState();
     if (state.openDialogs.includes(pageListName)) {
       // remove
-      newList = state.openDialogs.filter((n) => n != pageListName);
+      newList = state.openDialogs.filter((n) => n !== pageListName);
     } else {
       newList = state.openDialogs.concat(pageListName);
     }
 
     actionManager.process({ state: { openDialogs: newList } });
-
-    // actionManager.process({state: state.openDialogs. }})
-    // executeAction("pageList");
   };
 
   // show context menu

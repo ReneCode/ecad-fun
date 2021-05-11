@@ -46,7 +46,7 @@ describe("socket-io", () => {
     expect(newUserId).toBe(idSocketB);
   });
 
-  it("open-project", async () => {
+  it.only("open-project", async () => {
     const socketA = io(SOCKET_URL);
 
     await wait();
@@ -72,15 +72,20 @@ describe("socket-io", () => {
     socketA.close();
   });
 
-  it("create-object single", async () => {
+  it.only("create-object single", async () => {
     const { socket } = await openProject("project-b");
 
     let gotData: any = undefined;
-    socket.on("create-object", (res: string, data: any) => {
+    socket.on("do-cud", (res: string, data: any) => {
       gotData = [res, data];
     });
 
-    socket.emit("create-object", [{ id: "1:0", name: "page" }]);
+    socket.emit("do-cud", [
+      {
+        type: "create",
+        data: [{ id: "1:0", name: "page" }],
+      },
+    ]);
     await waitUntilTrue(() => gotData !== undefined);
     expect(gotData).toBeTruthy();
     expect(gotData).toEqual(["ack", [{ id: "1:0", name: "page" }]]);
@@ -149,7 +154,7 @@ const openProject = async (projectId: string) => {
   const socket = io(SOCKET_URL);
   await wait();
 
-  let clientId: any = undefined;
+  let clientId: number = undefined;
   socket.on("send-clientid", (id: number) => {
     clientId = id;
   });
@@ -159,7 +164,7 @@ const openProject = async (projectId: string) => {
     gotData = data;
   });
 
-  await waitUntilTrue(() => gotData !== undefined && !!clientId);
+  await waitUntilTrue(() => gotData !== undefined && clientId !== undefined);
   expect(clientId).not.toBeUndefined();
-  return { socket, clientId: clientId as number };
+  return { socket, clientId };
 };

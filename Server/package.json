@@ -8,7 +8,7 @@
     "start": "node dist/index.js",
     "start:w": "nodemon src/index.ts",
     "integrationtest": "jest integration-tests/ --runInBand --detectOpenHandles",
-    "integrationtest:w": "jest integration-tests/ --watchAll --runInBand",
+    "integrationtest:w": "jest integration-tests/ --watchAll --runInBand --verbose",
     "test": "jest src/ --runInBand",
     "test:w": "jest src/ --watchAll --runInBand --detectOpenHandles",
     "docker:build": "docker build -t ecad-fun-server .",
@@ -22,6 +22,7 @@
     "jwks-rsa": "^1.12.0",
     "morgan": "^1.10.0",
     "nanoid": "^3.1.10",
+    "pg": "^8.5.1",
     "socket.io": "2.3.0"
   },
   "devDependencies": {

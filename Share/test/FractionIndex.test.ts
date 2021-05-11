@@ -1,66 +1,80 @@
 import { FractionIndex } from "../src/FractionIndex";
 
-describe("findex", () => {
+// it.each
+// https://jestjs.io/docs/api#testeachtablename-fn-timeout
+
+describe("FractionIndex", () => {
   it("start", () => {
-    expect(FractionIndex.start()).toEqual("5");
+    expect(FractionIndex.start()).toEqual("V");
   });
 
-  it("FractionIndex.before", () => {
-    expect(FractionIndex.before("7")).toEqual("6");
-    expect(FractionIndex.before("2")).toEqual("1");
-    expect(FractionIndex.before("1")).toEqual("09");
-    expect(FractionIndex.before("05")).toEqual("04");
-    expect(FractionIndex.before("0001")).toEqual("00009");
-    expect(FractionIndex.before("2432")).toEqual("2431");
+  it.each([
+    ["7", "6"],
+    ["2", "1"],
+    ["1", "0z"],
+    ["05", "04"],
+    ["01", "00z"],
+    ["1234", "1233"],
+    ["abcdA", "abcd9"],
+  ])("before(%s) => %s", (input, expected) => {
+    expect(FractionIndex.before(input)).toEqual(expected);
+  });
+
+  it("before throws on '0'", () => {
     expect(() => FractionIndex.before("10")).toThrow();
   });
 
-  it("FractionIndex.after", () => {
-    expect(FractionIndex.after("3")).toEqual("4");
-    expect(FractionIndex.after("8")).toEqual("9");
-    expect(FractionIndex.after("9")).toEqual("91");
-    expect(FractionIndex.after("543")).toEqual("544");
-    expect(FractionIndex.after("")).toEqual("1");
+  it.each([
+    ["3", "4"],
+    ["8", "9"],
+    ["Z", "a"],
+    ["y", "z"],
+    ["z", "z1"],
+    ["543", "544"],
+    ["", "1"],
+  ])("after(%s) => %s", (input, expected) => {
+    expect(FractionIndex.after(input)).toEqual(expected);
   });
 
-  it("FractionIndex.between same numbers", () => {
+  it("between throws on same numbers", () => {
     expect(() => FractionIndex.between("3", "3")).toThrow();
   });
 
-  it("FractionIndex.between same length", () => {
-    expect(FractionIndex.between("3", "5")).toEqual("4");
-    expect(FractionIndex.between("3", "7")).toEqual("5");
-    expect(FractionIndex.between("3", "4")).toEqual("35");
-    expect(FractionIndex.between("3456", "3488")).toEqual("346");
-    expect(FractionIndex.between("123", "154")).toEqual("13");
-    expect(FractionIndex.between("123", "134")).toEqual("124");
-    expect(FractionIndex.between("128", "134")).toEqual("129");
-    expect(FractionIndex.between("129", "134")).toEqual("1295");
-  });
-
-  it("FractionIndex.between l1 < l2", () => {
-    expect(FractionIndex.between("5", "505")).toEqual("502");
-    expect(FractionIndex.between("5", "5001")).toEqual("50005");
-    expect(FractionIndex.between("1", "35")).toEqual("2");
-    expect(FractionIndex.between("4", "83")).toEqual("6");
-    expect(FractionIndex.between("0", "1")).toEqual("05");
-    expect(FractionIndex.between("5", "55")).toEqual("52");
-    expect(FractionIndex.between("5", "52")).toEqual("51");
-    expect(FractionIndex.between("5", "51")).toEqual("505");
-    expect(FractionIndex.between("38", "5")).toEqual("4");
-    expect(FractionIndex.between("38", "7")).toEqual("5");
-    expect(FractionIndex.between("458", "47")).toEqual("46");
-    expect(FractionIndex.between("458", "46")).toEqual("459");
-    expect(FractionIndex.between("459", "46")).toEqual("4595");
-  });
-
-  it("FractionIndex.between l1 > l2", () => {
-    expect(FractionIndex.between("12", "3")).toEqual("2");
-    expect(FractionIndex.between("13", "2")).toEqual("14");
-    expect(FractionIndex.between("19", "2")).toEqual("195");
-    expect(FractionIndex.between("412", "43")).toEqual("42");
-    expect(FractionIndex.between("412", "42")).toEqual("413");
-    expect(FractionIndex.between("418", "42")).toEqual("419");
-    expect(FractionIndex.between("419", "42")).toEqual("4195");
+  it.each([
+    // same length
+    ["3", "5", "4"],
+    ["3", "7", "5"],
+    ["3", "4", "3V"],
+    ["3456", "3488", "346"],
+    ["123", "154", "13"],
+    ["123", "134", "124"],
+    ["128", "134", "129"],
+    ["12z", "134", "12zV"],
+    // a.length < b.length
+    ["5", "505", "502"],
+    ["5", "5001", "5000V"],
+    ["1", "35", "2"],
+    ["4", "83", "6"],
+    ["0", "1", "0V"],
+    ["5", "55", "52"],
+    ["5", "52", "51"],
+    ["5", "51", "50V"],
+    ["38", "5", "4"],
+    ["38", "7", "5"],
+    ["458", "47", "46"],
+    ["458", "46", "459"],
+    ["459", "46", "45A"],
+    ["45A", "46", "45B"],
+    ["45z", "46", "45zV"],
+    // a.length > b.length
+    ["12", "3", "2"],
+    ["13", "2", "14"],
+    ["1z", "2", "1zV"],
+    ["412", "43", "42"],
+    ["412", "42", "413"],
+    ["418", "42", "419"],
+    ["41z", "42", "41zV"],
+  ])("between(%s, %s) => %s", (a, b, expected) => {
+    expect(FractionIndex.between(a, b)).toEqual(expected);
   });
 });
