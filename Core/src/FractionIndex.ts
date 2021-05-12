@@ -47,7 +47,7 @@ export class FractionIndex {
 
   static between = (s1: string, s2: string): string => {
     if (s1 === s2) {
-      throw new Error("can't get findex between equal numbers:");
+      throw new Error(`can't get findex between equal numbers: ${s1}`);
     }
 
     const l1 = s1.length;

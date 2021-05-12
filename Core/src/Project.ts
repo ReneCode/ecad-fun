@@ -10,6 +10,47 @@ class Node {
     this.id = id;
     this.name = name;
   }
+
+  appendChild(child: Node) {
+    let fIdx = "";
+    const countChildren = this.children.length;
+    const parentId = this.id;
+    if (countChildren === 0) {
+      fIdx = FractionIndex.start();
+    } else {
+      const lastChild = this.children[countChildren - 1];
+      const [pId, parentFIndex] = lastChild.parent.split("/");
+      if (pId !== parentId) {
+        throw new Error("children panik. ${parentId}, ${pId}");
+      }
+      fIdx = FractionIndex.after(parentFIndex);
+    }
+    child.parent = `${parentId}/${fIdx}`;
+    this.children.push(child);
+  }
+
+  insertChild(index: number, child: Node) {
+    const countChildren = this.children.length;
+    if (index < 0) {
+      throw new Error(`index too low: ${index}`);
+    }
+    if (index > countChildren - 1) {
+      throw new Error(`index too high: ${index}`);
+    }
+    let fIdx = "";
+    if (index === 0) {
+      // first position
+      const [_p, idx] = this.children[0].parent.split("/");
+      fIdx = FractionIndex.before(idx);
+    } else {
+      const [_p1, beforeIdx] = this.children[index - 1].parent.split("/");
+      const [_p2, afterIdx] = this.children[index].parent.split("/");
+      fIdx = FractionIndex.between(beforeIdx, afterIdx);
+    }
+    const parentId = this.id;
+    child.parent = `${parentId}/${fIdx}`;
+    this.children.splice(index, 0, child);
+  }
 }
 
 class Project extends Node {
@@ -25,35 +66,14 @@ class Project extends Node {
     this.key = key;
   }
 
-  createNode(parentId: string, name: string) {
-    const parent = this.getNode(parentId);
+  createNode(name: string) {
     const node = new Node(this.newId(), name);
-    this.appendChild(parent, node);
     return node;
   }
 
   private newId() {
     this.lastIdCounter++;
     return `${this.clientId}:${this.lastIdCounter}`;
-  }
-
-  private appendChild(parent: Node, node: Node) {
-    let fIdx = "";
-    const countChildren = parent.children.length;
-    const parentId = parent.id;
-    if (countChildren === 0) {
-      fIdx = FractionIndex.start();
-    } else {
-      const lastChild = parent.children[countChildren - 1];
-      const [pId, parentFIndex] = lastChild.parent.split("/");
-      if (pId !== parentId) {
-        throw new Error("children panik. ${parentId}, ${pId}");
-      }
-      fIdx = FractionIndex.after(parentFIndex);
-    }
-    node.parent = `${parentId}/${fIdx}`;
-    parent.children.push(node);
-    this.addNode(node);
   }
 
   private addNode(node: Node) {
