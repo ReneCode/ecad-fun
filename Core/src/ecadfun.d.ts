@@ -6,10 +6,16 @@ declare global {
   }
 }
 
+interface BaseNodeMixin {
+  id: string;
+  name: string;
+  children;
+}
+
 interface EcadfunAPI {
   readonly version: "1.0.0";
 
-  hello(msg: string): void;
+  createNode(name: string): BaseNode;
 }
 
 export {};
