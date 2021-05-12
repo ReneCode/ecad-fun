@@ -1,5 +1,10 @@
 import { FractionIndex } from "./FractionIndex";
 
+type FlushType = {
+  a: "c";
+  n: Record<string, unknown>;
+};
+
 class Node {
   id: string;
   name: string;
@@ -58,17 +63,33 @@ class Project extends Node {
   clientId: string;
   lastIdCounter: number = 0;
   nodes: Record<string, Node> = {};
+  flushCallback: (data: FlushType[]) => {};
+  flushData: FlushType[] = [];
 
-  constructor(clientId: string, key: string) {
+  constructor(
+    clientId: string,
+    key: string,
+    flushCallback: (data: FlushType[]) => {}
+  ) {
     super("0:0", "root");
     this.addNode(this);
     this.clientId = clientId;
     this.key = key;
+    this.flushCallback = flushCallback;
   }
 
   createNode(name: string) {
     const node = new Node(this.newId(), name);
+    this.flushData.push({
+      a: "c",
+      n: { id: node.id, name: node.name },
+    });
     return node;
+  }
+
+  flush() {
+    this.flushCallback(this.flushData);
+    this.flushData = [];
   }
 
   private newId() {

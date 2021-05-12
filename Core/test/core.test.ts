@@ -6,9 +6,10 @@ describe("core", () => {
   });
 
   describe("project", () => {
-    it("basic", () => {
+    it("basic createNode, appendChild, insertChild", () => {
       const clientId = "1";
-      const project = new Project(clientId, "abc");
+      const flushCallback = jest.fn();
+      const project = new Project(clientId, "abc", flushCallback);
       expect(project.id).toBe("0:0");
       expect(project.clientId).toBe(clientId);
       expect(project.key).toBe("abc");
@@ -52,6 +53,38 @@ describe("core", () => {
         const names = page.children.map((n) => n.name);
         expect(names).toEqual(["lineD", "lineA", "lineC", "lineB"]);
       }
+    });
+
+    it("flush", () => {
+      const clientId = "1";
+      const flushCallback = jest.fn();
+      const project = new Project(clientId, "project", flushCallback);
+
+      const page = project.createNode("page");
+      const pageId = page.id;
+
+      project.flush();
+      expect(flushCallback.mock.calls).toHaveLength(1);
+      expect(flushCallback.mock.calls[0]).toEqual([
+        [
+          {
+            a: "c",
+            n: { id: pageId, name: "page" },
+          },
+        ],
+      ]);
+
+      const lineA = project.createNode("lineA");
+      flushCallback.mockReset();
+      project.flush();
+      expect(flushCallback.mock.calls[0]).toEqual([
+        [
+          {
+            a: "c",
+            n: { id: lineA.id, name: lineA.name },
+          },
+        ],
+      ]);
     });
   });
 });
