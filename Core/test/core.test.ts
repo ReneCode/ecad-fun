@@ -6,6 +6,13 @@ describe("core", () => {
   });
 
   describe("project", () => {
+    it("version", () => {
+      const clientId = "1";
+      const flushCallback = jest.fn();
+      const project = new Project(clientId, "abc", flushCallback);
+      const version = project.version();
+      console.log(version);
+    });
     it("basic createNode, appendChild, insertChild", () => {
       const clientId = "1";
       const flushCallback = jest.fn();

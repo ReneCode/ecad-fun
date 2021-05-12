@@ -1,4 +1,6 @@
 import { FractionIndex } from "./FractionIndex";
+import {} from "./ecadfun.d";
+import "./ecadfun";
 
 type FlushType = {
   a: "c";
@@ -90,6 +92,10 @@ class Project extends Node {
   flush() {
     this.flushCallback(this.flushData);
     this.flushData = [];
+  }
+
+  version() {
+    return global.ecadfun.version;
   }
 
   private newId() {
