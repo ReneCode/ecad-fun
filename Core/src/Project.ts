@@ -1,19 +1,19 @@
 import { FractionIndex } from "./FractionIndex";
-import {} from "./ecadfun.d";
-import "./ecadfun";
 
-type FlushType = {
-  a: "c";
+type EditType = {
+  a: "c" | "u";
   n: Record<string, unknown>;
 };
 
 class Node {
+  project: Project;
   id: string;
   name: string;
   children: Node[] = [];
   parent: string = ""; //  <parentId>:<fIndex>
 
-  constructor(id: string, name: string) {
+  constructor(project: Project, id: string, name: string) {
+    this.project = project;
     this.id = id;
     this.name = name;
   }
@@ -34,6 +34,10 @@ class Node {
     }
     child.parent = `${parentId}/${fIdx}`;
     this.children.push(child);
+    this.project.addEditData({
+      a: "u",
+      n: { id: child.id, parent: child.parent },
+    });
   }
 
   insertChild(index: number, child: Node) {
@@ -57,6 +61,22 @@ class Node {
     const parentId = this.id;
     child.parent = `${parentId}/${fIdx}`;
     this.children.splice(index, 0, child);
+    this.project.addEditData({
+      a: "u",
+      n: { id: child.id, parent: child.parent },
+    });
+  }
+
+  findAll(callback?: (node: Node) => boolean) {
+    let result: Node[] = [];
+    for (let child of this.children) {
+      if (!callback || callback(child)) {
+        result.push(child);
+      }
+      const r = child.findAll(callback);
+      result = result.concat(r);
+    }
+    return result;
   }
 }
 
@@ -65,37 +85,50 @@ class Project extends Node {
   clientId: string;
   lastIdCounter: number = 0;
   nodes: Record<string, Node> = {};
-  flushCallback: (data: FlushType[]) => {};
-  flushData: FlushType[] = [];
+  flushEditsCallback: (data: EditType[]) => {};
+  private editData: EditType[] = [];
 
   constructor(
     clientId: string,
     key: string,
-    flushCallback: (data: FlushType[]) => {}
+    flushEditsCallback: (data: EditType[]) => {}
   ) {
-    super("0:0", "root");
+    super(undefined as unknown as Project, "0:0", "root");
+    // this can't set on super()
+    this.project = this;
     this.addNode(this);
     this.clientId = clientId;
     this.key = key;
-    this.flushCallback = flushCallback;
+    this.flushEditsCallback = flushEditsCallback;
   }
 
   createNode(name: string) {
-    const node = new Node(this.newId(), name);
-    this.flushData.push({
+    const node = new Node(this, this.newId(), name);
+    this.addEditData({
       a: "c",
       n: { id: node.id, name: node.name },
     });
     return node;
   }
 
-  flush() {
-    this.flushCallback(this.flushData);
-    this.flushData = [];
+  export() {
+    return this.findAll().map((node: Node) => {
+      const n: Partial<Node> = { ...node };
+      delete n.project;
+      delete n.children;
+      return n;
+    });
   }
 
-  version() {
-    return global.ecadfun.version;
+  applyEditData(data: EditType[]) {}
+
+  addEditData(data: EditType) {
+    this.editData.push(data);
+  }
+
+  flushEdits() {
+    this.flushEditsCallback(this.editData);
+    this.editData = [];
   }
 
   private newId() {
@@ -120,4 +153,4 @@ class Project extends Node {
   }
 }
 
-export { Project };
+export { Project, Node };
