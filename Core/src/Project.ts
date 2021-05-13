@@ -1,6 +1,5 @@
+import { IArcNode, ILineNode, IPageNode, NodeType } from "./ecadfun.d";
 import { FractionIndex } from "./FractionIndex";
-
-type NodeType = "PROJECT" | "PAGE" | "LINE";
 
 type EditType = {
   a: "c" | "u";
@@ -91,7 +90,20 @@ class Node implements INode {
   }
 }
 
+class ArcNode extends Node implements IArcNode {
+  radius: number = 10;
+}
+
+class PageNode extends Node implements IPageNode {
+  readonly type = "PAGE";
+}
+
+class LineNode extends Node implements ILineNode {
+  readonly type = "LINE";
+}
+
 class Project extends Node {
+  readonly type = "PROJECT";
   key: string;
   clientId: string;
   lastIdCounter: number = 0;
@@ -114,13 +126,29 @@ class Project extends Node {
   }
 
   createPage(name: string) {
-    const page = this.createNode("PAGE", name);
+    const page = this.createNode(PageNode, "PAGE", name);
     return page;
   }
 
   createLine(name: string) {
-    const line = this.createNode("LINE", name);
+    const line = this.createNode(LineNode, "LINE", name);
     return line;
+  }
+
+  createArc(name: string) {
+    const arc = this.createNode(ArcNode, "ARC", name);
+    const arcHandler = {
+      get: (arc: ArcNode, prop: string | number | symbol, target: any) => {
+        return Reflect.get(arc, prop, target);
+      },
+      set: (target: ArcNode, prop: string | number | symbol, value: any) => {
+        if (prop === "id") {
+          return false;
+        }
+        return Reflect.set(target, prop, value);
+      },
+    };
+    return new Proxy(arc, arcHandler);
   }
 
   export() {
@@ -141,9 +169,9 @@ class Project extends Node {
       const newNode = new Node(this, node.id, node.type, node.name);
       this.addNode(newNode);
       if (node.parent) {
-        newNode.parent = node.parent;
         const [parentId, parentFIndex] = node.parent.split("/");
         const parent = this.getNode(parentId);
+        newNode.parent = node.parent;
         parent.children.push(newNode);
       }
     }
@@ -160,8 +188,13 @@ class Project extends Node {
     this.editData = [];
   }
 
-  private createNode(type: NodeType, name: string) {
-    const node = new Node(this, this.newId(), type, name);
+  // https://www.typescriptlang.org/docs/handbook/2/generics.html#working-with-generic-type-variables
+  private createNode<T extends Node>(
+    c: new (project: Project, id: string, type: NodeType, name: string) => T,
+    type: NodeType,
+    name: string
+  ): T {
+    const node = new c(this, this.newId(), type, name);
     this.addEditData({
       a: "c",
       n: { id: node.id, type: type, name: name },

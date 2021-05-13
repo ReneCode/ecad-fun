@@ -62,7 +62,7 @@ describe("core", () => {
       const project = new Project(clientId, "abc", flushEditsCallback);
 
       const maxPage = 100;
-      const maxLine = 500;
+      const maxLine = 1000;
       for (let pageIdx = 0; pageIdx < maxPage; pageIdx++) {
         const page = project.createPage(`page-${pageIdx}`);
         project.appendChild(page);
@@ -166,6 +166,24 @@ describe("core", () => {
           n: { id: lineB.id, parent: "1:1/0z" },
         },
       ]);
+    });
+
+    it("update", () => {
+      const clientId = "1";
+      const flushEditsCallback = jest.fn();
+      const project = new Project(clientId, "project", flushEditsCallback);
+
+      const page = project.createPage("page");
+      const arc = project.createArc("arc");
+      expect(arc.radius).toEqual(10);
+      arc.name = "new name";
+      arc.radius = 50;
+
+      expect(arc.name).toEqual("new name");
+      expect(arc.radius).toEqual(50);
+      expect(() => {
+        arc.id = "432";
+      }).toThrowError();
     });
   });
 });
