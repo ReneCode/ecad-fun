@@ -1,17 +1,20 @@
-import { IArcNode, ILineNode, IPageNode, NodeType } from "./ecadfun.d";
+import {
+  EditType,
+  IArcNode,
+  ILineNode,
+  INode,
+  IPageNode,
+  NodeType,
+} from "./ecadfun.d";
 import { FractionIndex } from "./FractionIndex";
+import { NodeProxy } from "./NodeProxy";
 
-type EditType = {
-  a: "c" | "u";
-  n: Record<string, unknown>;
-};
-
-interface INode {
-  type: NodeType;
-  id: string;
-  name: string;
-  parent: string; //  <parentId>:<fIndex>
-}
+// interface INode {
+//   type: NodeType;
+//   id: string;
+//   name: string;
+//   parent: string; //  <parentId>:<fIndex>
+// }
 
 class Node implements INode {
   project: Project;
@@ -44,10 +47,6 @@ class Node implements INode {
     }
     child.parent = `${parentId}/${fIdx}`;
     this.children.push(child);
-    this.project.addEditData({
-      a: "u",
-      n: { id: child.id, parent: child.parent },
-    });
   }
 
   insertChild(index: number, child: Node) {
@@ -71,10 +70,6 @@ class Node implements INode {
     const parentId = this.id;
     child.parent = `${parentId}/${fIdx}`;
     this.children.splice(index, 0, child);
-    this.project.addEditData({
-      a: "u",
-      n: { id: child.id, parent: child.parent },
-    });
   }
 
   findAll(callback?: (node: Node) => boolean) {
@@ -127,11 +122,13 @@ class Project extends Node {
 
   createPage(name: string) {
     const page = this.createNode(PageNode, "PAGE", name);
+    return NodeProxy.create<PageNode>(page, this.addEditData.bind(this));
     return page;
   }
 
   createLine(name: string) {
     const line = this.createNode(LineNode, "LINE", name);
+    return NodeProxy.create<LineNode>(line, this.addEditData.bind(this));
     return line;
   }
 
@@ -152,21 +149,21 @@ class Project extends Node {
   }
 
   export() {
-    return this.findAll().map((node: Node) => {
-      const n: Partial<Node> = { ...node };
+    return this.findAll().map((node: INode) => {
+      const n: INode = { ...node };
       // do not export .project and .children properties
-      delete n.project;
-      delete n.children;
+      delete (n as any).project;
+      delete (n as any).children;
       return n;
     });
   }
 
-  import(nodes: INode[]) {
+  import(nodes: Partial<INode>[]) {
     this.nodes = {};
     this.addNode(this);
     this.children = [];
     for (let node of nodes) {
-      const newNode = new Node(this, node.id, node.type, node.name);
+      const newNode = new Node(this, node.id!, node.type!, node.name!);
       this.addNode(newNode);
       if (node.parent) {
         const [parentId, parentFIndex] = node.parent.split("/");

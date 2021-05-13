@@ -8,12 +8,20 @@ declare global {
 
 type NodeType = "PROJECT" | "PAGE" | "LINE" | "ARC";
 
+type EditType = {
+  a: "c" | "u";
+  n: Record<string, unknown>;
+};
+
 interface BaseNodeMixin {
   id: string;
   type: NodeType;
   name: string;
-  children;
+  children: BaseNodeMixin[];
+  parent: string;
 }
+
+interface INode extends BaseNodeMixin {}
 
 interface EcadfunAPI {
   readonly version: "1.0.0";
@@ -34,4 +42,4 @@ interface IArcNode extends BaseNodeMixin {
   radius: number = 10;
 }
 
-export { NodeType, IArcNode, IPageNode, ILineNode };
+export { EditType, NodeType, INode, IArcNode, IPageNode, ILineNode };

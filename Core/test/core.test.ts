@@ -108,7 +108,7 @@ describe("core", () => {
       const flushEditsCallback = jest.fn();
       const project = new Project(clientId, "abc", flushEditsCallback);
 
-      const data: INode[] = [
+      const data: Partial<INode>[] = [
         { parent: "0:0/1", id: "1:1", type: "PAGE", name: "page" },
         { parent: "1:1/0z", id: "1:5", type: "LINE", name: "lineD" },
         { parent: "1:1/1", id: "1:2", type: "LINE", name: "lineA" },
@@ -181,8 +181,12 @@ describe("core", () => {
 
       expect(arc.name).toEqual("new name");
       expect(arc.radius).toEqual(50);
+
       expect(() => {
-        arc.id = "432";
+        page.id = "page-id";
+      }).toThrowError();
+      expect(() => {
+        arc.id = "42";
       }).toThrowError();
     });
   });
