@@ -104,7 +104,7 @@ class Project extends Node {
   lastIdCounter: number = 0;
   nodes: Record<string, Node> = {};
   flushEditsCallback: (data: EditType[]) => {};
-  private editData: EditType[] = [];
+  private editLog: null | EditType[] = [];
 
   constructor(
     clientId: string,
@@ -121,31 +121,16 @@ class Project extends Node {
   }
 
   createPage(name: string) {
-    const page = this.createNode(PageNode, "PAGE", name);
-    return NodeProxy.create<PageNode>(page, this.addEditData.bind(this));
-    return page;
+    return this.createNode(PageNode, this.newId(), "PAGE", name);
   }
 
   createLine(name: string) {
-    const line = this.createNode(LineNode, "LINE", name);
-    return NodeProxy.create<LineNode>(line, this.addEditData.bind(this));
-    return line;
+    return this.createNode(LineNode, this.newId(), "LINE", name);
   }
 
   createArc(name: string) {
-    const arc = this.createNode(ArcNode, "ARC", name);
-    const arcHandler = {
-      get: (arc: ArcNode, prop: string | number | symbol, target: any) => {
-        return Reflect.get(arc, prop, target);
-      },
-      set: (target: ArcNode, prop: string | number | symbol, value: any) => {
-        if (prop === "id") {
-          return false;
-        }
-        return Reflect.set(target, prop, value);
-      },
-    };
-    return new Proxy(arc, arcHandler);
+    const arc = this.createNode(ArcNode, this.newId(), "ARC", name);
+    return NodeProxy.create<ArcNode>(arc, this.addEditData.bind(this));
   }
 
   export() {
@@ -162,41 +147,56 @@ class Project extends Node {
     this.nodes = {};
     this.addNode(this);
     this.children = [];
-    for (let node of nodes) {
-      const newNode = new Node(this, node.id!, node.type!, node.name!);
-      this.addNode(newNode);
-      if (node.parent) {
-        const [parentId, parentFIndex] = node.parent.split("/");
-        const parent = this.getNode(parentId);
-        newNode.parent = node.parent;
-        parent.children.push(newNode);
+    try {
+      // stop logging while importing
+      this.editLog = null;
+
+      for (let node of nodes) {
+        const newNode = this.buildNewNode(node.id!, node.type!, node.name!);
+        if (node.parent) {
+          const [parentId, parentFIndex] = node.parent.split("/");
+          const parent = this.getNode(parentId);
+          newNode.parent = node.parent;
+          parent.children.push(newNode);
+        }
       }
+    } finally {
+      // restart logging
+      this.editLog = [];
     }
   }
 
   applyEditData(data: EditType[]) {}
 
   addEditData(data: EditType) {
-    this.editData.push(data);
+    if (this.editLog) {
+      this.editLog.push(data);
+    }
   }
 
   flushEdits() {
-    this.flushEditsCallback(this.editData);
-    this.editData = [];
+    if (this.editLog && this.editLog.length > 0) {
+      this.flushEditsCallback(this.editLog);
+    }
+    this.editLog = [];
   }
 
   // https://www.typescriptlang.org/docs/handbook/2/generics.html#working-with-generic-type-variables
   private createNode<T extends Node>(
     c: new (project: Project, id: string, type: NodeType, name: string) => T,
+    id: string,
     type: NodeType,
     name: string
   ): T {
-    const node = new c(this, this.newId(), type, name);
+    const node = new c(this, id, type, name);
+
     this.addEditData({
       a: "c",
       n: { id: node.id, type: type, name: name },
     });
-    return node;
+    const proxy = NodeProxy.create<T>(node, this.addEditData.bind(this));
+    this.addNode(proxy);
+    return proxy;
   }
 
   private newId() {
@@ -212,13 +212,24 @@ class Project extends Node {
     this.nodes[id] = node;
   }
 
-  private getNode(id: string) {
+  public getNode(id: string) {
     const node = this.nodes[id];
     if (!node) {
       throw new Error(`Node not found. id:${id}`);
     }
     return node;
   }
+
+  buildNewNode(id: string, type: NodeType, name: string): Node {
+    switch (type) {
+      case "PAGE":
+        return this.createNode(PageNode, id, type, name);
+      case "LINE":
+        return this.createNode(LineNode, id, type, name);
+      default:
+        throw new Error(`bad node type: ${type}`);
+    }
+  }
 }
 
-export { Project, Node, INode };
+export { Project, LineNode, Node, INode };

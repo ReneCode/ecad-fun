@@ -8,7 +8,7 @@ declare global {
 
 type NodeType = "PROJECT" | "PAGE" | "LINE" | "ARC";
 
-type EditType = {
+type EditLogType = {
   a: "c" | "u";
   n: Record<string, unknown>;
 };
@@ -42,4 +42,11 @@ interface IArcNode extends BaseNodeMixin {
   radius: number = 10;
 }
 
-export { EditType, NodeType, INode, IArcNode, IPageNode, ILineNode };
+export {
+  EditLogType as EditType,
+  NodeType,
+  INode,
+  IArcNode,
+  IPageNode,
+  ILineNode,
+};
