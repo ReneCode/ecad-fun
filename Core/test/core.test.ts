@@ -1,4 +1,4 @@
-import { Project, Node } from "../src/Project";
+import { Project, Node, INode } from "../src/Project";
 
 describe("core", () => {
   it("dummy", () => {
@@ -15,21 +15,21 @@ describe("core", () => {
       expect(project.key).toBe("abc");
       expect(project.children).toHaveLength(0);
 
-      const page = project.createNode("page");
+      const page = project.createPage("page");
       expect(page.id).toBe(`${clientId}:1`);
       expect(page.project).toBe(project);
       project.appendChild(page);
       expect(page.parent).toBe("0:0/1");
       expect(project.children).toHaveLength(1);
       {
-        const lineA = project.createNode("lineA");
+        const lineA = project.createLine("lineA");
         expect(lineA.id).toBe(`${clientId}:2`);
         page.appendChild(lineA);
         expect(lineA.parent).toBe("1:1/1");
         expect(page.children).toHaveLength(1);
       }
       {
-        const lineB = project.createNode("lineB");
+        const lineB = project.createLine("lineB");
         expect(lineB.parent).toBe("");
         expect(lineB.id).toBe(`${clientId}:3`);
         page.appendChild(lineB);
@@ -37,7 +37,7 @@ describe("core", () => {
         expect(page.children).toHaveLength(2);
       }
       {
-        const lineC = project.createNode("lineC");
+        const lineC = project.createLine("lineC");
         expect(lineC.id).toBe(`${clientId}:4`);
         page.insertChild(1, lineC);
         expect(lineC.parent).toBe("1:1/1V");
@@ -46,7 +46,7 @@ describe("core", () => {
         expect(names).toEqual(["lineA", "lineC", "lineB"]);
       }
       {
-        const lineD = project.createNode("lineD");
+        const lineD = project.createLine("lineD");
         expect(lineD.id).toBe(`${clientId}:5`);
         page.insertChild(0, lineD);
         expect(lineD.parent).toBe("1:1/0z");
@@ -56,19 +56,38 @@ describe("core", () => {
       }
     });
 
+    it.skip("performance", () => {
+      const clientId = "1";
+      const flushEditsCallback = jest.fn();
+      const project = new Project(clientId, "abc", flushEditsCallback);
+
+      const maxPage = 100;
+      const maxLine = 500;
+      for (let pageIdx = 0; pageIdx < maxPage; pageIdx++) {
+        const page = project.createPage(`page-${pageIdx}`);
+        project.appendChild(page);
+        for (let lineIdx = 0; lineIdx < maxLine; lineIdx++) {
+          const line = project.createLine(`line-${lineIdx}`);
+          page.appendChild(line);
+        }
+      }
+      const data = project.export();
+      expect(data).toHaveLength(maxPage * maxLine + maxPage);
+    });
+
     it("export", () => {
       const clientId = "1";
       const flushEditsCallback = jest.fn();
       const project = new Project(clientId, "abc", flushEditsCallback);
-      const page = project.createNode("page");
+      const page = project.createPage("page");
       project.appendChild(page);
-      const lineA = project.createNode("lineA");
+      const lineA = project.createLine("lineA");
       page.appendChild(lineA);
-      const lineB = project.createNode("lineB");
+      const lineB = project.createLine("lineB");
       page.appendChild(lineB);
-      const lineC = project.createNode("lineC");
+      const lineC = project.createLine("lineC");
       page.insertChild(1, lineC);
-      const lineD = project.createNode("lineD");
+      const lineD = project.createLine("lineD");
       page.insertChild(0, lineD);
       const filter = (node: Node) => {
         console.log(node.id);
@@ -76,12 +95,30 @@ describe("core", () => {
       };
       const json = project.export();
       expect(json).toEqual([
-        { parent: "0:0/1", id: "1:1", name: "page" },
-        { parent: "1:1/0z", id: "1:5", name: "lineD" },
-        { parent: "1:1/1", id: "1:2", name: "lineA" },
-        { parent: "1:1/1V", id: "1:4", name: "lineC" },
-        { parent: "1:1/2", id: "1:3", name: "lineB" },
+        { parent: "0:0/1", id: "1:1", type: "PAGE", name: "page" },
+        { parent: "1:1/0z", id: "1:5", type: "LINE", name: "lineD" },
+        { parent: "1:1/1", id: "1:2", type: "LINE", name: "lineA" },
+        { parent: "1:1/1V", id: "1:4", type: "LINE", name: "lineC" },
+        { parent: "1:1/2", id: "1:3", type: "LINE", name: "lineB" },
       ]);
+    });
+
+    it("import", () => {
+      const clientId = "1";
+      const flushEditsCallback = jest.fn();
+      const project = new Project(clientId, "abc", flushEditsCallback);
+
+      const data: INode[] = [
+        { parent: "0:0/1", id: "1:1", type: "PAGE", name: "page" },
+        { parent: "1:1/0z", id: "1:5", type: "LINE", name: "lineD" },
+        { parent: "1:1/1", id: "1:2", type: "LINE", name: "lineA" },
+        { parent: "1:1/1V", id: "1:4", type: "LINE", name: "lineC" },
+        { parent: "1:1/2", id: "1:3", type: "LINE", name: "lineB" },
+      ];
+      const ok = project.import(data);
+
+      const exportResult = project.export();
+      expect(exportResult).toEqual(data);
     });
 
     it("flush", () => {
@@ -89,48 +126,45 @@ describe("core", () => {
       const flushEditsCallback = jest.fn();
       const project = new Project(clientId, "project", flushEditsCallback);
 
-      const page = project.createNode("page");
+      const page = project.createPage("page");
       const pageId = page.id;
 
       project.flushEdits();
       expect(flushEditsCallback.mock.calls).toHaveLength(1);
-      expect(flushEditsCallback.mock.calls[0]).toEqual([
-        [
-          {
-            a: "c",
-            n: { id: pageId, name: "page" },
-          },
-        ],
+      expect(flushEditsCallback.mock.calls[0]).toHaveLength(1);
+      expect(flushEditsCallback.mock.calls[0][0]).toEqual([
+        {
+          a: "c",
+          n: { id: pageId, type: "PAGE", name: "page" },
+        },
       ]);
 
       flushEditsCallback.mockReset();
-      const lineA = project.createNode("lineA");
+      const lineA = project.createLine("lineA");
       page.appendChild(lineA);
       const parentLineA = lineA.parent;
       expect(parentLineA).toEqual("1:1/1");
 
-      const lineB = project.createNode("lineB");
+      const lineB = project.createLine("lineB");
       page.insertChild(0, lineB);
       project.flushEdits();
-      expect(flushEditsCallback.mock.calls[0]).toEqual([
-        [
-          {
-            a: "c",
-            n: { id: lineA.id, name: lineA.name },
-          },
-          {
-            a: "u",
-            n: { id: lineA.id, parent: "1:1/1" },
-          },
-          {
-            a: "c",
-            n: { id: lineB.id, name: lineB.name },
-          },
-          {
-            a: "u",
-            n: { id: lineB.id, parent: "1:1/0z" },
-          },
-        ],
+      expect(flushEditsCallback.mock.calls[0][0]).toEqual([
+        {
+          a: "c",
+          n: { id: lineA.id, type: "LINE", name: "lineA" },
+        },
+        {
+          a: "u",
+          n: { id: lineA.id, parent: "1:1/1" },
+        },
+        {
+          a: "c",
+          n: { id: lineB.id, type: "LINE", name: "lineB" },
+        },
+        {
+          a: "u",
+          n: { id: lineB.id, parent: "1:1/0z" },
+        },
       ]);
     });
   });

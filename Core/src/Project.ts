@@ -1,20 +1,31 @@
 import { FractionIndex } from "./FractionIndex";
 
+type NodeType = "PROJECT" | "PAGE" | "LINE";
+
 type EditType = {
   a: "c" | "u";
   n: Record<string, unknown>;
 };
 
-class Node {
+interface INode {
+  type: NodeType;
+  id: string;
+  name: string;
+  parent: string; //  <parentId>:<fIndex>
+}
+
+class Node implements INode {
   project: Project;
+  type: NodeType;
   id: string;
   name: string;
   children: Node[] = [];
-  parent: string = ""; //  <parentId>:<fIndex>
+  parent: string = "";
 
-  constructor(project: Project, id: string, name: string) {
+  constructor(project: Project, id: string, type: NodeType, name: string) {
     this.project = project;
     this.id = id;
+    this.type = type;
     this.name = name;
   }
 
@@ -93,8 +104,8 @@ class Project extends Node {
     key: string,
     flushEditsCallback: (data: EditType[]) => {}
   ) {
-    super(undefined as unknown as Project, "0:0", "root");
-    // this can't set on super()
+    super(undefined as unknown as Project, "0:0", "PROJECT", "root");
+    // this can't use this on super()
     this.project = this;
     this.addNode(this);
     this.clientId = clientId;
@@ -102,22 +113,40 @@ class Project extends Node {
     this.flushEditsCallback = flushEditsCallback;
   }
 
-  createNode(name: string) {
-    const node = new Node(this, this.newId(), name);
-    this.addEditData({
-      a: "c",
-      n: { id: node.id, name: node.name },
-    });
-    return node;
+  createPage(name: string) {
+    const page = this.createNode("PAGE", name);
+    return page;
+  }
+
+  createLine(name: string) {
+    const line = this.createNode("LINE", name);
+    return line;
   }
 
   export() {
     return this.findAll().map((node: Node) => {
       const n: Partial<Node> = { ...node };
+      // do not export .project and .children properties
       delete n.project;
       delete n.children;
       return n;
     });
+  }
+
+  import(nodes: INode[]) {
+    this.nodes = {};
+    this.addNode(this);
+    this.children = [];
+    for (let node of nodes) {
+      const newNode = new Node(this, node.id, node.type, node.name);
+      this.addNode(newNode);
+      if (node.parent) {
+        newNode.parent = node.parent;
+        const [parentId, parentFIndex] = node.parent.split("/");
+        const parent = this.getNode(parentId);
+        parent.children.push(newNode);
+      }
+    }
   }
 
   applyEditData(data: EditType[]) {}
@@ -129,6 +158,15 @@ class Project extends Node {
   flushEdits() {
     this.flushEditsCallback(this.editData);
     this.editData = [];
+  }
+
+  private createNode(type: NodeType, name: string) {
+    const node = new Node(this, this.newId(), type, name);
+    this.addEditData({
+      a: "c",
+      n: { id: node.id, type: type, name: name },
+    });
+    return node;
   }
 
   private newId() {
@@ -153,4 +191,4 @@ class Project extends Node {
   }
 }
 
-export { Project, Node };
+export { Project, Node, INode };
