@@ -1,10 +1,16 @@
 import {
+  combineParentProperty,
+  insertChildToParent,
+  splitParentProperty,
+} from "./childrenUtils";
+import {
   EditLogType,
   BaseNodeMixin,
   IArcNode,
   ILineNode,
   IPageNode,
   NodeType,
+  NodeRecord,
 } from "./ecadfun.d";
 import { FractionIndex } from "./FractionIndex";
 import { NodeProxy } from "./NodeProxy";
@@ -153,7 +159,7 @@ class Project extends Node {
           node.name ? node.name : ""
         );
         if (node.parent) {
-          const [parentId, parentFIndex] = node.parent.split("/");
+          const [parentId, parentFIndex] = splitParentProperty(node.parent);
           const parent = this.getNode(parentId);
           newNode.parent = node.parent;
           parent.children.push(newNode);
@@ -165,7 +171,57 @@ class Project extends Node {
     }
   }
 
-  applyEditData(data: EditLogType[]) {}
+  applyEdits(edits: EditLogType[]) {
+    for (let edit of edits) {
+      switch (edit.a) {
+        case "c":
+          this.applyEditCreate(edit.n);
+          break;
+        case "u":
+          this.applyEditUpdate(edit.n);
+          break;
+        default:
+          throw new Error(`applyEdits: bad action: ${(edit as any).a}`);
+      }
+    }
+  }
+
+  private applyEditCreate(edit: { id: string; type: NodeType; name: string }) {
+    const id = edit.id;
+    if (!id) {
+      throw new Error("can't apply edit without id");
+    }
+    if (this.nodes[id]) {
+      throw new Error(`can't apply edit-create. Id ${id} allready exists`);
+    }
+    const node = this.buildNewNode(id, edit.type, edit.name as string);
+    this.applyProperties(node, edit);
+  }
+
+  private applyEditUpdate(edit: { id: string } & NodeRecord) {
+    const node = this.getNode(edit.id);
+    this.applyProperties(node, edit);
+  }
+
+  private applyProperties(node: Node, props: Record<string, unknown>) {
+    for (let prop in props) {
+      if (prop === "id" || prop === "type") {
+        continue;
+      }
+      if (prop === "parent") {
+        let parentValue = props[prop] as string;
+        const [parentId, fIndex] = splitParentProperty(parentValue);
+        const parent = this.getNode(parentId);
+        const newfIndex = insertChildToParent(parent, node, fIndex);
+        if (newfIndex !== fIndex) {
+          parentValue = combineParentProperty(parentId, newfIndex);
+        }
+        (node as any)[prop] = parentValue;
+      } else {
+        (node as any)[prop] = props[prop];
+      }
+    }
+  }
 
   addEditData(data: EditLogType) {
     if (this.editLog) {

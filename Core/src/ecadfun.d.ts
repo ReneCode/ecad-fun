@@ -8,10 +8,17 @@ declare global {
 
 type NodeType = "PROJECT" | "PAGE" | "LINE" | "ARC";
 
-type EditLogType = {
-  a: "c" | "u";
-  n: Record<string, unknown>;
-};
+type NodeRecord = Record<string, unknown>;
+
+type EditLogType =
+  | {
+      a: "c";
+      n: { id: string; type: NodeType; name: string } & NodeRecord;
+    }
+  | {
+      a: "u";
+      n: { id: string } & NodeRecord;
+    };
 
 interface BaseNodeMixin {
   id: string;
@@ -40,4 +47,12 @@ interface IArcNode extends BaseNodeMixin {
   radius: number = 10;
 }
 
-export { EditLogType, NodeType, BaseNodeMixin, IArcNode, IPageNode, ILineNode };
+export {
+  EditLogType,
+  NodeType,
+  NodeRecord,
+  BaseNodeMixin,
+  IArcNode,
+  IPageNode,
+  ILineNode,
+};

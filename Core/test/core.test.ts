@@ -1,4 +1,5 @@
-import { Project, LineNode, Node } from "../src/Project";
+import { EditLogType } from "../src/ecadfun.d";
+import { Project, LineNode, Node, PageNode } from "../src/Project";
 
 describe("core project", () => {
   let project: Project;
@@ -205,5 +206,51 @@ describe("core project", () => {
     expect(() => {
       arc.id = "42";
     }).toThrowError();
+  });
+
+  it("appyEdits", () => {
+    const edits: EditLogType[] = [
+      {
+        a: "c",
+        n: { id: "1:1", type: "PAGE", name: "page" },
+      },
+      {
+        a: "u",
+        n: { id: "1:1", parent: "0:0/1" },
+      },
+      {
+        a: "c",
+        n: {
+          id: "1:2",
+          type: "LINE",
+          name: "lineA",
+          x1: 42,
+          parent: "1:1/1",
+          width: 3.14,
+        },
+      },
+      {
+        a: "c",
+        n: { id: "1:3", type: "LINE", name: "lineB", color: "red" },
+      },
+      {
+        a: "u",
+        n: { id: "1:3", parent: "1:1/0z" },
+      },
+    ];
+
+    project.applyEdits(edits);
+    expect(project.getNode("1:1")).toBeTruthy();
+    expect(project.children).toHaveLength(1);
+    const page = project.children[0];
+    expect(page).toBeInstanceOf(PageNode);
+    expect(page.name).toBe("page");
+    expect(page.children).toHaveLength(2);
+    expect(page.children[0]).toBeInstanceOf(LineNode);
+    expect(page.children[0]).toHaveProperty("name", "lineB");
+    expect(page.children[0]).toHaveProperty("color", "red");
+    expect(page.children[1]).toBeInstanceOf(LineNode);
+    expect(page.children[1]).toHaveProperty("x1", 42);
+    expect(page.children[1]).toHaveProperty("width", 3.14);
   });
 });
