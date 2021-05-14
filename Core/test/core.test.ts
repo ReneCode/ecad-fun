@@ -78,10 +78,6 @@ describe("core project", () => {
   });
 
   it.skip("performance", () => {
-    const clientId = "1";
-    const flushEditsCallback = jest.fn();
-    const project = new Project(clientId, "abc", flushEditsCallback);
-
     const maxPage = 100;
     const maxLine = 1000;
     for (let pageIdx = 0; pageIdx < maxPage; pageIdx++) {
@@ -97,9 +93,6 @@ describe("core project", () => {
   });
 
   it("export", () => {
-    const clientId = "1";
-    const flushEditsCallback = jest.fn();
-    const project = new Project(clientId, "abc", flushEditsCallback);
     const page = project.createPage("page");
     project.appendChild(page);
     const lineA = project.createLine("lineA");
@@ -121,10 +114,6 @@ describe("core project", () => {
   });
 
   it("import", () => {
-    const clientId = "1";
-    const flushEditsCallback = jest.fn();
-    const project = new Project(clientId, "abc", flushEditsCallback);
-
     const data = [
       { parent: "0:0/1", id: "1:1", type: "PAGE", name: "page" },
       { parent: "1:1/0z", id: "1:5", type: "LINE", name: "lineD" },
@@ -158,10 +147,6 @@ describe("core project", () => {
   });
 
   it("flush", () => {
-    const clientId = "1";
-    const flushEditsCallback = jest.fn();
-    const project = new Project(clientId, "project", flushEditsCallback);
-
     const page = project.createPage("page");
     const pageId = page.id;
 
@@ -205,10 +190,6 @@ describe("core project", () => {
   });
 
   it("update", () => {
-    const clientId = "1";
-    const flushEditsCallback = jest.fn();
-    const project = new Project(clientId, "project", flushEditsCallback);
-
     const page = project.createPage("page");
     const arc = project.createArc("arc");
     expect(arc.radius).toEqual(10);
