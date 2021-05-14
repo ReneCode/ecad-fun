@@ -1,0 +1,16 @@
+.project-view {
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid gainsboro;
+  border-radius: 10px;
+}
+
+.page-list {
+}
+
+.page-node {
+  &:hover {
+    cursor: pointer;
+    background-color: lightskyblue;
+  }
+}

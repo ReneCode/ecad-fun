@@ -1,54 +1,54 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import { EditLogType } from "../core/ecadfun.d";
-import { Project } from "../core/Project";
+import { PageNode, Project } from "../core/Project";
 
-import "./ProjectView.css";
+import "./ProjectView.scss";
+
+import PageList from "./PageList";
 
 type Props = {
   clientId: string;
+  onSendEditsToServer: (clientId: string, data: EditLogType[]) => void;
 };
-const ProjectView = ({ clientId }: Props) => {
-  const [project, setProject] = useState<Project>(
-    undefined as unknown as Project
-  );
-  const [drawIndex, setDrawIndex] = useState(0);
-  const flushEdits = (data: EditLogType[]) => {
-    setDrawIndex((i) => i + 1);
-  };
+class ProjectView extends React.Component<Props> {
+  project: Project;
+  clientId: string;
 
-  useEffect(() => {
-    console.log("create project");
-    const project = new Project(clientId, "key", flushEdits);
-    setProject(project);
-  }, []);
+  constructor(props: Props) {
+    super(props);
+    const { clientId, onSendEditsToServer } = props;
+    this.clientId = clientId;
+    this.project = new Project(clientId, "key", (data: EditLogType[]) => {
+      onSendEditsToServer(this.clientId, data);
+    });
 
-  const onInc = () => {
-    setDrawIndex((i) => i + 1);
-  };
-
-  const onCreate = () => {
-    console.log("create");
-    const pages = project.findAll((n) => n.type === "PAGE");
-    const page = project.createPage(`page-${pages.length + 1}`);
-    project.appendChild(page);
-    project.flushEdits();
-  };
-
-  if (!project) {
-    return null;
+    this.onCreate = this.onCreate.bind(this);
   }
 
-  const pages = project.findAll((n) => n.type === "PAGE");
-  return (
-    <div className="project-view">
-      <h3>client: {clientId}</h3>
-      <button onClick={onCreate}>Create</button>
-      <button onClick={onInc}>Inc</button>
-      {pages.map((p) => {
-        return <div className="page-node">{p.name}</div>;
-      })}
-    </div>
-  );
-};
+  applyEdits(msg: string) {
+    console.log(`client: ${this.clientId} got: ${msg}`);
+    this.setState({});
+  }
+
+  onCreate() {
+    const pages = this.project.findAll((n) => n.type === "PAGE");
+    const page = this.project.createPage(`page-${pages.length + 1}`);
+    this.project.appendChild(page);
+    this.project.flushEdits();
+    this.setState({ name: "hallo" });
+  }
+
+  render() {
+    const pages = this.project.findAll((n) => n.type === "PAGE") as PageNode[];
+    return (
+      <div className="project-view">
+        <h3>client: {this.clientId}</h3>
+        <button onClick={this.onCreate}>Create</button>
+        <PageList pages={pages}></PageList>
+        <div className="page-list"></div>
+      </div>
+    );
+  }
+}
 
 export default ProjectView;
