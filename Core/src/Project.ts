@@ -1,15 +1,15 @@
 import {
   EditLogType,
+  BaseNodeMixin,
   IArcNode,
   ILineNode,
-  INode,
   IPageNode,
   NodeType,
 } from "./ecadfun.d";
 import { FractionIndex } from "./FractionIndex";
 import { NodeProxy } from "./NodeProxy";
 
-class Node implements INode {
+class Node implements BaseNodeMixin {
   project: Project;
   type: NodeType;
   id: string;
@@ -127,8 +127,8 @@ class Project extends Node {
   }
 
   export() {
-    return this.findAll().map((node: INode) => {
-      const n: INode = { ...node };
+    return this.findAll().map((node: Node) => {
+      const n = { ...node };
       // do not export .project and .children properties
       delete (n as any).project;
       delete (n as any).children;
@@ -136,7 +136,9 @@ class Project extends Node {
     });
   }
 
-  import(nodes: Partial<INode>[]) {
+  import(
+    nodes: { id: string; type: string; parent?: string; name?: string }[]
+  ) {
     this.nodes = {};
     this.addNode(this);
     this.children = [];
@@ -145,7 +147,11 @@ class Project extends Node {
       this.editLog = null;
 
       for (let node of nodes) {
-        const newNode = this.buildNewNode(node.id!, node.type!, node.name!);
+        const newNode = this.buildNewNode(
+          node.id,
+          node.type as NodeType,
+          node.name ? node.name : ""
+        );
         if (node.parent) {
           const [parentId, parentFIndex] = node.parent.split("/");
           const parent = this.getNode(parentId);

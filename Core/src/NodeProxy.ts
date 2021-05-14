@@ -1,8 +1,8 @@
-import { EditLogType, INode } from "./ecadfun.d";
+import { EditLogType, BaseNodeMixin } from "./ecadfun.d";
 
 type addEditDataType = (data: EditLogType) => void;
 
-const getHandler = <T extends INode>(addEditData: addEditDataType) => {
+const getHandler = <T extends BaseNodeMixin>(addEditData: addEditDataType) => {
   return {
     get: (arc: T, prop: string | symbol, target: any) => {
       return Reflect.get(arc, prop, target);
@@ -24,7 +24,7 @@ const getHandler = <T extends INode>(addEditData: addEditDataType) => {
 };
 
 class NodeProxy {
-  public static create<T extends INode>(
+  public static create<T extends BaseNodeMixin>(
     target: T,
     addEditData: addEditDataType
   ) {

@@ -21,12 +21,10 @@ interface BaseNodeMixin {
   parent: string;
 }
 
-interface INode extends BaseNodeMixin {}
-
 interface EcadfunAPI {
   readonly version: "1.0.0";
 
-  createNode(name: string): BaseNode;
+  createNode(name: string): BaseNodeMixin;
 }
 
 interface IPageNode extends BaseNodeMixin {
@@ -42,4 +40,4 @@ interface IArcNode extends BaseNodeMixin {
   radius: number = 10;
 }
 
-export { EditLogType, NodeType, INode, IArcNode, IPageNode, ILineNode };
+export { EditLogType, NodeType, BaseNodeMixin, IArcNode, IPageNode, ILineNode };

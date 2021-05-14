@@ -1,10 +1,16 @@
-import { Project, LineNode, Node, INode } from "../src/Project";
+import { Project, LineNode, Node } from "../src/Project";
 
 describe("core project", () => {
+  let project: Project;
+  let flushEditsCallback = jest.fn();
+  let clientId = "1";
+
+  beforeEach(() => {
+    flushEditsCallback = jest.fn();
+    project = new Project(clientId, "abc", flushEditsCallback);
+  });
+
   it("getNode", () => {
-    const clientId = "1";
-    const flushEditsCallback = jest.fn();
-    const project = new Project(clientId, "abc", flushEditsCallback);
     const page = project.createPage("new page");
     const p = project.getNode(page.id);
     expect(p.name).toBe(page.name);
@@ -25,9 +31,6 @@ describe("core project", () => {
   });
 
   it("basic createNode, appendChild, insertChild", () => {
-    const clientId = "1";
-    const flushEditsCallback = jest.fn();
-    const project = new Project(clientId, "abc", flushEditsCallback);
     expect(project.id).toBe("0:0");
     expect(project.clientId).toBe(clientId);
     expect(project.key).toBe("abc");
@@ -122,7 +125,7 @@ describe("core project", () => {
     const flushEditsCallback = jest.fn();
     const project = new Project(clientId, "abc", flushEditsCallback);
 
-    const data: Partial<INode>[] = [
+    const data = [
       { parent: "0:0/1", id: "1:1", type: "PAGE", name: "page" },
       { parent: "1:1/0z", id: "1:5", type: "LINE", name: "lineD" },
       { parent: "1:1/1", id: "1:2", type: "LINE", name: "lineA" },
