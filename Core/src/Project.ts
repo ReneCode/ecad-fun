@@ -103,7 +103,8 @@ class Project extends Node {
   lastIdCounter: number = 0;
   nodes: Record<string, Node> = {};
   flushEditsCallback: (data: EditLogType[]) => void;
-  private editLog: null | EditLogType[] = [];
+  private editLog: EditLogType[] = [];
+  private useEditLog = true;
 
   constructor(
     clientId: string,
@@ -150,7 +151,7 @@ class Project extends Node {
     this.children = [];
     try {
       // stop logging while importing
-      this.editLog = null;
+      this.useEditLog = false;
 
       for (let node of nodes) {
         const newNode = this.buildNewNode(
@@ -166,27 +167,34 @@ class Project extends Node {
         }
       }
     } finally {
-      // restart logging
-      this.editLog = [];
+      // continue logging
+      this.useEditLog = true;
     }
   }
 
   applyEdits(edits: EditLogType[]) {
-    for (let edit of edits) {
-      switch (edit.a) {
-        case "c":
-          this.applyEditCreate(edit.n);
-          break;
-        case "u":
-          this.applyEditUpdate(edit.n);
-          break;
-        default:
-          throw new Error(`applyEdits: bad action: ${(edit as any).a}`);
+    try {
+      this.useEditLog = false;
+      for (let edit of edits) {
+        switch (edit.a) {
+          case "c":
+            this.applyEditCreate(edit.n);
+            break;
+          case "u":
+            this.applyEditUpdate(edit.n);
+            break;
+          default:
+            throw new Error(`applyEdits: bad action: ${(edit as any).a}`);
+        }
       }
+    } finally {
+      this.useEditLog = true;
     }
   }
 
-  private applyEditCreate(edit: { id: string; type: NodeType; name: string }) {
+  private applyEditCreate(
+    edit: { id: string; type: NodeType; name: string } & NodeRecord
+  ) {
     const id = edit.id;
     if (!id) {
       throw new Error("can't apply edit without id");
@@ -215,6 +223,8 @@ class Project extends Node {
         const newfIndex = insertChildToParent(parent, node, fIndex);
         if (newfIndex !== fIndex) {
           parentValue = combineParentProperty(parentId, newfIndex);
+          // modified parent value
+          props[prop] = parentValue;
         }
         (node as any)[prop] = parentValue;
       } else {
@@ -224,16 +234,16 @@ class Project extends Node {
   }
 
   addEditData(data: EditLogType) {
-    if (this.editLog) {
+    if (this.useEditLog) {
       this.editLog.push(data);
     }
   }
 
   flushEdits() {
-    if (this.editLog && this.editLog.length > 0) {
+    if (this.editLog.length > 0) {
       this.flushEditsCallback(this.editLog);
+      this.editLog = [];
     }
-    this.editLog = [];
   }
 
   // https://www.typescriptlang.org/docs/handbook/2/generics.html#working-with-generic-type-variables

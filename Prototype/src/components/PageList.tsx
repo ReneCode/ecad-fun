@@ -1,5 +1,5 @@
 import { PageNode } from "../core/Project";
-import "./ProjectView.scss";
+import "./PageList.scss";
 
 type Props = {
   pages: PageNode[];

@@ -12,21 +12,19 @@ type Props = {
 };
 class ProjectView extends React.Component<Props> {
   project: Project;
-  clientId: string;
 
   constructor(props: Props) {
     super(props);
-    const { clientId, onSendEditsToServer } = props;
-    this.clientId = clientId;
-    this.project = new Project(clientId, "key", (data: EditLogType[]) => {
-      onSendEditsToServer(this.clientId, data);
+    this.project = new Project(props.clientId, "key", (data: EditLogType[]) => {
+      props.onSendEditsToServer(this.props.clientId, data);
     });
 
     this.onCreate = this.onCreate.bind(this);
   }
 
-  applyEdits(msg: string) {
-    console.log(`client: ${this.clientId} got: ${msg}`);
+  applyEdits(edits: EditLogType[]) {
+    this.project.applyEdits(edits);
+    console.log(`client: ${this.props.clientId} received edits`);
     this.setState({});
   }
 
@@ -42,7 +40,7 @@ class ProjectView extends React.Component<Props> {
     const pages = this.project.findAll((n) => n.type === "PAGE") as PageNode[];
     return (
       <div className="project-view">
-        <h3>client: {this.clientId}</h3>
+        <h3>Client {this.props.clientId}</h3>
         <button onClick={this.onCreate}>Create</button>
         <PageList pages={pages}></PageList>
         <div className="page-list"></div>

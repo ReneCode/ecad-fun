@@ -240,6 +240,7 @@ describe("core project", () => {
     ];
 
     project.applyEdits(edits);
+
     expect(project.getNode("1:1")).toBeTruthy();
     expect(project.children).toHaveLength(1);
     const page = project.children[0];
@@ -252,5 +253,52 @@ describe("core project", () => {
     expect(page.children[1]).toBeInstanceOf(LineNode);
     expect(page.children[1]).toHaveProperty("x1", 42);
     expect(page.children[1]).toHaveProperty("width", 3.14);
+  });
+  it("appyEdits with updates", () => {
+    const edits: EditLogType[] = [
+      {
+        a: "c",
+        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0/1" },
+      },
+      {
+        a: "c",
+        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0/1" },
+      },
+    ];
+
+    project.applyEdits(edits);
+    expect(project.children[0]).toHaveProperty("name", "pageA");
+    expect(project.children[0]).toHaveProperty("parent", "0:0/1");
+    expect(project.children[1]).toHaveProperty("name", "pageB");
+    expect(project.children[1]).toHaveProperty("parent", "0:0/2");
+
+    // parent is changed
+    expect(edits).toEqual([
+      {
+        a: "c",
+        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0/1" },
+      },
+      {
+        a: "c",
+        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0/2" },
+      },
+    ]);
+  });
+
+  it("appyEdits without flushEdits", () => {
+    const edits: EditLogType[] = [
+      {
+        a: "c",
+        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0/1" },
+      },
+      {
+        a: "c",
+        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0/1" },
+      },
+    ];
+
+    project.applyEdits(edits);
+    project.flushEdits();
+    expect(flushEditsCallback.mock.calls).toHaveLength(0);
   });
 });

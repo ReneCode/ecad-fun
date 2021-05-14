@@ -15,19 +15,16 @@ const App = () => {
     serverView.current?.applyEdits(clientId, data);
   };
 
-  const onSendToClient = () => {};
-
-  const onApplyEdits = () => {
-    client1View.current?.applyEdits("hello client");
-    client2View.current?.applyEdits("hello client");
-    client3View.current?.applyEdits("hello client");
+  const onSendEditsToClient = (edits: EditLogType[]) => {
+    //  client1View.current?.applyEdits(edits);
+    client2View.current?.applyEdits(edits);
+    client3View.current?.applyEdits(edits);
   };
 
   return (
     <div className="App">
       <div className="header">
         <p>ecad.fun prototype</p>
-        <button onClick={onApplyEdits}>apply edits</button>
       </div>
       <div className="grid">
         <ProjectView
@@ -46,7 +43,10 @@ const App = () => {
           clientId="3"
         />
 
-        <ServerView ref={serverView} onSendToClient={onSendToClient} />
+        <ServerView
+          ref={serverView}
+          onSendEditsToClient={onSendEditsToClient}
+        />
       </div>
     </div>
   );
