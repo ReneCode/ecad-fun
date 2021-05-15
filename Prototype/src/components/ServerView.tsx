@@ -26,6 +26,7 @@ class ServerView extends React.Component<Props> {
 
     this.project.applyEdits(edits);
     this.props.onSendEditsToClient(edits);
+
     this.setState({});
   }
 

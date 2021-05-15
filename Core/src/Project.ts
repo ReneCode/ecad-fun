@@ -44,11 +44,16 @@ class Node implements BaseNodeMixin {
       }
       fIdx = FractionIndex.after(parentFIndex);
     }
+    this.removeFromCurrentParent(child);
     child.parent = `${parentId}/${fIdx}`;
     this.children.push(child);
   }
 
   insertChild(index: number, child: Node) {
+    if (index === 0 && this.children.length === 0) {
+      return this.appendChild(child);
+    }
+
     const countChildren = this.children.length;
     if (index < 0) {
       throw new Error(`index too low: ${index}`);
@@ -67,8 +72,23 @@ class Node implements BaseNodeMixin {
       fIdx = FractionIndex.between(beforeIdx, afterIdx);
     }
     const parentId = this.id;
+    this.removeFromCurrentParent(child);
     child.parent = `${parentId}/${fIdx}`;
     this.children.splice(index, 0, child);
+  }
+
+  public removeFromCurrentParent(child: Node) {
+    if (!child.parent) {
+      return;
+    }
+
+    const [parentId, _fIndex] = splitParentProperty(child.parent);
+    const parent = this.project.getNode(parentId);
+    const foundIndex = parent.children.indexOf(child);
+    if (foundIndex < 0) {
+      throw new Error(`child ${child.id} not found in parent ${parentId}`);
+    }
+    parent.children.splice(foundIndex, 1);
   }
 
   findAll(callback?: (node: Node) => boolean) {
@@ -217,6 +237,7 @@ class Project extends Node {
         continue;
       }
       if (prop === "parent") {
+        this.removeFromCurrentParent(node);
         let parentValue = props[prop] as string;
         const [parentId, fIndex] = splitParentProperty(parentValue);
         const parent = this.getNode(parentId);

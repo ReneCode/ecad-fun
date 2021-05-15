@@ -78,6 +78,13 @@ describe("core project", () => {
     }
   });
 
+  it("insertChild", () => {
+    const page = project.createPage("page");
+    const line = project.createLine("line");
+    page.insertChild(0, line);
+    expect(page.children[0]).toBe(line);
+  });
+
   it.skip("performance", () => {
     const maxPage = 100;
     const maxLine = 1000;
@@ -208,6 +215,40 @@ describe("core project", () => {
     }).toThrowError();
   });
 
+  it("change parent on appendChild", () => {
+    const pageA = project.createPage("pageA");
+    const pageB = project.createPage("pageB");
+    const line = project.createLine("line");
+    pageA.appendChild(line);
+    expect(pageA.children).toHaveLength(1);
+    expect(pageB.children).toHaveLength(0);
+    // should remove from pageA
+    pageB.appendChild(line);
+    expect(pageA.children).toHaveLength(0);
+    expect(pageB.children).toHaveLength(1);
+  });
+
+  it("change parent on insertChild", () => {
+    const pageA = project.createPage("pageA");
+    const pageB = project.createPage("pageB");
+    const lA = project.createLine("lA");
+    pageA.appendChild(lA);
+    const lB = project.createLine("lB");
+    pageB.appendChild(lB);
+
+    const line = project.createLine("line");
+    pageA.insertChild(0, line);
+    expect(pageA.children).toHaveLength(2);
+    expect(pageB.children).toHaveLength(1);
+    // should remove from pageA
+    pageB.insertChild(0, line);
+    expect(pageA.children).toHaveLength(1);
+    expect(pageA.children[0]).toBe(lA);
+    expect(pageB.children).toHaveLength(2);
+    expect(pageB.children[0]).toBe(line);
+    expect(pageB.children[1]).toBe(lB);
+  });
+
   it("appyEdits", () => {
     const edits: EditLogType[] = [
       {
@@ -300,5 +341,22 @@ describe("core project", () => {
     project.applyEdits(edits);
     project.flushEdits();
     expect(flushEditsCallback.mock.calls).toHaveLength(0);
+  });
+
+  it("applyEdits - remove from old parent", () => {
+    const pageA = project.createPage("pageA");
+    const pageB = project.createPage("pageB");
+    const line = project.createLine("line");
+    pageA.appendChild(line);
+
+    const edits: EditLogType[] = [
+      {
+        a: "u",
+        n: { id: line.id, parent: `${pageB.id}/5` },
+      },
+    ];
+    project.applyEdits(edits);
+    expect(pageA.children).toHaveLength(0);
+    expect(pageB.children).toHaveLength(1);
   });
 });
