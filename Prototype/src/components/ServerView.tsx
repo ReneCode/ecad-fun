@@ -5,9 +5,7 @@ import PageList from "./PageList";
 
 import "./ServerView.scss";
 
-type Props = {
-  onSendEditsToClient: (data: EditLogType[]) => void;
-};
+type Props = {};
 class ServerView extends React.Component<Props> {
   project: Project;
 
@@ -15,19 +13,12 @@ class ServerView extends React.Component<Props> {
     super(props);
     this.project = new Project("0", "key", (edit: EditLogType[]) => {
       console.log("server edit-callbacks - do not call!");
-      // props.onSendEditsToClient(edit);
     });
-  }
 
-  public applyEdits(clientId: string, edits: EditLogType[]) {
-    console.log(
-      `Server got from client: ${clientId} message: ${JSON.stringify(edits)}`
-    );
-
-    this.project.applyEdits(edits);
-    this.props.onSendEditsToClient(edits);
-
-    this.setState({});
+    this.project.on("all", () => {
+      // redraw
+      this.setState({});
+    });
   }
 
   render() {

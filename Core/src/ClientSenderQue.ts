@@ -1,0 +1,3 @@
+class ClientSenderQue {}
+
+export { ClientSenderQue };

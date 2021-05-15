@@ -19,21 +19,24 @@ class ProjectView extends React.Component<Props> {
       props.onSendEditsToServer(this.props.clientId, data);
     });
 
+    this.project.on("all", () => {
+      // redraw
+      this.setState({});
+    });
+
     this.onCreate = this.onCreate.bind(this);
   }
 
-  applyEdits(edits: EditLogType[]) {
-    this.project.applyEdits(edits);
-    console.log(`client: ${this.props.clientId} received edits`);
-    this.setState({});
-  }
+  // applyEdits(edits: EditLogType[]) {
+  //   this.project.applyEdits(edits);
+  //   console.log(`client: ${this.props.clientId} received edits`);
+  // }
 
   onCreate() {
     const pages = this.project.findAll((n) => n.type === "PAGE");
     const page = this.project.createPage(`page-${pages.length + 1}`);
     this.project.appendChild(page);
     this.project.flushEdits();
-    this.setState({ name: "hallo" });
   }
 
   render() {

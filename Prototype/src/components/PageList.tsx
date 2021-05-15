@@ -10,7 +10,7 @@ const PageList = ({ pages }: Props) => {
       {pages.map((p) => {
         return (
           <div key={p.id} className="page-node">
-            {p.name}
+            {p.id} = {p.parent} = {p.name}
           </div>
         );
       })}

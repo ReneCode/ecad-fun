@@ -125,13 +125,14 @@ class Project extends Node {
   flushEditsCallback: (data: EditLogType[]) => void;
   private editLog: EditLogType[] = [];
   private useEditLog = true;
+  private changeCallbacks: (() => void)[] = [];
 
   constructor(
     clientId: string,
     key: string,
     flushEditsCallback: (data: EditLogType[]) => void
   ) {
-    super(undefined as unknown as Project, "0:0", "PROJECT", "root");
+    super(null as unknown as Project, "0:0", "PROJECT", "root");
     // this can't use this on super()
     this.project = this;
     this.addNode(this);
@@ -139,6 +140,20 @@ class Project extends Node {
     this.key = key;
     this.flushEditsCallback = flushEditsCallback;
   }
+
+  on(changes: "all", callback: () => void) {
+    this.changeCallbacks.push(callback);
+  }
+
+  off(changes: "all", callback: () => void) {
+    this.changeCallbacks = this.changeCallbacks.filter((cb) => cb != callback);
+  }
+
+  private dispatchChanges = () => {
+    for (let callback of this.changeCallbacks) {
+      callback();
+    }
+  };
 
   createPage(name: string) {
     return this.createNode(PageNode, this.newId(), "PAGE", name);
@@ -190,18 +205,24 @@ class Project extends Node {
       // continue logging
       this.useEditLog = true;
     }
+    this.dispatchChanges();
   }
 
-  applyEdits(edits: EditLogType[]) {
+  applyEdits(edits: EditLogType[]): "ack" | "reject" {
+    let ok = true;
     try {
       this.useEditLog = false;
       for (let edit of edits) {
         switch (edit.a) {
           case "c":
-            this.applyEditCreate(edit.n);
+            if (!this.applyEditCreate(edit.n)) {
+              ok = false;
+            }
             break;
           case "u":
-            this.applyEditUpdate(edit.n);
+            if (!this.applyEditUpdate(edit.n)) {
+              ok = false;
+            }
             break;
           default:
             throw new Error(`applyEdits: bad action: ${(edit as any).a}`);
@@ -210,6 +231,8 @@ class Project extends Node {
     } finally {
       this.useEditLog = true;
     }
+    this.dispatchChanges();
+    return ok ? "ack" : "reject";
   }
 
   private applyEditCreate(
@@ -223,15 +246,16 @@ class Project extends Node {
       throw new Error(`can't apply edit-create. Id ${id} allready exists`);
     }
     const node = this.buildNewNode(id, edit.type, edit.name as string);
-    this.applyProperties(node, edit);
+    return this.applyProperties(node, edit);
   }
 
   private applyEditUpdate(edit: { id: string } & NodeRecord) {
     const node = this.getNode(edit.id);
-    this.applyProperties(node, edit);
+    return this.applyProperties(node, edit);
   }
 
   private applyProperties(node: Node, props: Record<string, unknown>) {
+    let ok = true;
     for (let prop in props) {
       if (prop === "id" || prop === "type") {
         continue;
@@ -246,12 +270,14 @@ class Project extends Node {
           parentValue = combineParentProperty(parentId, newfIndex);
           // modified parent value
           props[prop] = parentValue;
+          ok = false;
         }
         (node as any)[prop] = parentValue;
       } else {
         (node as any)[prop] = props[prop];
       }
     }
+    return ok;
   }
 
   addEditData(data: EditLogType) {
@@ -262,6 +288,7 @@ class Project extends Node {
 
   flushEdits() {
     if (this.editLog.length > 0) {
+      this.dispatchChanges();
       this.flushEditsCallback(this.editLog);
       this.editLog = [];
     }

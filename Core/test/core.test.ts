@@ -280,7 +280,7 @@ describe("core project", () => {
       },
     ];
 
-    project.applyEdits(edits);
+    expect(project.applyEdits(edits)).toBe("ack");
 
     expect(project.getNode("1:1")).toBeTruthy();
     expect(project.children).toHaveLength(1);
@@ -358,5 +358,27 @@ describe("core project", () => {
     project.applyEdits(edits);
     expect(pageA.children).toHaveLength(0);
     expect(pageB.children).toHaveLength(1);
+  });
+
+  it("applyEdits - change parent because of conflict", () => {
+    const page = project.createPage("page");
+    const lineA = project.createLine("lineA");
+    const edits: EditLogType[] = [
+      {
+        a: "u",
+        n: { id: lineA.id, parent: `${page.id}/2` },
+      },
+    ];
+    expect(project.applyEdits(edits)).toBe("ack");
+
+    const lineB = project.createLine("lineB");
+    const conflictEdits: EditLogType[] = [
+      {
+        a: "u",
+        n: { id: lineB.id, parent: `${page.id}/2` },
+      },
+    ];
+    expect(project.applyEdits(conflictEdits)).toBe("reject");
+    expect(conflictEdits[0].n).toHaveProperty("parent", `${page.id}/3`);
   });
 });
