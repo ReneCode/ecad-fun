@@ -1,6 +1,7 @@
 import {
   combineParentProperty,
   insertChildToParent,
+  setChildToParent,
   splitParentProperty,
 } from "./childrenUtils";
 import {
@@ -204,19 +205,22 @@ class Project extends Node {
     this.dispatchChanges();
   }
 
-  applyEdits(edits: EditLogType[]): "ack" | "reject" {
+  // TODO
+  // if force, that edits has not to be changed !!!
+
+  applyEdits(edits: EditLogType[], force: boolean = false): "ack" | "reject" {
     let ok = true;
     try {
       this.useEditLog = false;
       for (let edit of edits) {
         switch (edit.a) {
           case "c":
-            if (!this.applyEditCreate(edit.n)) {
+            if (!this.applyEditCreate(edit.n, force)) {
               ok = false;
             }
             break;
           case "u":
-            if (!this.applyEditUpdate(edit.n)) {
+            if (!this.applyEditUpdate(edit.n, force)) {
               ok = false;
             }
             break;
@@ -232,7 +236,8 @@ class Project extends Node {
   }
 
   private applyEditCreate(
-    edit: { id: string; type: NodeType; name: string } & NodeRecord
+    edit: { id: string; type: NodeType; name: string } & NodeRecord,
+    force: boolean
   ) {
     const id = edit.id;
     if (!id) {
@@ -244,15 +249,19 @@ class Project extends Node {
       );
     }
     const node = this.buildNewNode(id, edit.type, edit.name as string);
-    return this.applyProperties(node, edit);
+    return this.applyProperties(node, edit, force);
   }
 
-  private applyEditUpdate(edit: { id: string } & NodeRecord) {
+  private applyEditUpdate(edit: { id: string } & NodeRecord, force: boolean) {
     const node = this.getNode(edit.id);
-    return this.applyProperties(node, edit);
+    return this.applyProperties(node, edit, force);
   }
 
-  private applyProperties(node: Node, props: Record<string, unknown>) {
+  private applyProperties(
+    node: Node,
+    props: Record<string, unknown>,
+    force: boolean
+  ) {
     let ok = true;
     for (let prop in props) {
       if (prop === "id" || prop === "type") {
@@ -263,12 +272,16 @@ class Project extends Node {
         let parentValue = props[prop] as string;
         const [parentId, fIndex] = splitParentProperty(parentValue);
         const parent = this.getNode(parentId);
-        const newfIndex = insertChildToParent(parent, node, fIndex);
-        if (newfIndex !== fIndex) {
-          parentValue = combineParentProperty(parentId, newfIndex);
-          // modified parent value
-          props[prop] = parentValue;
-          ok = false;
+        if (force) {
+          setChildToParent(parent, node, fIndex);
+        } else {
+          const newfIndex = insertChildToParent(parent, node, fIndex);
+          if (newfIndex !== fIndex) {
+            parentValue = combineParentProperty(parentId, newfIndex);
+            // modified parent value
+            props[prop] = parentValue;
+            ok = false;
+          }
         }
         (node as any)[prop] = parentValue;
       } else {

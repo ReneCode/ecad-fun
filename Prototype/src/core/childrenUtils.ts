@@ -71,3 +71,41 @@ export const insertChildToParent = (
     return fIndex;
   }
 };
+
+export const setChildToParent = (
+  parent: { id: string; children: { parent: string }[] },
+  child: { parent: string },
+  fIndex: string
+) => {
+  if (parent.children.length === 0) {
+    parent.children.push(child);
+    return;
+  }
+  const idx = parent.children.findIndex((n) => {
+    const [_, fidx] = splitParentProperty(n.parent);
+    return fIndex <= fidx;
+  });
+  if (idx < 0) {
+    // all child have lower fIndex
+    parent.children.push(child);
+    return;
+  }
+
+  const foundChild = parent.children[idx];
+  const [_, foundfIndex] = splitParentProperty(foundChild.parent);
+  if (foundfIndex === fIndex) {
+    // fIndex allready used
+    // give foundChild a new fIndex
+    let newfIndex = "";
+    if (idx + 1 === parent.children.length) {
+      newfIndex = FractionIndex.after(foundfIndex);
+    } else {
+      const nextChild = parent.children[idx + 1];
+      const [_, nextChildfIndex] = splitParentProperty(nextChild.parent);
+      newfIndex = FractionIndex.between(fIndex, nextChildfIndex);
+    }
+    foundChild.parent = combineParentProperty(parent.id, newfIndex);
+  }
+  // insert before the found child
+  parent.children.splice(idx, 0, child);
+};

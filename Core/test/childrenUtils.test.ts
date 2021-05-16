@@ -1,4 +1,4 @@
-import { insertChildToParent } from "../src/childrenUtils";
+import { insertChildToParent, setChildToParent } from "../src/childrenUtils";
 
 describe("childrenUtils", () => {
   describe("insertChildToParent", () => {
@@ -67,6 +67,59 @@ describe("childrenUtils", () => {
       expect(parent.children[0]).toBe(childA);
       expect(parent.children[1]).toBe(childC);
       expect(parent.children[2]).toBe(childB);
+    });
+  });
+
+  describe("setChildToParent", () => {
+    it("empty parent", () => {
+      const parent = { id: "0:0", children: [] };
+      const child = { id: "1:1", parent: "" };
+      setChildToParent(parent, child, "5");
+      expect(parent.children).toHaveLength(1);
+      expect(parent.children[0]).toBe(child);
+    });
+
+    it("append, no conflict", () => {
+      const parent = { id: "0:0", children: [] };
+      const childA = { id: "1:1", parent: "0:0/5" };
+      const childB = { id: "1:2", parent: "" };
+      insertChildToParent(parent, childA, "5");
+      setChildToParent(parent, childB, "6");
+      expect(parent.children).toHaveLength(2);
+      expect(parent.children[0]).toBe(childA);
+      expect(parent.children[0]).toHaveProperty("parent", "0:0/5");
+      expect(parent.children[1]).toBe(childB);
+      expect(parent.children[1]).toHaveProperty("parent", "");
+    });
+
+    it("append, modifiy old parent", () => {
+      const parent = { id: "0:0", children: [] };
+      const childA = { id: "1:1", parent: "0:0/5" };
+      const childB = { id: "1:2", parent: "" };
+      insertChildToParent(parent, childA, "5");
+      setChildToParent(parent, childB, "5");
+      expect(parent.children).toHaveLength(2);
+      expect(parent.children[0]).toBe(childB);
+      expect(parent.children[0]).toHaveProperty("parent", "");
+      expect(parent.children[1]).toBe(childA);
+      expect(parent.children[1]).toHaveProperty("parent", "0:0/6");
+    });
+
+    it("set add head, modify old parent", () => {
+      const parent = { id: "0:0", children: [] };
+      const childA = { id: "1:1", parent: "0:0/5" };
+      const childB = { id: "1:2", parent: "0:0/6" };
+      const childC = { id: "1:3", parent: "" };
+      insertChildToParent(parent, childA, "5");
+      insertChildToParent(parent, childB, "6");
+      setChildToParent(parent, childC, "5");
+      expect(parent.children).toHaveLength(3);
+      expect(parent.children[0]).toBe(childC);
+      expect(parent.children[0]).toHaveProperty("parent", "");
+      expect(parent.children[1]).toBe(childA);
+      expect(parent.children[1]).toHaveProperty("parent", "0:0/5V");
+      expect(parent.children[2]).toBe(childB);
+      expect(parent.children[2]).toHaveProperty("parent", "0:0/6");
     });
   });
 });

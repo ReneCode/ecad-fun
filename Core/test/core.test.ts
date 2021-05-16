@@ -383,6 +383,20 @@ describe("core project", () => {
     expect(conflictEdits[0].n).toHaveProperty("parent", `${page.id}/3`);
   });
 
+  it("applyEdit - force", () => {
+    const pageA = project.createPage("pageA");
+    project.appendChild(pageA);
+    expect(pageA).toHaveProperty("parent", "0:0/1");
+    const pageB = project.createPage("pageB");
+    const edit: EditLogType = {
+      a: "u",
+      n: { id: pageB.id, parent: "0:0/1" },
+    };
+    project.applyEdits([edit], true);
+    expect(pageB).toHaveProperty("parent", "0:0/1");
+    expect(pageA).toHaveProperty("parent", "0:0/2");
+  });
+
   it("onFlushEdits", () => {
     const callback = jest.fn();
     project.onFlushEdits = callback;

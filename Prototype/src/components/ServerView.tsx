@@ -1,5 +1,4 @@
 import React from "react";
-import { EditLogType } from "../core/ecadfun.d";
 import { PageNode, Project } from "../core/Project";
 import PageList from "./PageList";
 

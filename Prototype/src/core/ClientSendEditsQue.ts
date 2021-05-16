@@ -8,6 +8,7 @@ class ClientSendEditsQue {
   sendToServerCallback: SendToServerCallback;
   lastId: number = 0;
   que: { id: number; edit: EditLogType }[] = [];
+  delayBeforeSendToServer = 0;
 
   constructor(project: Project, sendToServerCallback: SendToServerCallback) {
     this.project = project;
@@ -26,14 +27,13 @@ class ClientSendEditsQue {
 
   sendEdits() {
     for (let q of this.que) {
-      console.log("sendEditsToSender:", q.id, q.edit);
       this.sendToServerCallback(q.id, q.edit);
     }
     this.que = [];
   }
 
   receiveFromServer(
-    result: "ack" | "reject" | "ok",
+    result: "ack" | "reject" | "force",
     id: number,
     edit?: EditLogType
   ) {
@@ -44,12 +44,12 @@ class ClientSendEditsQue {
       if (!edit) {
         throw new Error("edit missing");
       }
-      this.project.applyEdits([edit]);
-    } else if (result === "ok") {
+      this.project.applyEdits([edit], true);
+    } else if (result === "force") {
       if (!edit) {
         throw new Error("edit missing");
       }
-      this.project.applyEdits([edit]);
+      this.project.applyEdits([edit], true);
     }
   }
 }

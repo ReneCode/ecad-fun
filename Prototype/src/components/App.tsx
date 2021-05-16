@@ -17,7 +17,7 @@ const App = () => {
   useEffect(() => {
     const sendToClientCallback = (
       clientId: string,
-      result: "ack" | "reject" | "ok",
+      result: "ack" | "reject" | "force",
       id: number,
       edit?: EditLogType
     ) => {
@@ -39,6 +39,7 @@ const App = () => {
         serverView.current.project,
         sendToClientCallback
       );
+      serverDispatcher.current.delayBeforeSendToClients = 2000;
       serverDispatcher.current.connectClient("1");
       serverDispatcher.current.connectClient("2");
       serverDispatcher.current.connectClient("3");

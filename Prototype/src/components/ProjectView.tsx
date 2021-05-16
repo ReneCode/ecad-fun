@@ -34,7 +34,7 @@ class ProjectView extends React.Component<Props> {
   }
 
   receiveFromServer(
-    result: "ack" | "reject" | "ok",
+    result: "ack" | "reject" | "force",
     id: number,
     edit?: EditLogType
   ) {
