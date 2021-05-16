@@ -1,9 +1,15 @@
-echo copy cord files to ./Prototype
+#!/bin/bash
 
-rm -rf ../Prototype/src/core
+FOLDERS=( Prototype Web Server)
 
-mkdir -p ../Prototype/src/core/
+for folder in ${FOLDERS[@]}
+do
+  echo copy core files to ./${folder}
+  rm -rf ../${folder}/src/core
+  mkdir -p ../${folder}/src/core/
+  cp -v ./src/* ../${folder}/src/core/
+  chmod -w ../${folder}/src/core/*
+done
 
-cp -v ./src/* ../Prototype/src/core/
 
-chmod -w ../Prototype/src/core/*
+
