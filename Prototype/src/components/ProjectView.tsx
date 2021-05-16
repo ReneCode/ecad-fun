@@ -30,6 +30,7 @@ class ProjectView extends React.Component<Props> {
         this.props.onSendEditToServer(this.props.clientId, id, edit);
       }
     );
+    this.clientSendEditQue.delayBeforeSendToServer = 1000;
     this.onCreate = this.onCreate.bind(this);
   }
 

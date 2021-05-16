@@ -13,12 +13,6 @@ describe("multi-user project", () => {
   let serverProxy: ServerDispatcher;
 
   beforeEach(() => {
-    const sendToServer = (
-      // clientId: string,
-      // result: "ack" | "reject" | "ok",
-      // id: number,
-      edit: EditLogType
-    ) => {};
     projectA = new Project("1", "");
     clientAProxy = new ClientSendEditsQue(
       projectA,
@@ -56,37 +50,34 @@ describe("multi-user project", () => {
     );
     serverProxy.connectClient("1");
     serverProxy.connectClient("2");
+    serverProxy.delayBeforeSendToClients = 500;
   });
 
   it("scenario two clients and one server", async () => {
     const pageA = projectA.createPage("pageA");
     projectA.appendChild(pageA);
     expect(pageA).toHaveProperty("id", "1:1");
-    expect(pageA).toHaveProperty("parent", "0:0/1");
+    expect(pageA).toHaveProperty("parent", "0:0-1");
     expect(projectA.children[0]).toHaveProperty("name", "pageA");
     projectA.flushEdits();
-
-    await wait(100);
 
     const pageB = projectB.createPage("pageB");
     projectB.appendChild(pageB);
     expect(pageB).toHaveProperty("id", "2:1");
-    expect(pageB).toHaveProperty("parent", "0:0/1");
+    expect(pageB).toHaveProperty("parent", "0:0-1");
     expect(projectB.children[0]).toHaveProperty("name", "pageB");
     projectB.flushEdits();
 
-    await wait(1200);
+    await wait(500);
 
     expect(projectS.children[0]).toHaveProperty("name", "pageA");
-    expect(projectS.children[0]).toHaveProperty("parent", "0:0/1");
+    expect(projectS.children[0]).toHaveProperty("parent", "0:0-1");
     expect(projectS.children[1]).toHaveProperty("name", "pageB");
-    expect(projectS.children[1]).toHaveProperty("parent", "0:0/2");
+    expect(projectS.children[1]).toHaveProperty("parent", "0:0-2");
 
     expect(projectA.children[0]).toHaveProperty("name", "pageA");
-    expect(projectA.children[0]).toHaveProperty("parent", "0:0/1");
+    expect(projectA.children[0]).toHaveProperty("parent", "0:0-1");
     expect(projectA.children[1]).toHaveProperty("name", "pageB");
-    expect(projectA.children[1]).toHaveProperty("parent", "0:0/2");
-
-    // expect(projectB.children[0]).toHaveProperty("name", "pageA");
+    expect(projectA.children[1]).toHaveProperty("parent", "0:0-2");
   });
 });

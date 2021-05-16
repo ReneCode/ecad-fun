@@ -39,14 +39,14 @@ class Node implements BaseNodeMixin {
       fIdx = FractionIndex.start();
     } else {
       const lastChild = this.children[countChildren - 1];
-      const [pId, parentFIndex] = lastChild.parent.split("/");
+      const [pId, parentFIndex] = splitParentProperty(lastChild.parent);
       if (pId !== parentId) {
         throw new Error("children panik. ${parentId}, ${pId}");
       }
       fIdx = FractionIndex.after(parentFIndex);
     }
     this.removeFromCurrentParent(child);
-    child.parent = `${parentId}/${fIdx}`;
+    child.parent = combineParentProperty(parentId, fIdx);
     this.children.push(child);
   }
 
@@ -65,16 +65,18 @@ class Node implements BaseNodeMixin {
     let fIdx = "";
     if (index === 0) {
       // first position
-      const [_p, idx] = this.children[0].parent.split("/");
+      const [_p, idx] = splitParentProperty(this.children[0].parent);
       fIdx = FractionIndex.before(idx);
     } else {
-      const [_p1, beforeIdx] = this.children[index - 1].parent.split("/");
-      const [_p2, afterIdx] = this.children[index].parent.split("/");
+      const [_p1, beforeIdx] = splitParentProperty(
+        this.children[index - 1].parent
+      );
+      const [_p2, afterIdx] = splitParentProperty(this.children[index].parent);
       fIdx = FractionIndex.between(beforeIdx, afterIdx);
     }
     const parentId = this.id;
     this.removeFromCurrentParent(child);
-    child.parent = `${parentId}/${fIdx}`;
+    child.parent = combineParentProperty(parentId, fIdx);
     this.children.splice(index, 0, child);
   }
 

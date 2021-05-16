@@ -42,13 +42,13 @@ describe("core project", () => {
     expect(page.id).toBe(`${clientId}:1`);
     expect(page.project).toBe(project);
     project.appendChild(page);
-    expect(page.parent).toBe("0:0/1");
+    expect(page.parent).toBe("0:0-1");
     expect(project.children).toHaveLength(1);
     {
       const lineA = project.createLine("lineA");
       expect(lineA.id).toBe(`${clientId}:2`);
       page.appendChild(lineA);
-      expect(lineA.parent).toBe("1:1/1");
+      expect(lineA.parent).toBe("1:1-1");
       expect(page.children).toHaveLength(1);
     }
     {
@@ -56,14 +56,14 @@ describe("core project", () => {
       expect(lineB.parent).toBe("");
       expect(lineB.id).toBe(`${clientId}:3`);
       page.appendChild(lineB);
-      expect(lineB.parent).toBe("1:1/2");
+      expect(lineB.parent).toBe("1:1-2");
       expect(page.children).toHaveLength(2);
     }
     {
       const lineC = project.createLine("lineC");
       expect(lineC.id).toBe(`${clientId}:4`);
       page.insertChild(1, lineC);
-      expect(lineC.parent).toBe("1:1/1V");
+      expect(lineC.parent).toBe("1:1-1V");
 
       const names = page.children.map((n) => n.name);
       expect(names).toEqual(["lineA", "lineC", "lineB"]);
@@ -72,7 +72,7 @@ describe("core project", () => {
       const lineD = project.createLine("lineD");
       expect(lineD.id).toBe(`${clientId}:5`);
       page.insertChild(0, lineD);
-      expect(lineD.parent).toBe("1:1/0z");
+      expect(lineD.parent).toBe("1:1-0z");
 
       const names = page.children.map((n) => n.name);
       expect(names).toEqual(["lineD", "lineA", "lineC", "lineB"]);
@@ -114,21 +114,21 @@ describe("core project", () => {
     page.insertChild(0, lineD);
     const json = project.export();
     expect(json).toEqual([
-      { parent: "0:0/1", id: "1:1", type: "PAGE", name: "page" },
-      { parent: "1:1/0z", id: "1:5", type: "LINE", name: "lineD" },
-      { parent: "1:1/1", id: "1:2", type: "LINE", name: "lineA" },
-      { parent: "1:1/1V", id: "1:4", type: "LINE", name: "lineC" },
-      { parent: "1:1/2", id: "1:3", type: "LINE", name: "lineB" },
+      { parent: "0:0-1", id: "1:1", type: "PAGE", name: "page" },
+      { parent: "1:1-0z", id: "1:5", type: "LINE", name: "lineD" },
+      { parent: "1:1-1", id: "1:2", type: "LINE", name: "lineA" },
+      { parent: "1:1-1V", id: "1:4", type: "LINE", name: "lineC" },
+      { parent: "1:1-2", id: "1:3", type: "LINE", name: "lineB" },
     ]);
   });
 
   it("import", () => {
     const data = [
-      { parent: "0:0/1", id: "1:1", type: "PAGE", name: "page" },
-      { parent: "1:1/0z", id: "1:5", type: "LINE", name: "lineD" },
-      { parent: "1:1/1", id: "1:2", type: "LINE", name: "lineA" },
-      { parent: "1:1/1V", id: "1:4", type: "LINE", name: "lineC" },
-      { parent: "1:1/2", id: "1:3", type: "LINE", name: "lineB" },
+      { parent: "0:0-1", id: "1:1", type: "PAGE", name: "page" },
+      { parent: "1:1-0z", id: "1:5", type: "LINE", name: "lineD" },
+      { parent: "1:1-1", id: "1:2", type: "LINE", name: "lineA" },
+      { parent: "1:1-1V", id: "1:4", type: "LINE", name: "lineC" },
+      { parent: "1:1-2", id: "1:3", type: "LINE", name: "lineB" },
     ];
     const ok = project.import(data);
     // no edits during import
@@ -172,8 +172,7 @@ describe("core project", () => {
     flushEditsCallback.mockReset();
     const lineA = project.createLine("lineA");
     page.appendChild(lineA);
-    const parentLineA = lineA.parent;
-    expect(parentLineA).toEqual("1:1/1");
+    expect(lineA.parent).toEqual("1:1-1");
 
     const lineB = project.createLine("lineB");
     page.insertChild(0, lineB);
@@ -185,7 +184,7 @@ describe("core project", () => {
       },
       {
         a: "u",
-        n: { id: lineA.id, parent: "1:1/1" },
+        n: { id: lineA.id, parent: "1:1-1" },
       },
       {
         a: "c",
@@ -193,7 +192,7 @@ describe("core project", () => {
       },
       {
         a: "u",
-        n: { id: lineB.id, parent: "1:1/0z" },
+        n: { id: lineB.id, parent: "1:1-0z" },
       },
     ]);
   });
@@ -258,7 +257,7 @@ describe("core project", () => {
       },
       {
         a: "u",
-        n: { id: "1:1", parent: "0:0/1" },
+        n: { id: "1:1", parent: "0:0-1" },
       },
       {
         a: "c",
@@ -267,7 +266,7 @@ describe("core project", () => {
           type: "LINE",
           name: "lineA",
           x1: 42,
-          parent: "1:1/1",
+          parent: "1:1-1",
           width: 3.14,
         },
       },
@@ -277,7 +276,7 @@ describe("core project", () => {
       },
       {
         a: "u",
-        n: { id: "1:3", parent: "1:1/0z" },
+        n: { id: "1:3", parent: "1:1-0z" },
       },
     ];
 
@@ -300,29 +299,29 @@ describe("core project", () => {
     const edits: EditLogType[] = [
       {
         a: "c",
-        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0/1" },
+        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0-1" },
       },
       {
         a: "c",
-        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0/1" },
+        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0-1" },
       },
     ];
 
     project.applyEdits(edits);
     expect(project.children[0]).toHaveProperty("name", "pageA");
-    expect(project.children[0]).toHaveProperty("parent", "0:0/1");
+    expect(project.children[0]).toHaveProperty("parent", "0:0-1");
     expect(project.children[1]).toHaveProperty("name", "pageB");
-    expect(project.children[1]).toHaveProperty("parent", "0:0/2");
+    expect(project.children[1]).toHaveProperty("parent", "0:0-2");
 
     // parent is changed
     expect(edits).toEqual([
       {
         a: "c",
-        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0/1" },
+        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0-1" },
       },
       {
         a: "c",
-        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0/2" },
+        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0-2" },
       },
     ]);
   });
@@ -331,11 +330,11 @@ describe("core project", () => {
     const edits: EditLogType[] = [
       {
         a: "c",
-        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0/1" },
+        n: { id: "1:1", type: "PAGE", name: "pageA", parent: "0:0-1" },
       },
       {
         a: "c",
-        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0/1" },
+        n: { id: "1:2", type: "PAGE", name: "pageB", parent: "0:0-1" },
       },
     ];
 
@@ -353,7 +352,7 @@ describe("core project", () => {
     const edits: EditLogType[] = [
       {
         a: "u",
-        n: { id: line.id, parent: `${pageB.id}/5` },
+        n: { id: line.id, parent: `${pageB.id}-5` },
       },
     ];
     project.applyEdits(edits);
@@ -367,7 +366,7 @@ describe("core project", () => {
     const edits: EditLogType[] = [
       {
         a: "u",
-        n: { id: lineA.id, parent: `${page.id}/2` },
+        n: { id: lineA.id, parent: `${page.id}-2` },
       },
     ];
     expect(project.applyEdits(edits)).toBe("ack");
@@ -376,25 +375,25 @@ describe("core project", () => {
     const conflictEdits: EditLogType[] = [
       {
         a: "u",
-        n: { id: lineB.id, parent: `${page.id}/2` },
+        n: { id: lineB.id, parent: `${page.id}-2` },
       },
     ];
     expect(project.applyEdits(conflictEdits)).toBe("reject");
-    expect(conflictEdits[0].n).toHaveProperty("parent", `${page.id}/3`);
+    expect(conflictEdits[0].n).toHaveProperty("parent", `${page.id}-3`);
   });
 
   it("applyEdit - force", () => {
     const pageA = project.createPage("pageA");
     project.appendChild(pageA);
-    expect(pageA).toHaveProperty("parent", "0:0/1");
+    expect(pageA).toHaveProperty("parent", "0:0-1");
     const pageB = project.createPage("pageB");
     const edit: EditLogType = {
       a: "u",
-      n: { id: pageB.id, parent: "0:0/1" },
+      n: { id: pageB.id, parent: "0:0-1" },
     };
     project.applyEdits([edit], true);
-    expect(pageB).toHaveProperty("parent", "0:0/1");
-    expect(pageA).toHaveProperty("parent", "0:0/2");
+    expect(pageB).toHaveProperty("parent", "0:0-1");
+    expect(pageA).toHaveProperty("parent", "0:0-2");
   });
 
   it("onFlushEdits", () => {

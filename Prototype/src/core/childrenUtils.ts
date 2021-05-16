@@ -1,5 +1,4 @@
 import { FractionIndex } from "./FractionIndex";
-import { Node } from "./Project";
 
 export const combineParentProperty = (parentId: string, fIndex: string) => {
   if (!parentId || !fIndex) {
@@ -7,11 +6,11 @@ export const combineParentProperty = (parentId: string, fIndex: string) => {
       `combineParentProperty: bad parts: parentId: ${parentId} fIndex: ${fIndex}`
     );
   }
-  return `${parentId}/${fIndex}`;
+  return `${parentId}-${fIndex}`;
 };
 
 export const splitParentProperty = (propValue: string) => {
-  const [parentId, fIndex] = propValue.split("/");
+  const [parentId, fIndex] = propValue.split("-");
   if (!parentId) {
     throw new Error(`splitParentProperty: bad propValue: ${propValue}`);
   }

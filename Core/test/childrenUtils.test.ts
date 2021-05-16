@@ -12,8 +12,8 @@ describe("childrenUtils", () => {
     });
 
     it("append", () => {
-      const childA = { id: "1:2", parent: "1:1/1", name: "A" };
-      const childB = { id: "1:3", parent: "1:1/2", name: "B" };
+      const childA = { id: "1:2", parent: "1:1-1", name: "A" };
+      const childB = { id: "1:3", parent: "", name: "B" };
       const parent = { id: "1:1", children: [childA] };
       const fIndex = insertChildToParent(parent, childB, "2");
       expect(fIndex).toEqual("2");
@@ -23,8 +23,8 @@ describe("childrenUtils", () => {
     });
 
     it("insert at head", () => {
-      const childA = { id: "1:2", parent: "1:1/1", name: "A" };
-      const childB = { id: "1:3", parent: "1:1/2", name: "B" };
+      const childA = { id: "1:2", parent: "", name: "A" };
+      const childB = { id: "1:3", parent: "1:1-2", name: "B" };
       const parent = { id: "1:1", children: [childB] };
       const fIndex = insertChildToParent(parent, childA, "1");
       expect(fIndex).toEqual("1");
@@ -34,9 +34,9 @@ describe("childrenUtils", () => {
     });
 
     it("insert", () => {
-      const childA = { id: "1:2", parent: "1:1/1", name: "A" };
-      const childB = { id: "1:3", parent: "1:1/2", name: "B" };
-      const childC = { id: "1:4", parent: "1:1/3", name: "C" };
+      const childA = { id: "1:2", parent: "1:1-1", name: "A" };
+      const childB = { id: "1:3", parent: "", name: "B" };
+      const childC = { id: "1:4", parent: "1:1-3", name: "C" };
       const parent = { id: "1:1", children: [childA, childC] };
       const fIndex = insertChildToParent(parent, childB, "2");
       expect(fIndex).toEqual("2");
@@ -46,7 +46,7 @@ describe("childrenUtils", () => {
       expect(parent.children[2]).toBe(childC);
     });
     it("conflict at last children - append after", () => {
-      const childA = { id: "1:2", parent: "1:1/1", name: "A" };
+      const childA = { id: "1:2", parent: "1:1-1", name: "A" };
       const childB = { id: "1:3", parent: "", name: "B" };
       const parent = { id: "1:1", children: [childA] };
       const fIndex = insertChildToParent(parent, childB, "1");
@@ -57,8 +57,8 @@ describe("childrenUtils", () => {
     });
 
     it("conflict in children", () => {
-      const childA = { id: "1:2", parent: "1:1/1", name: "A" };
-      const childB = { id: "1:3", parent: "1:1/2", name: "B" };
+      const childA = { id: "1:2", parent: "1:1-1", name: "A" };
+      const childB = { id: "1:3", parent: "1:1-2", name: "B" };
       const childC = { id: "1:4", parent: "", name: "C" };
       const parent = { id: "1:1", children: [childA, childB] };
       const fIndex = insertChildToParent(parent, childC, "1");
@@ -81,20 +81,20 @@ describe("childrenUtils", () => {
 
     it("append, no conflict", () => {
       const parent = { id: "0:0", children: [] };
-      const childA = { id: "1:1", parent: "0:0/5" };
+      const childA = { id: "1:1", parent: "0:0-5" };
       const childB = { id: "1:2", parent: "" };
       insertChildToParent(parent, childA, "5");
       setChildToParent(parent, childB, "6");
       expect(parent.children).toHaveLength(2);
       expect(parent.children[0]).toBe(childA);
-      expect(parent.children[0]).toHaveProperty("parent", "0:0/5");
+      expect(parent.children[0]).toHaveProperty("parent", "0:0-5");
       expect(parent.children[1]).toBe(childB);
       expect(parent.children[1]).toHaveProperty("parent", "");
     });
 
     it("append, modifiy old parent", () => {
       const parent = { id: "0:0", children: [] };
-      const childA = { id: "1:1", parent: "0:0/5" };
+      const childA = { id: "1:1", parent: "0:0-5" };
       const childB = { id: "1:2", parent: "" };
       insertChildToParent(parent, childA, "5");
       setChildToParent(parent, childB, "5");
@@ -102,13 +102,13 @@ describe("childrenUtils", () => {
       expect(parent.children[0]).toBe(childB);
       expect(parent.children[0]).toHaveProperty("parent", "");
       expect(parent.children[1]).toBe(childA);
-      expect(parent.children[1]).toHaveProperty("parent", "0:0/6");
+      expect(parent.children[1]).toHaveProperty("parent", "0:0-6");
     });
 
     it("set add head, modify old parent", () => {
       const parent = { id: "0:0", children: [] };
-      const childA = { id: "1:1", parent: "0:0/5" };
-      const childB = { id: "1:2", parent: "0:0/6" };
+      const childA = { id: "1:1", parent: "0:0-5" };
+      const childB = { id: "1:2", parent: "0:0-6" };
       const childC = { id: "1:3", parent: "" };
       insertChildToParent(parent, childA, "5");
       insertChildToParent(parent, childB, "6");
@@ -117,9 +117,9 @@ describe("childrenUtils", () => {
       expect(parent.children[0]).toBe(childC);
       expect(parent.children[0]).toHaveProperty("parent", "");
       expect(parent.children[1]).toBe(childA);
-      expect(parent.children[1]).toHaveProperty("parent", "0:0/5V");
+      expect(parent.children[1]).toHaveProperty("parent", "0:0-5V");
       expect(parent.children[2]).toBe(childB);
-      expect(parent.children[2]).toHaveProperty("parent", "0:0/6");
+      expect(parent.children[2]).toHaveProperty("parent", "0:0-6");
     });
   });
 });

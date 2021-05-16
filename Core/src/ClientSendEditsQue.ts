@@ -1,5 +1,6 @@
 import { EditLogType } from "./ecadfun.d";
 import { Project } from "./Project";
+import { wait } from "./wait";
 
 type SendToServerCallback = (id: number, edit: EditLogType) => void;
 
@@ -25,8 +26,11 @@ class ClientSendEditsQue {
     };
   }
 
-  sendEdits() {
+  async sendEdits() {
     for (let q of this.que) {
+      if (this.delayBeforeSendToServer) {
+        await wait(this.delayBeforeSendToServer);
+      }
       this.sendToServerCallback(q.id, q.edit);
     }
     this.que = [];
