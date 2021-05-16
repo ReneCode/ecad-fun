@@ -39,7 +39,6 @@ class ServerDispatcher {
       throw new Error(`can't receive from not connect client: ${clientId}`);
     }
 
-    // await wait(1000);
     const result = this.project.applyEdits([edit]);
     if (this.delayBeforeSendToClients) {
       await wait(this.delayBeforeSendToClients);

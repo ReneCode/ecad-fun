@@ -15,7 +15,11 @@ class ClientSendEditsQue {
     this.project = project;
     this.sendToServerCallback = sendToServerCallback;
 
-    this.project.onFlushEdits = (edits: EditLogType[]) => {
+    this.project.onFlushEdits = async (edits: EditLogType[]) => {
+      if (this.delayBeforeSendToServer) {
+        await wait(this.delayBeforeSendToServer);
+      }
+
       this.que = this.que.concat(
         edits.map((e) => {
           return { id: ++this.lastId, edit: e };
@@ -26,11 +30,8 @@ class ClientSendEditsQue {
     };
   }
 
-  async sendEdits() {
+  sendEdits() {
     for (let q of this.que) {
-      if (this.delayBeforeSendToServer) {
-        await wait(this.delayBeforeSendToServer);
-      }
       this.sendToServerCallback(q.id, q.edit);
     }
     this.que = [];
