@@ -1,30 +1,37 @@
 require("dotenv").config();
 import http from "http";
-import SocketIO from "socket.io";
 
 import debug from "debug";
 import { clientService } from "./ObjectStore/ClientService";
 import { projectService } from "./ProjectService";
 import { CUDType, ObjectType } from "./share/types";
+import { Socket } from "socket.io";
 
 const socketDebug = debug("socket");
 const errorDebug = debug("error");
 
 export const initSocketIO = (server: http.Server) => {
   //setupSocketServer(server);
-  const io = SocketIO(server, {
-    handlePreflightRequest: function (req, res) {
-      var headers = {
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Origin": req.header ? req.header.origin : "*",
-        "Access-Control-Allow-Credentials": true,
-      };
-      res.writeHead(200, headers);
-      res.end();
+
+  // cors
+  // https://socket.io/docs/v3/handling-cors/
+  const io = require("socket.io")(server, {
+    cors: {
+      origin: "http://localhost:3000",
+      allowedHeaders: ["X-ECAD-FUN"],
     },
+    // handlePreflightRequest: (req: any, res: any) => {
+    //   const headers = {
+    //     "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    //     "Access-Control-Allow-Origin": req.header ? req.header.origin : "*",
+    //     "Access-Control-Allow-Credentials": true,
+    //   };
+    //   res.writeHead(200, headers);
+    //   res.end();
+    // },
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", (socket: Socket) => {
     socketDebug(`connection ${socket.id}`);
     io.to(`${socket.id}`).emit("init-room");
 

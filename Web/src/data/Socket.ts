@@ -1,4 +1,4 @@
-import io from "socket.io-client";
+import io, * as SocketIOClient from "socket.io-client";
 import { Project, CUDType } from "../share";
 
 const WS_SERVER = process.env.REACT_APP_WEBSOCKET_SERVER as string;
@@ -17,7 +17,10 @@ export class Socket {
     callbackProjectChange: (project: Project) => void
   ) {
     // console.log("socket init:", WS_SERVER);
-    this.socket = io(WS_SERVER);
+    this.socket = io(WS_SERVER, {
+      withCredentials: false,
+      extraHeaders: { "X-ECAD-FUN": "abc" },
+    });
 
     // register callbacks
     this.socket.on("open-project", (data: any) => {
