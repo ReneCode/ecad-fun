@@ -5,8 +5,8 @@ import { wait } from "./wait";
 type SendToClientCallbackType = (
   clientId: string,
   result: "ack" | "reject" | "ok",
-  messageId: string,
-  edits: EditLogType[]
+  id: number,
+  edit?: EditLogType
 ) => void;
 
 class ServerDispatcher {
@@ -33,27 +33,23 @@ class ServerDispatcher {
     this.clientIds = this.clientIds.filter((id) => id != clientId);
   }
 
-  async receiveFromClient(
-    clientId: string,
-    messageId: string,
-    edits: EditLogType[]
-  ) {
+  async receiveFromClient(clientId: string, id: number, edit: EditLogType) {
     if (!this.clientIds.includes(clientId)) {
       throw new Error(`can't receive from not connect client: ${clientId}`);
     }
 
-    await wait();
-    const result = this.project.applyEdits(edits);
-    await wait();
+    await wait(2000);
+    const result = this.project.applyEdits([edit]);
+    await wait(2000);
     if (result === "ack") {
-      this.sendToClientCallback(clientId, "ack", messageId, []);
+      this.sendToClientCallback(clientId, "ack", id, undefined);
     } else {
-      this.sendToClientCallback(clientId, "reject", messageId, edits);
+      this.sendToClientCallback(clientId, "reject", id, edit);
     }
     this.clientIds
       .filter((id) => id !== clientId)
       .forEach((otherClientId) => {
-        this.sendToClientCallback(otherClientId, "ok", messageId, edits);
+        this.sendToClientCallback(otherClientId, "ok", id, edit);
       });
   }
 }

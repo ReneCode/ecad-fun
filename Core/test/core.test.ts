@@ -8,7 +8,8 @@ describe("core project", () => {
 
   beforeEach(() => {
     flushEditsCallback = jest.fn();
-    project = new Project(clientId, "abc", flushEditsCallback);
+    project = new Project(clientId, "abc");
+    project.onFlushEdits = flushEditsCallback;
   });
 
   it("getNode", () => {
@@ -380,5 +381,21 @@ describe("core project", () => {
     ];
     expect(project.applyEdits(conflictEdits)).toBe("reject");
     expect(conflictEdits[0].n).toHaveProperty("parent", `${page.id}/3`);
+  });
+
+  it("onFlushEdits", () => {
+    const callback = jest.fn();
+    project.onFlushEdits = callback;
+
+    project.createLine("line");
+    project.flushEdits();
+
+    expect(callback.mock.calls).toHaveLength(1);
+    expect(callback.mock.calls[0][0]).toStrictEqual([
+      {
+        a: "c",
+        n: { id: "1:1", type: "LINE", name: "line" },
+      },
+    ]);
   });
 });

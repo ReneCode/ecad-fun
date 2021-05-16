@@ -1,6 +1,7 @@
 import React from "react";
 import { EditLogType } from "../core/ecadfun.d";
 import { PageNode, Project } from "../core/Project";
+import { ClientSendEditsQue } from "../core/ClientSendEditsQue";
 
 import "./ProjectView.scss";
 
@@ -8,23 +9,36 @@ import PageList from "./PageList";
 
 type Props = {
   clientId: string;
-  onSendEditsToServer: (clientId: string, data: EditLogType[]) => void;
+  onSendEditToServer: (clientId: string, id: number, edit: EditLogType) => void;
 };
 class ProjectView extends React.Component<Props> {
   project: Project;
+  clientSendEditQue: ClientSendEditsQue;
 
   constructor(props: Props) {
     super(props);
-    this.project = new Project(props.clientId, "key", (data: EditLogType[]) => {
-      props.onSendEditsToServer(this.props.clientId, data);
-    });
+    this.project = new Project(props.clientId, "key");
 
     this.project.on("all", () => {
       // redraw
       this.setState({});
     });
 
+    this.clientSendEditQue = new ClientSendEditsQue(
+      this.project,
+      (id: number, edit: EditLogType) => {
+        this.props.onSendEditToServer(this.props.clientId, id, edit);
+      }
+    );
     this.onCreate = this.onCreate.bind(this);
+  }
+
+  receiveFromServer(
+    result: "ack" | "reject" | "ok",
+    id: number,
+    edit?: EditLogType
+  ) {
+    this.clientSendEditQue.receiveFromServer(result, id, edit);
   }
 
   // applyEdits(edits: EditLogType[]) {

@@ -122,23 +122,19 @@ class Project extends Node {
   clientId: string;
   lastIdCounter: number = 0;
   nodes: Record<string, Node> = {};
-  flushEditsCallback: (data: EditLogType[]) => void;
+
+  onFlushEdits: null | ((edits: EditLogType[]) => void) = null;
   private editLog: EditLogType[] = [];
   private useEditLog = true;
   private changeCallbacks: (() => void)[] = [];
 
-  constructor(
-    clientId: string,
-    key: string,
-    flushEditsCallback: (data: EditLogType[]) => void
-  ) {
+  constructor(clientId: string, key: string) {
     super(null as unknown as Project, "0:0", "PROJECT", "root");
     // this can't use this on super()
     this.project = this;
     this.addNode(this);
     this.clientId = clientId;
     this.key = key;
-    this.flushEditsCallback = flushEditsCallback;
   }
 
   on(changes: "all", callback: () => void) {
@@ -243,7 +239,9 @@ class Project extends Node {
       throw new Error("can't apply edit without id");
     }
     if (this.nodes[id]) {
-      throw new Error(`can't apply edit-create. Id ${id} allready exists`);
+      throw new Error(
+        `project:${this.name} can't apply edit-create. Id ${id} allready exists`
+      );
     }
     const node = this.buildNewNode(id, edit.type, edit.name as string);
     return this.applyProperties(node, edit);
@@ -289,7 +287,10 @@ class Project extends Node {
   flushEdits() {
     if (this.editLog.length > 0) {
       this.dispatchChanges();
-      this.flushEditsCallback(this.editLog);
+      if (this.onFlushEdits) {
+        this.onFlushEdits(this.editLog);
+      }
+
       this.editLog = [];
     }
   }

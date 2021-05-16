@@ -11,9 +11,7 @@ class ServerView extends React.Component<Props> {
 
   constructor(props: Props) {
     super(props);
-    this.project = new Project("0", "key", (edit: EditLogType[]) => {
-      console.log("server edit-callbacks - do not call!");
-    });
+    this.project = new Project("0", "key");
 
     this.project.on("all", () => {
       // redraw

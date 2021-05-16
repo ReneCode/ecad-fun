@@ -17,22 +17,22 @@ const App = () => {
   useEffect(() => {
     const sendToClientCallback = (
       clientId: string,
-      result: string,
-      messageId: string,
-      edits: EditLogType[]
+      result: "ack" | "reject" | "ok",
+      id: number,
+      edit?: EditLogType
     ) => {
-      let project;
+      let projectView;
       if (clientId === "1") {
-        project = client1View.current?.project;
+        projectView = client1View.current;
       }
       if (clientId === "2") {
-        project = client2View.current?.project;
+        projectView = client2View.current;
       }
       if (clientId === "3") {
-        project = client3View.current?.project;
+        projectView = client3View.current;
       }
 
-      project?.applyEdits(edits);
+      projectView?.receiveFromServer(result, id, edit);
     };
     if (serverView.current) {
       serverDispatcher.current = new ServerDispatcher(
@@ -45,11 +45,12 @@ const App = () => {
     }
   }, []);
 
-  const onSendEditsToServer = async (
+  const onSendEditToServer = async (
     clientId: string,
-    edits: EditLogType[]
+    id: number,
+    edit: EditLogType
   ) => {
-    await serverDispatcher.current?.receiveFromClient(clientId, "", edits);
+    await serverDispatcher.current?.receiveFromClient(clientId, id, edit);
   };
 
   return (
@@ -60,17 +61,17 @@ const App = () => {
       <div className="grid">
         <ProjectView
           ref={client1View}
-          onSendEditsToServer={onSendEditsToServer}
+          onSendEditToServer={onSendEditToServer}
           clientId="1"
         />
         <ProjectView
           ref={client2View}
-          onSendEditsToServer={onSendEditsToServer}
+          onSendEditToServer={onSendEditToServer}
           clientId="2"
         />
         <ProjectView
           ref={client3View}
-          onSendEditsToServer={onSendEditsToServer}
+          onSendEditToServer={onSendEditToServer}
           clientId="3"
         />
 
