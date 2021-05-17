@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FOLDERS=( Prototype Web Server)
+FOLDERS=( Prototype Web Server Client)
 
 for folder in ${FOLDERS[@]}
 do

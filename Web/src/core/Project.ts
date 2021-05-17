@@ -117,6 +117,10 @@ class PageNode extends Node implements IPageNode {
 
 class LineNode extends Node implements ILineNode {
   readonly type = "LINE";
+  x1: number = 50;
+  y1: number = 50;
+  x2: number = 200;
+  y2: number = 100;
 }
 
 class Project extends Node {
