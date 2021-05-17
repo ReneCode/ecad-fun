@@ -17,7 +17,7 @@ export const initSocketIO = (server: http.Server) => {
   // https://socket.io/docs/v3/handling-cors/
   const io = require("socket.io")(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: process.env.APP_ORIGIN,
       allowedHeaders: ["X-ECAD-FUN"],
     },
     // handlePreflightRequest: (req: any, res: any) => {
