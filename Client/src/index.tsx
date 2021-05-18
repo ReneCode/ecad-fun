@@ -6,6 +6,9 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import Routing from "./components/Routing";
 
+// register all actions
+import "./actions"
+
 ReactDOM.render(
   <React.StrictMode>
     <Router>
