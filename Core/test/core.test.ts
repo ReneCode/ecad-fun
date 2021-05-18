@@ -113,7 +113,12 @@ describe("core project", () => {
     const lineD = project.createLine("lineD");
     page.insertChild(0, lineD);
     const json = project.export();
-    expect(json).toEqual([
+
+    expect(
+      json.map((d) => {
+        return { parent: d.parent, id: d.id, type: d.type, name: d.name };
+      })
+    ).toEqual([
       { parent: "0:0-1", id: "1:1", type: "PAGE", name: "page" },
       { parent: "1:1-0z", id: "1:5", type: "LINE", name: "lineD" },
       { parent: "1:1-1", id: "1:2", type: "LINE", name: "lineA" },
@@ -139,7 +144,11 @@ describe("core project", () => {
     expect(lineA).toBeInstanceOf(LineNode);
 
     const exportResult = project.export();
-    expect(exportResult).toEqual(data);
+    expect(
+      exportResult.map((d) => {
+        return { parent: d.parent, id: d.id, type: d.type, name: d.name };
+      })
+    ).toEqual(data);
 
     // edit after import
     flushEditsCallback.mockReset();
