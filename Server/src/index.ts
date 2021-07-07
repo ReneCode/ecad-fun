@@ -77,7 +77,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send("cad.fun server");
+  res.send("cad.fun server is running.");
 });
 
 // =========== authorization for /api routes ================
@@ -93,7 +93,7 @@ app.use("/api", routing);
 
 // not found handler
 app.use((req, res) => {
-  res.status(404).send("sorry, not found");
+  res.status(404).send("sorry, not found.");
 });
 
 // error handler
